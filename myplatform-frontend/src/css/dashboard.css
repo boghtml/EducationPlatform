@@ -1,0 +1,70 @@
+/* src/css/dashboard.css */
+.navbar-nav .nav-link {
+  color: white;
+  transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ff6600;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  width: 200px;
+  display: none;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border-radius: 5px;
+}
+
+.profile-dropdown.show {
+  display: block;
+}
+
+.profile-dropdown a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+  border-bottom: 1px solid #ddd;
+}
+
+.profile-dropdown a:hover {
+  background-color: #f0f0f0;
+}
+
+.profile-dropdown #user-info {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+}
+
+.profile-dropdown .profile-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-link {
+  font-size: 1.1rem;
+}
+
+.container h1 {
+  color: #ff6600; /* Adjust color as needed */
+}

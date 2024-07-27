@@ -1,0 +1,121 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+body {
+  background-color: #fff;
+  color: #333;
+}
+
+.navbar {
+  background-color: #f8f9fa;
+}
+
+.navbar-nav .nav-item .nav-link {
+  color: #121212;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-item.active .nav-link,
+.navbar-nav .nav-item .nav-link:hover {
+  color: #ff6600;
+}
+
+.navbar-nav .nav-item .btn-outline-primary {
+  color: #ff6600;
+  border-color: #ff6600;
+}
+
+.navbar-nav .nav-item .btn-outline-primary:hover {
+  background-color: #ff6600;
+  color: #fff;
+}
+
+.navbar-nav .nav-item .btn-primary {
+  background-color: #ff6600;
+  border-color: #ff6600;
+}
+
+.navbar-nav .nav-item .btn-primary:hover {
+  background-color: #e65c00;
+  border-color: #e65c00;
+}
+
+h1, h5 {
+  color: #ff6600;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  color: #ff6600;
+}
+
+.card-text {
+  color: #555;
+}
+
+.btn-primary {
+  background-color: #ff6600;
+  border-color: #ff6600;
+}
+
+.btn-primary:hover {
+  background-color: #e65c00;
+  border-color: #e65c00;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  color: white;
+}
+
+/* Add this to your CSS file */
+.badge-free {
+  background-color: green;
+  color: white;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.badge-premium {
+  background-color: orange;
+  color: white;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
