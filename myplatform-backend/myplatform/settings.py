@@ -155,11 +155,19 @@ CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
 # Якщо ви хочете дозволити всі домени (тільки для розробки):
 CORS_ALLOW_ALL_ORIGINS = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '18.188.58.119']
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'boghtml@gmail.com'
+EMAIL_HOST_PASSWORD = '1234567890HTML'
