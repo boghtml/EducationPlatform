@@ -29,5 +29,11 @@ class CourseViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response({'message': 'Course updated successfully', 'course': serializer.data}, status=status.HTTP_200_OK)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({'message': 'Course created successfully', 'course': serializer.data}, status=status.HTTP_201_CREATED)
+    
     def perform_update(self, serializer):
         serializer.save()
