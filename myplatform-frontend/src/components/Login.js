@@ -42,6 +42,7 @@ function Login() {
       .then(response => {
         console.log('User logged in successfully', response.data);
         sessionStorage.setItem('userName', response.data.userName);
+        sessionStorage.setItem('userId', response.data.id); // Додаємо збереження userId
         sessionStorage.setItem('userEmail', response.data.userEmail);
         sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
         window.location.href = '/dashboard';

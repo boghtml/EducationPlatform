@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.assignments',
     'apps.payments',
     'apps.notifications',
+    'apps.enrollments',
 ]
 
 MIDDLEWARE = [
@@ -147,6 +148,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+
 CSRF_USE_SESSIONS = True
 CORS_ALLOW_CREDENTIALS = True
 CSRF_COOKIE_NAME = "csrftoken"
