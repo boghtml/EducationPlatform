@@ -69,6 +69,10 @@ function Login() {
         </div>
         <button type="submit" className="btn btn-primary">Увійти</button>
       </form>
+      <div className="mt-3">
+        <button className="btn btn-secondary" onClick={() => window.location.href = '/forgot-password'}>Забули пароль?</button>
+        <button className="btn btn-danger ml-2">Увійти через Google</button>
+      </div>
     </div>
   );
 }

@@ -6,9 +6,10 @@ import Events from './components/Events';
 import Blog from './components/Blog';
 import Reviews from './components/Reviews';
 import CourseDetail from './components/CourseDetail';
-import Register from './components/Register'; // Імпортуйте компонент реєстрації
+import Register from './components/Register';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import ForgotPassword from './components/ForgotPassword';
 
 function App() {
   return (
@@ -20,10 +21,10 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/reviews" element={<Reviews />} />
-        <Route path="/register" element={<Register />} /> {/* Додайте маршрут */}
-        <Route path="/login" element={<Login />} /> {/* Додаємо маршрут */}
-        <Route path="/Dashboard" element={<Dashboard />} /> {/* Додаємо маршрут */}
-
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
