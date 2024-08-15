@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../css/dashboard.css'; // Підключаємо стилі
-import { Link } from 'react-router-dom'; // Підключаємо Link для навігації
+import '../css/style.css';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const [user, setUser] = useState({ name: 'User', email: 'user@example.com', profileImageUrl: 'https://via.placeholder.com/40' });
@@ -41,64 +41,64 @@ function Dashboard() {
   };
 
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a className="navbar-brand" href="#">Best IT School</a>
-        <div className="collapse navbar-collapse">
-          <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <a className="nav-link" href="#">Мої курси</a>
+    <div className="dashboard">
+      <nav className="dashboard__navbar">
+        <a className="dashboard__brand" href="#">Best IT School</a>
+        <div className="dashboard__collapse" id="navbarNav">
+          <ul className="dashboard__nav">
+            <li className="dashboard__nav-item">
+              <a className="dashboard__nav-link" href="#">Мої курси</a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}>Магазин</a>
+            <li className="dashboard__nav-item">
+              <a className="dashboard__nav-link" href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}>Магазин</a>
             </li>
           </ul>
-          <form className="form-inline my-2 my-lg-0">
-            <input className="form-control mr-sm-2" type="search" placeholder="Пошук курсів" aria-label="Search" />
+          <form className="dashboard__search-form">
+            <input className="dashboard__search-input" type="search" placeholder="Пошук курсів" aria-label="Search" />
           </form>
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <img src={user.profileImageUrl} className="rounded-circle profile-icon" id="profile-icon" alt="User Icon" onClick={toggleDropdown} />
+          <ul className="dashboard__profile-nav">
+            <li className="dashboard__profile-item">
+              <img src={user.profileImageUrl} className="dashboard__profile-icon" id="profile-icon" alt="User Icon" onClick={toggleDropdown} />
             </li>
           </ul>
         </div>
       </nav>
-      <div className="profile-dropdown" id="profile-dropdown">
-        <div id="user-info">
-          <p id="user-name-email">{user.name} ({user.email})</p>
+      <div className="dashboard__profile-dropdown" id="profile-dropdown">
+        <div className="dashboard__user-info">
+          <p className="dashboard__user-name-email">{user.name} ({user.email})</p>
         </div>
-        <a href="profile.html">Профіль</a>
-        <a href="#">Мої домашні завдання</a>
-        <a href="#">Керування підпискою</a>
-        <a href="#">Налаштування</a>
-        <a href="#">Вихід</a>
+        <a href="profile.html" className="dashboard__profile-link">Профіль</a>
+        <a href="#" className="dashboard__profile-link">Мої домашні завдання</a>
+        <a href="#" className="dashboard__profile-link">Керування підпискою</a>
+        <a href="#" className="dashboard__profile-link">Налаштування</a>
+        <a href="#" className="dashboard__profile-link">Вихід</a>
       </div>
-      <div className="container">
-        <h1>Ласкаво просимо, <span id="user-name">{user.name}</span>!</h1>
+      <div className="dashboard__container">
+        <h1 className="dashboard__welcome-title">Ласкаво просимо, <span className="dashboard__user-name">{user.name}</span>!</h1>
         {loading ? (
-          <p>Завантаження курсів...</p>
+          <p className="dashboard__loading-text">Завантаження курсів...</p>
         ) : courses.length > 0 ? (
-          <div className="row">
+          <div className="dashboard__courses-row">
             {courses.map(course => (
-              <div className="col-md-4" key={course.id}>
-                <div className="card mb-4 shadow-sm position-relative">
-                  <img src={course.image_url} className="card-img-top" alt={course.title} />
-                  <div className={`badge ${course.status === 'free' ? 'badge-free' : 'badge-premium'}`}>
+              <div className="dashboard__course-col" key={course.id}>
+                <div className="dashboard__course-card">
+                  <img src={course.image_url} className="dashboard__course-img" alt={course.title} />
+                  <div className={`dashboard__badge ${course.status === 'free' ? 'dashboard__badge-free' : 'dashboard__badge-premium'}`}>
                     {course.status}
                   </div>
-                  <div className="card-body">
-                    <Link to={`/courses/${course.id}`} style={{ color: 'orange', textDecoration: 'none' }}>
-                      <h5 className="card-title">{course.title}</h5>
-                    </Link>    
-                    <p className="card-text">{course.description}</p>
-                    <small className="text-muted">{course.duration} тижнів</small>
+                  <div className="dashboard__course-body">
+                    <Link to={`/courses/${course.id}`} className="dashboard__course-link">
+                      <h5 className="dashboard__course-title">{course.title}</h5>
+                    </Link>
+                    <p className="dashboard__course-description">{course.description}</p>
+                    <small className="dashboard__course-duration">{course.duration} тижнів</small>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p>У вас немає підписаних курсів.</p>
+          <p className="dashboard__no-courses-text">У вас немає підписаних курсів.</p>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../css/style.css';
 import API_URL from '../api';
 
 function Login() {
@@ -56,24 +57,43 @@ function Login() {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Авторизація</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Email або ім'я користувача</label>
-          <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Пароль</label>
-          <input type="password" className="form-control" id="password" name="password" value={formData.password} onChange={handleChange} required />
-        </div>
-        <button type="submit" className="btn btn-primary">Увійти</button>
-      </form>
-      <div className="mt-3">
-        <button className="btn btn-secondary" onClick={() => window.location.href = '/forgot-password'}>Забули пароль?</button>
-        <button className="btn btn-danger ml-2">Увійти через Google</button>
+    <div className="auth-container dashboard__auth-container">
+    <h2 className="dashboard__auth-title">Авторизація</h2>
+    <form onSubmit={handleSubmit} className="dashboard__auth-form">
+      <div className="dashboard__form-group">
+        <label htmlFor="username" className="dashboard__form-label">Email або ім'я користувача</label>
+        <input
+          type="text"
+          className="dashboard__form-control"
+          id="username"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          required
+        />
       </div>
+      <div className="dashboard__form-group">
+        <label htmlFor="password" className="dashboard__form-label">Пароль</label>
+        <input
+          type="password"
+          className="dashboard__form-control"
+          id="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <button type="submit" className="dashboard__btn dashboard__btn--primary">Увійти</button>
+    </form>
+    <div className="dashboard__auth-buttons">
+      <button className="dashboard__btn dashboard__btn--secondary" onClick={() => window.location.href = '/forgot-password'}>
+        Забули пароль?
+      </button>
+      <button className="dashboard__btn dashboard__btn--danger">Увійти через Google</button>
     </div>
+  </div>
+  
   );
 }
 

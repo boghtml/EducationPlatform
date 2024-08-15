@@ -1,0 +1,90 @@
+.dashboard {
+    &__auth-container {
+      margin-top: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 20px;
+      background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+  
+    &__auth-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 20px;
+    }
+  
+    &__auth-form {
+      .dashboard__form-group {
+        margin-bottom: 20px;
+        
+        .dashboard__form-label {
+          display: block;
+          font-size: 16px;
+          color: white;
+          margin-bottom: 5px;
+        }
+        
+        .dashboard__form-control {
+          width: 100%;
+          padding: 10px;
+          border-radius: 5px;
+          border: 1px solid #ddd;
+          font-size: 16px;
+          color: #333;
+        }
+      }
+    }
+  
+    &__btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      color: white;
+  
+      &--primary {
+        background-color: #007bff;
+        
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+  
+      &--secondary {
+        background-color: #6c757d;
+        
+        &:hover {
+          background-color: #5a6268;
+        }
+      }
+  
+      &--danger {
+        background-color: #dc3545;
+        
+        &:hover {
+          background-color: #c82333;
+        }
+      }
+    }
+  
+    &__auth-buttons {
+      margin-top: 20px;
+  
+      .dashboard__btn {
+        margin-right: 10px;
+  
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+  

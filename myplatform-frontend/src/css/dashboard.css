@@ -1,70 +1,186 @@
-/* src/css/dashboard.css */
-.navbar-nav .nav-link {
+.dashboard__navbar {
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  align-items: center;
+  position: relative;
+}
+.dashboard__navbar .dashboard__brand {
   color: white;
-  transition: color 0.3s;
-}
-
-.navbar-nav .nav-link:hover {
-  color: #ff6600;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-}
-
-.profile-dropdown {
-  position: absolute;
-  top: 60px;
-  right: 20px;
-  width: 200px;
-  display: none;
-  background-color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  border-radius: 5px;
-}
-
-.profile-dropdown.show {
-  display: block;
-}
-
-.profile-dropdown a {
-  display: block;
-  padding: 10px;
+  font-size: 24px;
+  font-weight: 600;
   text-decoration: none;
-  color: black;
-  border-bottom: 1px solid #ddd;
 }
-
-.profile-dropdown a:hover {
-  background-color: #f0f0f0;
+.dashboard__navbar .dashboard__collapse {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
 }
-
-.profile-dropdown #user-info {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+.dashboard__navbar .dashboard__nav {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.dashboard__navbar .dashboard__nav-item {
+  margin-right: 20px;
+}
+.dashboard__navbar .dashboard__nav-item:last-child {
+  margin-right: 0;
+}
+.dashboard__navbar .dashboard__nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+.dashboard__navbar .dashboard__nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.dashboard__navbar .dashboard__search-form {
+  display: flex;
+  flex: 1;
+  margin: 0 20px;
+}
+.dashboard__navbar .dashboard__search-form .dashboard__search-input {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+}
+.dashboard__navbar .dashboard__profile-nav {
   display: flex;
   align-items: center;
 }
-
-.profile-dropdown .profile-image {
+.dashboard__navbar .dashboard__profile-nav .dashboard__profile-item {
+  margin-left: 20px;
+}
+.dashboard__navbar .dashboard__profile-nav .dashboard__profile-item .dashboard__profile-icon {
   width: 40px;
   height: 40px;
-  margin-right: 10px;
   border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.605);
+  cursor: pointer;
+  transition: border-color 0.3s;
 }
-
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
+.dashboard__navbar .dashboard__profile-nav .dashboard__profile-item .dashboard__profile-icon:hover {
+  border-color: #ff6600;
 }
-
-.nav-link {
-  font-size: 1.1rem;
+.dashboard__profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border: 1px solid rgba(255, 255, 255, 0.738);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  padding: 10px;
 }
-
-.container h1 {
-  color: #ff6600; /* Adjust color as needed */
+.dashboard__profile-dropdown .dashboard__user-info {
+  margin-bottom: 10px;
 }
+.dashboard__profile-dropdown .dashboard__user-info .dashboard__user-name-email {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+.dashboard__profile-dropdown .dashboard__profile-link {
+  display: block;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+.dashboard__profile-dropdown .dashboard__profile-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.dashboard__container {
+  padding: 60px 30px;
+}
+.dashboard__container .dashboard__welcome-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+}
+.dashboard__container .dashboard__welcome-title .dashboard__user-name {
+  color: #ff6600;
+}
+.dashboard__container .dashboard__loading-text {
+  font-size: 18px;
+  color: white;
+}
+.dashboard__container .dashboard__courses-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -15px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-col {
+  flex: 1;
+  max-width: 33.3333%;
+  padding: 15px;
+}
+@media (max-width: 767px) {
+  .dashboard__container .dashboard__courses-row .dashboard__course-col {
+    max-width: 100%;
+  }
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card {
+  border: 3px solid rgba(255, 255, 255, 0.738);
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.605);
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  position: relative;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-img {
+  border-radius: 10px;
+  max-width: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.605);
+  box-shadow: 0 0 5px 0px rgba(255, 255, 255, 0.605);
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__badge-free {
+  background-color: #28a745;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__badge-premium {
+  background-color: #dc3545;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body {
+  padding: 15px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body .dashboard__course-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff6600;
+  margin-bottom: 10px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body .dashboard__course-description {
+  font-size: 16px;
+  color: white;
+  margin-bottom: 10px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body .dashboard__course-duration {
+  color: #aaa;
+}
+.dashboard__container .dashboard__no-courses-text {
+  font-size: 18px;
+  color: white;
+}/*# sourceMappingURL=dashboard.css.map */

@@ -1,0 +1,65 @@
+.registration {
+    &__container {
+      margin-top: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 20px;
+      background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+  
+    &__title {
+      font-size: 28px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 20px;
+    }
+  
+    &__form {
+      .registration__form-group {
+        margin-bottom: 20px;
+  
+        .registration__form-label {
+          display: block;
+          font-size: 16px;
+          color: white;
+          margin-bottom: 5px;
+        }
+  
+        .registration__form-control {
+          width: 100%;
+          padding: 10px;
+          border-radius: 5px;
+          border: 1px solid #ddd;
+          font-size: 16px;
+          color: #333;
+        }
+      }
+    }
+  
+    &__btn {
+      display: inline-block;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px; /* Зменшено розмір шрифту */
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: white;
+      background-color: transparent;
+      text-align: center;
+  
+      &--primary {
+        background-color: #ff6600;
+  
+        &:hover {
+          background-color: #e65c00;
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+  

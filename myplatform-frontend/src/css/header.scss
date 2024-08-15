@@ -1,0 +1,40 @@
+.header {
+    background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    & *{
+      color: white !important; 
+      font-size: 20px !important;
+      font-weight: 600;
+    }  
+    &__logo{
+      max-width: 80px;
+    }
+    button{
+      background-color: transparent !important;
+      transition: all .3s;
+      font-weight: 600;
+      font-size: 24px;
+      &:hover{
+        background-color: #ff6600 !important;
+        transform: scale(1.05);
+      }
+    }
+    &__nav{
+      display: flex;
+      margin-left: 50px;
+      &-item{
+        transition: transform .3s;
+        &:hover{
+          transform: scale(1.1);
+        }
+      }
+      &-list{
+        &--right{
+          display: flex;
+          gap: 40px;
+        }
+      }
+    }
+  }

@@ -1,34 +1,38 @@
-// src/components/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../images/logo.png';
+import '../css/style.css';
+
 
 const Header = () => (
-  <nav className="navbar navbar-expand-lg navbar-light bg-light">
-    <a className="navbar-brand" href="#">Каталог курсів</a>
-    <div className="collapse navbar-collapse" id="navbarNav">
-      <ul className="navbar-nav mr-auto">
-        <li className="nav-item">
-          <a className="nav-link" href="/">Курси</a>
+  <nav className="header navbar navbar-expand-lg navbar-light bg-light">
+    <a className="header__brand navbar-brand" href="#">
+      <img src={logo} alt="Логотип" className="header__logo" />
+    </a>
+    <div className="header__collapse collapse navbar-collapse" id="navbarNav">
+      <ul className="header__nav  mr-auto">
+        <li className="header__nav-item nav-item">
+          <a className="header__nav-link nav-link" href="/">Курси</a>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to="/events">Найближчі заходи</Link>
+        <li className="header__nav-item nav-item">
+          <Link className="header__nav-link nav-link" to="/events">Найближчі заходи</Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to="/blog">Блог</Link>
+        <li className="header__nav-item nav-item">
+          <Link className="header__nav-link nav-link" to="/blog">Блог</Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to="/reviews">Відгуки</Link>
+        <li className="header__nav-item nav-item">
+          <Link className="header__nav-link nav-link" to="/reviews">Відгуки</Link>
         </li>
-        <li className="nav-item">
-          <Link className="nav-link" to="/about">Про нас</Link>
+        <li className="header__nav-item nav-item">
+          <Link className="header__nav-link nav-link" to="/about">Про нас</Link>
         </li>
       </ul>
-      <ul className="navbar-nav">
-        <li className="nav-item">
-          <button className="btn btn-outline-primary" onClick={() => window.location.href = '/login'}>Увійти</button>
+      <ul className="header__auth navbar-nav">
+        <li className="header__auth-item nav-item">
+          <button className="header__auth-button btn btn-outline-primary" onClick={() => window.location.href = '/login'}>Увійти</button>
         </li>
-        <li className="nav-item ml-2">
-          <button className="btn btn-primary" onClick={() => window.location.href = '/register'}>Зареєструватися</button>
+        <li className="header__auth-item nav-item ml-2">
+          <button className="header__auth-button btn btn-primary" onClick={() => window.location.href = '/register'}>Зареєструватися</button>
         </li>
       </ul>
     </div>

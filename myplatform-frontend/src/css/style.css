@@ -1,14 +1,22 @@
+@charset "UTF-8";
 .course {
   padding: 60px 30px;
-  border: 1px solid black;
+  border: 3px solid rgba(255, 255, 255, 0.738);
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.605);
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
   border-radius: 15px;
 }
 .course__title {
   font-weight: 700;
-  margin-bottom: 50px;
+  margin-bottom: 70px;
+  padding-bottom: 4px;
+  border-bottom: 4px solid #ff6600;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
 }
 .course__description {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 500;
 }
 .course__info {
   display: flex;
@@ -50,6 +58,8 @@
 .course__image {
   border-radius: 20px;
   max-width: 450px;
+  border: 2px solid rgba(255, 255, 255, 0.605);
+  box-shadow: 0 0 5px 0px rgba(255, 255, 255, 0.605);
 }
 .course__payment-details {
   max-width: 800px;
@@ -57,7 +67,7 @@
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: transparent;
   max-width: 600px;
 }
 .course__payment-title {
@@ -94,6 +104,456 @@
   outline: none;
 }
 
+.header {
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.header * {
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 600;
+}
+.header__logo {
+  max-width: 80px;
+}
+.header button {
+  background-color: transparent !important;
+  transition: all 0.3s;
+  font-weight: 600;
+  font-size: 24px;
+}
+.header button:hover {
+  background-color: #ff6600 !important;
+  transform: scale(1.05);
+}
+.header__nav {
+  display: flex;
+  margin-left: 50px;
+}
+.header__nav-item {
+  transition: transform 0.3s;
+}
+.header__nav-item:hover {
+  transform: scale(1.1);
+}
+.header__nav-list--right {
+  display: flex;
+  gap: 40px;
+}
+
+.dashboard__navbar {
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  align-items: center;
+  position: relative;
+}
+.dashboard__navbar .dashboard__brand {
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.dashboard__navbar .dashboard__collapse {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+.dashboard__navbar .dashboard__nav {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.dashboard__navbar .dashboard__nav-item {
+  margin-right: 20px;
+}
+.dashboard__navbar .dashboard__nav-item:last-child {
+  margin-right: 0;
+}
+.dashboard__navbar .dashboard__nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+.dashboard__navbar .dashboard__nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.dashboard__navbar .dashboard__search-form {
+  display: flex;
+  flex: 1;
+  margin: 0 20px;
+}
+.dashboard__navbar .dashboard__search-form .dashboard__search-input {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+}
+.dashboard__navbar .dashboard__profile-nav {
+  display: flex;
+  align-items: center;
+}
+.dashboard__navbar .dashboard__profile-nav .dashboard__profile-item {
+  margin-left: 20px;
+}
+.dashboard__navbar .dashboard__profile-nav .dashboard__profile-item .dashboard__profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.605);
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+.dashboard__navbar .dashboard__profile-nav .dashboard__profile-item .dashboard__profile-icon:hover {
+  border-color: #ff6600;
+}
+.dashboard__profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border: 1px solid rgba(255, 255, 255, 0.738);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  padding: 10px;
+}
+.dashboard__profile-dropdown .dashboard__user-info {
+  margin-bottom: 10px;
+}
+.dashboard__profile-dropdown .dashboard__user-info .dashboard__user-name-email {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+.dashboard__profile-dropdown .dashboard__profile-link {
+  display: block;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+.dashboard__profile-dropdown .dashboard__profile-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.dashboard__container {
+  padding: 60px 30px;
+}
+.dashboard__container .dashboard__welcome-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+}
+.dashboard__container .dashboard__welcome-title .dashboard__user-name {
+  color: #ff6600;
+}
+.dashboard__container .dashboard__loading-text {
+  font-size: 18px;
+  color: white;
+}
+.dashboard__container .dashboard__courses-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -15px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-col {
+  flex: 1;
+  max-width: 33.3333%;
+  padding: 15px;
+}
+@media (max-width: 767px) {
+  .dashboard__container .dashboard__courses-row .dashboard__course-col {
+    max-width: 100%;
+  }
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card {
+  border: 3px solid rgba(255, 255, 255, 0.738);
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.605);
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  position: relative;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-img {
+  border-radius: 10px;
+  max-width: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.605);
+  box-shadow: 0 0 5px 0px rgba(255, 255, 255, 0.605);
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__badge-free {
+  background-color: #28a745;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__badge-premium {
+  background-color: #dc3545;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body {
+  padding: 15px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body .dashboard__course-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff6600;
+  margin-bottom: 10px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body .dashboard__course-description {
+  font-size: 16px;
+  color: white;
+  margin-bottom: 10px;
+}
+.dashboard__container .dashboard__courses-row .dashboard__course-card .dashboard__course-body .dashboard__course-duration {
+  color: #aaa;
+}
+.dashboard__container .dashboard__no-courses-text {
+  font-size: 18px;
+  color: white;
+}
+
+.dashboard__auth-container {
+  margin-top: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.dashboard__auth-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 20px;
+}
+.dashboard__auth-form .dashboard__form-group {
+  margin-bottom: 20px;
+}
+.dashboard__auth-form .dashboard__form-group .dashboard__form-label {
+  display: block;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 5px;
+}
+.dashboard__auth-form .dashboard__form-group .dashboard__form-control {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  color: #333;
+}
+.dashboard__btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  color: white;
+}
+.dashboard__btn--primary {
+  background-color: #007bff;
+}
+.dashboard__btn--primary:hover {
+  background-color: #0056b3;
+}
+.dashboard__btn--secondary {
+  background-color: #6c757d;
+}
+.dashboard__btn--secondary:hover {
+  background-color: #5a6268;
+}
+.dashboard__btn--danger {
+  background-color: #dc3545;
+}
+.dashboard__btn--danger:hover {
+  background-color: #c82333;
+}
+.dashboard__auth-buttons {
+  margin-top: 20px;
+}
+.dashboard__auth-buttons .dashboard__btn {
+  margin-right: 10px;
+}
+.dashboard__auth-buttons .dashboard__btn:last-child {
+  margin-right: 0;
+}
+
+.dashboard__forgot-password-container {
+  margin-top: 40px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.dashboard__forgot-password-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 20px;
+}
+.dashboard__forgot-password-form .dashboard__form-group {
+  margin-bottom: 20px;
+}
+.dashboard__forgot-password-form .dashboard__form-group .dashboard__form-label {
+  display: block;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 5px;
+}
+.dashboard__forgot-password-form .dashboard__form-group .dashboard__form-control {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  color: #333;
+}
+.dashboard__btn {
+  display: inline-block;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px; /* Зменшено розмір шрифту */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: white;
+  background-color: transparent;
+  text-align: center;
+}
+.dashboard__btn--primary {
+  background-color: #ff6600;
+}
+.dashboard__btn--primary:hover {
+  background-color: #e65c00;
+  transform: scale(1.05);
+}
+.dashboard__btn--secondary {
+  background-color: transparent;
+  border: 2px solid #ff6600;
+  color: #ff6600;
+}
+.dashboard__btn--secondary:hover {
+  background-color: #ff6600;
+  color: white;
+  transform: scale(1.05);
+}
+.dashboard__btn--google {
+  background-color: transparent;
+  border: 2px solid #ff6600;
+  color: #ff6600;
+}
+.dashboard__btn--google:hover {
+  background-color: #ff6600;
+  color: white;
+  transform: scale(1.05);
+}
+
+.registration__container {
+  margin-top: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+.registration__title {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 20px;
+}
+.registration__form .registration__form-group {
+  margin-bottom: 20px;
+}
+.registration__form .registration__form-group .registration__form-label {
+  display: block;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 5px;
+}
+.registration__form .registration__form-group .registration__form-control {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  color: #333;
+}
+.registration__btn {
+  display: inline-block;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px; /* Зменшено розмір шрифту */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: white;
+  background-color: transparent;
+  text-align: center;
+}
+.registration__btn--primary {
+  background-color: #ff6600;
+}
+.registration__btn--primary:hover {
+  background-color: #e65c00;
+  transform: scale(1.05);
+}
+
+.about__main {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.about__section {
+  margin-bottom: 20px;
+}
+.about__title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 15px;
+}
+.about__description {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #666;
+  margin-bottom: 15px;
+}
+
 html {
   box-sizing: border-box;
   font-size: 16px;
@@ -120,4 +580,9 @@ img {
 
 .container {
   margin-bottom: 80px;
+}
+
+body {
+  background-color: #181818;
+  color: white;
 }/*# sourceMappingURL=style.css.map */

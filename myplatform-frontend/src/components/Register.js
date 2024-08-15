@@ -60,44 +60,105 @@ function Register() {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Реєстрація</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Ім'я користувача</label>
-          <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input type="email" className="form-control" id="email" name="email" value={formData.email} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="first_name">Ім'я</label>
-          <input type="text" className="form-control" id="first_name" name="first_name" value={formData.first_name} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="last_name">Прізвище</label>
-          <input type="text" className="form-control" id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="phone_number">Номер телефону</label>
-          <input type="text" className="form-control" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="profile_image_url">URL зображення профілю</label>
-          <input type="text" className="form-control" id="profile_image_url" name="profile_image_url" value={formData.profile_image_url} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password1">Пароль</label>
-          <input type="password" className="form-control" id="password1" name="password1" value={formData.password1} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password2">Підтвердіть пароль</label>
-          <input type="password" className="form-control" id="password2" name="password2" value={formData.password2} onChange={handleChange} required />
-        </div>
-        <button type="submit" className="btn btn-primary">Зареєструватися</button>
-      </form>
-    </div>
+    <div className="registration__container">
+    <h2 className="registration__title">Реєстрація</h2>
+    <form onSubmit={handleSubmit} className="registration__form">
+      <div className="registration__form-group">
+        <label htmlFor="username" className="registration__form-label">Ім'я користувача</label>
+        <input
+          type="text"
+          className="registration__form-control"
+          id="username"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="email" className="registration__form-label">Email</label>
+        <input
+          type="email"
+          className="registration__form-control"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="first_name" className="registration__form-label">Ім'я</label>
+        <input
+          type="text"
+          className="registration__form-control"
+          id="first_name"
+          name="first_name"
+          value={formData.first_name}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="last_name" className="registration__form-label">Прізвище</label>
+        <input
+          type="text"
+          className="registration__form-control"
+          id="last_name"
+          name="last_name"
+          value={formData.last_name}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="phone_number" className="registration__form-label">Номер телефону</label>
+        <input
+          type="text"
+          className="registration__form-control"
+          id="phone_number"
+          name="phone_number"
+          value={formData.phone_number}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="profile_image_url" className="registration__form-label">URL зображення профілю</label>
+        <input
+          type="text"
+          className="registration__form-control"
+          id="profile_image_url"
+          name="profile_image_url"
+          value={formData.profile_image_url}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="password1" className="registration__form-label">Пароль</label>
+        <input
+          type="password"
+          className="registration__form-control"
+          id="password1"
+          name="password1"
+          value={formData.password1}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div className="registration__form-group">
+        <label htmlFor="password2" className="registration__form-label">Підтвердіть пароль</label>
+        <input
+          type="password"
+          className="registration__form-control"
+          id="password2"
+          name="password2"
+          value={formData.password2}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <button type="submit" className="registration__btn registration__btn--primary">Зареєструватися</button>
+    </form>
+  </div>
+  
   );
 }
 

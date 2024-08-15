@@ -1,0 +1,38 @@
+.header {
+  background: linear-gradient(45deg, rgb(25, 25, 25), rgb(47, 47, 47));
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.header * {
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 600;
+}
+.header__logo {
+  max-width: 80px;
+}
+.header button {
+  background-color: transparent !important;
+  transition: all 0.3s;
+  font-weight: 600;
+  font-size: 24px;
+}
+.header button:hover {
+  background-color: #ff6600 !important;
+  transform: scale(1.05);
+}
+.header__nav {
+  display: flex;
+  margin-left: 50px;
+}
+.header__nav-item {
+  transition: transform 0.3s;
+}
+.header__nav-item:hover {
+  transform: scale(1.1);
+}
+.header__nav-list--right {
+  display: flex;
+  gap: 40px;
+}/*# sourceMappingURL=header.css.map */
