@@ -42,6 +42,7 @@ function Login() {
       .then(response => {
         console.log('User logged in successfully', response.data);
         sessionStorage.setItem('userName', response.data.userName);
+        sessionStorage.setItem('userId', response.data.id); // Додаємо збереження userId
         sessionStorage.setItem('userEmail', response.data.userEmail);
         sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
         window.location.href = '/dashboard';
@@ -68,6 +69,10 @@ function Login() {
         </div>
         <button type="submit" className="btn btn-primary">Увійти</button>
       </form>
+      <div className="mt-3">
+        <button className="btn btn-secondary" onClick={() => window.location.href = '/forgot-password'}>Забули пароль?</button>
+        <button className="btn btn-danger ml-2">Увійти через Google</button>
+      </div>
     </div>
   );
 }

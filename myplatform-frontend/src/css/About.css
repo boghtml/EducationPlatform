@@ -1,0 +1,44 @@
+@charset "UTF-8";
+.about__container {
+  padding: 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+.about__title {
+  font-size: 36px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+.about__description {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+.about__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+.about__card {
+  flex: 1 1 calc(33.333% - 20px); /* 3 картки в ряд */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
+  text-align: center;
+}
+.about__card-icon {
+  font-size: 40px;
+  color: #007bff;
+  margin-bottom: 15px;
+}
+.about__card-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.about__card-description {
+  font-size: 16px;
+  color: #555;
+}/*# sourceMappingURL=About.css.map */

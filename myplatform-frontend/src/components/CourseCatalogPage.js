@@ -5,6 +5,7 @@ import 'nouislider/dist/nouislider.css';
 import noUiSlider from 'nouislider';
 import '../css/style.css';
 import { Link } from 'react-router-dom';
+import Header from '../components/Header'; 
 
 function CourseCatalogPage() {
   const [courses, setCourses] = useState([]);
@@ -40,7 +41,10 @@ function CourseCatalogPage() {
           from: value => Number(value)
         }
       }).on('update', (values, handle) => {
-        setPriceRange([parseInt(values[0]), parseInt(values[1])]);
+        const newPriceRange = [parseInt(values[0]), parseInt(values[1])];
+        setPriceRange(newPriceRange);
+        document.getElementById('price-from').value = newPriceRange[0];
+        document.getElementById('price-to').value = newPriceRange[1];
       });
     }
 
@@ -57,7 +61,10 @@ function CourseCatalogPage() {
           from: value => Number(value)
         }
       }).on('update', (values, handle) => {
-        setDurationRange([parseInt(values[0]), parseInt(values[1])]);
+        const newDurationRange = [parseInt(values[0]), parseInt(values[1])];
+        setDurationRange(newDurationRange);
+        document.getElementById('duration-from').value = newDurationRange[0];
+        document.getElementById('duration-to').value = newDurationRange[1];
       });
     }
 
@@ -90,6 +97,24 @@ function CourseCatalogPage() {
     setFilteredCourses(filtered);
   };
 
+  const handlePriceChange = (e) => {
+    const newPriceRange = [parseInt(document.getElementById('price-from').value), parseInt(document.getElementById('price-to').value)];
+    setPriceRange(newPriceRange);
+    const priceSlider = document.getElementById('price-slider');
+    if (priceSlider && priceSlider.noUiSlider) {
+      priceSlider.noUiSlider.set(newPriceRange);
+    }
+  };
+
+  const handleDurationChange = (e) => {
+    const newDurationRange = [parseInt(document.getElementById('duration-from').value), parseInt(document.getElementById('duration-to').value)];
+    setDurationRange(newDurationRange);
+    const durationSlider = document.getElementById('duration-slider');
+    if (durationSlider && durationSlider.noUiSlider) {
+      durationSlider.noUiSlider.set(newDurationRange);
+    }
+  };
+
   const handleResetFilters = () => {
     setStatusFilter('');
     setPriceRange([0, 5000]);
@@ -108,42 +133,17 @@ function CourseCatalogPage() {
       durationSlider.noUiSlider.set([1, 20]);
     }
 
+    document.getElementById('price-from').value = 0;
+    document.getElementById('price-to').value = 5000;
+    document.getElementById('duration-from').value = 1;
+    document.getElementById('duration-to').value = 20;
+
     filterAndSortCourses();
   };
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="#">Каталог курсів</a>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <a className="nav-link" href="/">Курси <span className="sr-only">(поточна)</span></a>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/events">Найближчі заходи</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/blog">Блог</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/reviews">Відгуки</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/about">Про нас</Link>
-            </li>
-          </ul>
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <button className="btn btn-outline-primary" onClick={() => window.location.href = '/login'} >Увійти</button>
-            </li>
-            <li className="nav-item ml-2">
-              <button className="btn btn-primary" onClick={() => window.location.href = '/register'}>Зареєструватися</button>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
+      <Header />
       <div className="container mt-5">
         <div className="row">
           <div className="col-md-3">
@@ -157,13 +157,23 @@ function CourseCatalogPage() {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="price-slider">Цінова категорія</label>
-              <div id="price-slider"></div>
+              <label htmlFor="price-from">Цінова категорія</label>
+              <div className="d-flex">
+                <input id="price-from" type="number" className="form-control" value={priceRange[0]} onChange={handlePriceChange} />
+                <span className="mx-2">до</span>
+                <input id="price-to" type="number" className="form-control" value={priceRange[1]} onChange={handlePriceChange} />
+              </div>
+              <div id="price-slider" className="mt-2"></div>
               <p>Від <span>{priceRange[0]}</span> до <span>{priceRange[1]}</span></p>
             </div>
             <div className="form-group">
-              <label htmlFor="duration-slider">Тривалість курсу (тижнів)</label>
-              <div id="duration-slider"></div>
+              <label htmlFor="duration-from">Тривалість курсу (тижнів)</label>
+              <div className="d-flex">
+                <input id="duration-from" type="number" className="form-control" value={durationRange[0]} onChange={handleDurationChange} />
+                <span className="mx-2">до</span>
+                <input id="duration-to" type="number" className="form-control" value={durationRange[1]} onChange={handleDurationChange} />
+              </div>
+              <div id="duration-slider" className="mt-2"></div>
               <p>Від <span>{durationRange[0]}</span> до <span>{durationRange[1]}</span> тижнів</p>
             </div>
             <button id="reset-filters" className="btn btn-secondary" onClick={handleResetFilters}>Скинути</button>

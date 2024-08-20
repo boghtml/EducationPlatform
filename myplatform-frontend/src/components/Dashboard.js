@@ -1,16 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../css/dashboard.css'; // Підключаємо стилі
+import { Link } from 'react-router-dom'; // Підключаємо Link для навігації
 
 function Dashboard() {
   const [user, setUser] = useState({ name: 'User', email: 'user@example.com', profileImageUrl: 'https://via.placeholder.com/40' });
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const userName = sessionStorage.getItem('userName') || 'User';
     const userEmail = sessionStorage.getItem('userEmail') || 'undefined';
     const profileImageUrl = sessionStorage.getItem('profileImageUrl') || 'https://via.placeholder.com/40';
+    const userId = sessionStorage.getItem('userId'); // Отримуємо userId з sessionStorage
+
     setUser({ name: userName, email: userEmail, profileImageUrl: profileImageUrl });
-    console.log("User data from session:", { userName, userEmail, profileImageUrl });
+    console.log("User data from session:", { userName, userEmail, profileImageUrl, userId });
+
+    // Отримуємо курси користувача
+    if (userId) {
+      axios.get(`http://localhost:8000/api/enrollments/user-courses/${userId}/`)
+        .then(response => {
+          setCourses(response.data.courses);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error("Error fetching courses:", error);
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const toggleDropdown = () => {
@@ -55,6 +75,31 @@ function Dashboard() {
       </div>
       <div className="container">
         <h1>Ласкаво просимо, <span id="user-name">{user.name}</span>!</h1>
+        {loading ? (
+          <p>Завантаження курсів...</p>
+        ) : courses.length > 0 ? (
+          <div className="row">
+            {courses.map(course => (
+              <div className="col-md-4" key={course.id}>
+                <div className="card mb-4 shadow-sm position-relative">
+                  <img src={course.image_url} className="card-img-top" alt={course.title} />
+                  <div className={`badge ${course.status === 'free' ? 'badge-free' : 'badge-premium'}`}>
+                    {course.status}
+                  </div>
+                  <div className="card-body">
+                    <Link to={`/courses/${course.id}`} style={{ color: 'orange', textDecoration: 'none' }}>
+                      <h5 className="card-title">{course.title}</h5>
+                    </Link>    
+                    <p className="card-text">{course.description}</p>
+                    <small className="text-muted">{course.duration} тижнів</small>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>У вас немає підписаних курсів.</p>
+        )}
       </div>
     </div>
   );

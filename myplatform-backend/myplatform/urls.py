@@ -34,4 +34,5 @@ urlpatterns = [
     path('api/get-csrf-token/', get_csrf_token),  # Додайте цей маршрут
     path('api/', include('apps.courses.urls')),  
     path('api/users/', include('apps.users.urls')),
+    path('api/enrollments/', include('apps.enrollments.urls')),
 ]

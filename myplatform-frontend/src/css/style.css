@@ -1,0 +1,123 @@
+.course {
+  padding: 60px 30px;
+  border: 1px solid black;
+  border-radius: 15px;
+}
+.course__title {
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+.course__description {
+  font-size: 18px;
+}
+.course__info {
+  display: flex;
+  gap: 40px;
+}
+.course__info-basic {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  flex-basis: calc((100% - 40px) * 0.5833333333);
+  padding-left: 20px;
+}
+.course__info-detailed {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  flex-basis: calc((100% - 40px) * 0.4166666667);
+  font-size: 24px;
+}
+.course__info-detailed p {
+  padding-left: 30px;
+}
+.course__info-detailed p::before {
+  content: "* ";
+  font-size: 30px;
+  color: red;
+}
+.course__signup-btn, .course__submit-btn {
+  font-size: 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  padding: 10px 30px;
+  width: 100%;
+  max-width: 300px;
+}
+.course__submit-btn {
+  margin: 0 auto;
+}
+.course__image {
+  border-radius: 20px;
+  max-width: 450px;
+}
+.course__payment-details {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  max-width: 600px;
+}
+.course__payment-title {
+  font-size: 32px;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.course__payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 30px 20px;
+}
+.course__payment-form .form-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 22px;
+}
+.course__payment-form .form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.course__payment-form .form-group input {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 10px 5px;
+  font-size: 24px;
+  padding: 10px;
+  font-size: 16px;
+}
+.course__payment-form .form-group input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.container {
+  margin-bottom: 80px;
+}/*# sourceMappingURL=style.css.map */

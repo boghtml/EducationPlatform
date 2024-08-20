@@ -14,6 +14,8 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
+from django.http import JsonResponse, Http404
+from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
 
@@ -146,10 +148,57 @@ def list_students(request):
             'first_name': student.first_name,
             'last_name': student.last_name,
             'phone_number': student.phone_number,
-            'profile_image_url': student.profile_image_url
+            'profile_image_url': student.profile_image_url,
+            'last_login': student.last_login,
+            'data_joined': student.date_joined,
         } for student in students]
         return JsonResponse(students_list, safe=False)
     return JsonResponse({'message': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
+def get_student_details(request, id):
+    try:
+        user = get_object_or_404(CustomUser, id=id, role='student')
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'phone_number': user.phone_number,
+            'profile_image_url': user.profile_image_url,
+            'role': user.role,
+            'last_login': user.last_login,
+            'date_joined': user.date_joined,
+        }
+        return JsonResponse({'message': 'Student details retrieved successfully', 'data': user_data})
+    except Http404:
+        return JsonResponse({'error': 'Student not found or does not have the correct role'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
+
+@csrf_exempt
+def get_teacher_details(request, id):
+    try:
+        user = get_object_or_404(CustomUser, id=id, role='teacher')
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'phone_number': user.phone_number,
+            'profile_image_url': user.profile_image_url,
+            'role': user.role,
+            'last_login': user.last_login,
+            'date_joined': user.date_joined,
+        }
+        return JsonResponse({'message': 'Teacher details retrieved successfully', 'data': user_data})
+    except Http404:
+        return JsonResponse({'error': 'Teacher not found or does not have the correct role'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
 
 
 # Password Reset (Forgot Password)

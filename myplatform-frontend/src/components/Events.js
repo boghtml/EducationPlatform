@@ -1,10 +1,15 @@
 import React from 'react';
+import Header from '../components/Header';
+
 
 function Events() {
   return (
-    <div className="container mt-5">
+    <div>
+      <Header/>
+      <div className="container mt-5">
       <h1>Найближчі заходи</h1>
       <p>Контент для найближчих заходів...</p>
+    </div>
     </div>
   );
 }
