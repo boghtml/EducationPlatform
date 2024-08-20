@@ -1,6 +1,7 @@
 // src/components/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { NavbarItem } from './ui/NavbarItem';
 
 const Header = () => (
   <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -10,12 +11,14 @@ const Header = () => (
         <li className="nav-item">
           <a className="nav-link" href="/">Курси</a>
         </li>
+        <NavbarItem link="/events" title="Найближчі заходи" />
         <li className="nav-item">
           <Link className="nav-link" to="/events">Найближчі заходи</Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/blog">Блог</Link>
         </li>
+        
         <li className="nav-item">
           <Link className="nav-link" to="/reviews">Відгуки</Link>
         </li>
