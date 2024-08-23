@@ -1,7 +1,7 @@
 // src/components/About.js
 
 import React from 'react';
-import Header from '../components/Header';
+import Header from './Header';
 import '../css/About.css'; // Підключіть ваш CSS файл
 
 function About() {

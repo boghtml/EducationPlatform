@@ -11,12 +11,23 @@ from apps.courses.serializers import CourseSerializer
 from django.views.decorators.csrf import csrf_exempt
 from .mixins import CsrfExemptSessionAuthentication
 from rest_framework.permissions import AllowAny
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class EnrollCourseView(APIView):
 
     authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = [AllowAny]
-    
+     
+    @swagger_auto_schema(
+        request_body=EnrollmentSerializer,
+        responses={
+            201: EnrollmentSerializer,
+            400: 'Bad Request',
+            404: 'Not Found',
+        }
+    )
+
     def post(self, request, *args, **kwargs):
         course_id = request.data.get('course_id')
         student_id = request.data.get('student_id')
@@ -46,6 +57,16 @@ class UserEnrolledCoursesView(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('user_id', openapi.IN_PATH, description="ID of the user", type=openapi.TYPE_INTEGER),
+        ],
+        responses={
+            200: CourseSerializer(many=True),
+            400: 'Bad Request',
+            404: 'Not Found',
+        }
+    )
     def get(self, request, user_id, *args, **kwargs):
         try:
             student = CustomUser.objects.get(id=user_id, role='student')

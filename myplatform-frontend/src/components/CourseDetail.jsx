@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import API_URL from '../api';
-import Header from '../components/Header';
+import Header from './Header';
 import '../css/style.css';
 
 function CourseDetail() {

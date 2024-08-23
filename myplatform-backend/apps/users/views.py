@@ -1,3 +1,5 @@
+# apps->users->views.py
+
 from .forms import CustomUserCreationForm
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
@@ -16,10 +18,15 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+from drf_yasg.utils import swagger_auto_schema
+from .serializers import CustomUserSerializer  # Імпорт серіалізатора
 
 logger = logging.getLogger(__name__)
 
+
 @csrf_exempt
+#@api_view(['POST'])
 def register(request):
     if request.method == 'POST':
         logger.debug(f'Request POST data: {request.POST}')
@@ -42,11 +49,10 @@ def register(request):
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
-        logger.debug(f'Login - Request POST data: {request.POST}')
-        logger.debug(f'Login - Request body: {request.body}')
-        
         try:
-            data = json.loads(request.body)
+            # Отримуємо body перед зверненням до request.POST
+            body = request.body.decode('utf-8')
+            data = json.loads(body)
             username_or_email = data.get('username')  # Це поле може містити або username, або email
             password = data.get('password')
         except json.JSONDecodeError:
@@ -135,7 +141,6 @@ def list_teachers(request):
         } for teacher in teachers]
         return JsonResponse(teachers_list, safe=False)
     return JsonResponse({'message': 'Invalid request method'}, status=400)
-
 
 @csrf_exempt
 def list_students(request):

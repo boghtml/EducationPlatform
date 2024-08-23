@@ -21,6 +21,9 @@ from django.urls import path, include
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import get_token
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
 
 def get_csrf_token(request):
     response = JsonResponse({'csrftoken': get_token(request)})
@@ -28,6 +31,15 @@ def get_csrf_token(request):
     response['Access-Control-Allow-Credentials'] = 'true'
     return response
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="My API",
+        default_version='v1',
+        description="API documentation",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,4 +47,8 @@ urlpatterns = [
     path('api/', include('apps.courses.urls')),  
     path('api/users/', include('apps.users.urls')),
     path('api/enrollments/', include('apps.enrollments.urls')),
+
+    # Документація
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc-ui'),
 ]
