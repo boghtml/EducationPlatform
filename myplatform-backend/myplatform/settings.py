@@ -177,6 +177,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://b5c7-188-163-27-104.ngrok-free.app',
 ]
 
+
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')

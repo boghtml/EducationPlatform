@@ -1,7 +1,12 @@
 # apps/users/urls.py
 
 from django.urls import path
-from .views import register, login_view, update_profile, delete_user, list_teachers, list_students, reset_password_request, reset_password_confirm, test_email, change_password
+from .views import (
+    register, login_view, update_profile, delete_user,
+    list_teachers, list_students, reset_password_request,
+    reset_password_confirm, change_password, test_email, get_student_details, get_teacher_details, 
+  #  google_login
+)
 
 urlpatterns = [
     path('register/', register, name='register'),
@@ -14,4 +19,10 @@ urlpatterns = [
     path('reset-password-confirm/', reset_password_confirm, name='reset_password_confirm'),
     path('test-email/', test_email, name='test_email'),
     path('change-password/', change_password, name='change_password'),
+
+    path('student/<int:id>/', get_student_details, name='get_student_details'),
+    path('teacher/<int:id>/', get_teacher_details, name='get_teacher_details'),
+
+    # path('google-login/', google_login, name='google_login'),
+
 ]
