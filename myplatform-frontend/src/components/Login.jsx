@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_URL from '../api';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -42,7 +43,7 @@ function Login() {
       .then(response => {
         console.log('User logged in successfully', response.data);
         sessionStorage.setItem('userName', response.data.userName);
-        sessionStorage.setItem('userId', response.data.id); // Додаємо збереження userId
+        sessionStorage.setItem('userId', response.data.id); 
         sessionStorage.setItem('userEmail', response.data.userEmail);
         sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
         window.location.href = '/dashboard';
@@ -55,6 +56,23 @@ function Login() {
       });
   };
 
+  const handleGoogleLogin = (credentialResponse) => {
+    axios.post(`${API_URL}/users/login/`, {
+      token: credentialResponse.credential
+    })
+    .then(response => {
+      console.log('User logged in via Google successfully', response.data);
+      sessionStorage.setItem('userName', response.data.userName);
+      sessionStorage.setItem('userId', response.data.id);
+      sessionStorage.setItem('userEmail', response.data.userEmail);
+      sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
+      window.location.href = '/dashboard';
+    })
+    .catch(error => {
+      console.error('There was an error logging in via Google!', error);
+    });
+  };
+
   return (
     <div className="container mt-5">
       <h2>Авторизація</h2>
@@ -65,13 +83,26 @@ function Login() {
         </div>
         <div className="form-group">
           <label htmlFor="password">Пароль</label>
-          <input type="password" className="form-control" id="password" name="password" value={formData.password} onChange={handleChange} required />
+          <input type="password" className="form-control" id="password" name="password" value={formData.password} onChange={handleChange} required autoComplete="current-password" />
         </div>
         <button type="submit" className="btn btn-primary">Увійти</button>
       </form>
+
       <div className="mt-3">
         <button className="btn btn-secondary" onClick={() => window.location.href = '/forgot-password'}>Забули пароль?</button>
-        <button className="btn btn-danger ml-2">Увійти через Google</button>
+        
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+        <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              console.log(credentialResponse);
+              handleGoogleLogin(credentialResponse);
+            }}
+            
+            onError={() => {
+              console.log('Login Failed');
+            }}
+          />
+        </GoogleOAuthProvider>
       </div>
     </div>
   );

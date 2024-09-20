@@ -1,0 +1,143 @@
+.course-detail-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .course-sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+  }
+  
+  .course-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  .course-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .general-channel {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+  }
+
+
+  /* Ще нове */ 
+
+
+  .course-detail-container {
+    display: flex;
+    height: 100vh;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .course-sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar-header {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .course-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .course-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+  }
+  
+  .course-description h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .modules-list {
+    margin-top: 20px;
+  }
+  
+  .module {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    background-color: #f1f3f5;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .module-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #333;
+  }
+  
+  .module-description {
+    padding: 0 20px 15px;
+    color: #666;
+  }
+  
+  .lessons-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .lesson-item {
+    padding: 10px 20px;
+    border-top: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .lesson-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .lesson-content {
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .lesson-content h3 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .lesson-content iframe {
+    width: 100%;
+    max-width: 800px;
+    height: 450px;
+    margin-bottom: 20px;
+  }
+  
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.5em;
+    color: #333;
+  }

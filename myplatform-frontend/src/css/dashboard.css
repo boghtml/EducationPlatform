@@ -68,3 +68,78 @@
 .container h1 {
   color: #ff6600; /* Adjust color as needed */
 }
+
+
+/* Новвоведення */
+
+
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 200px;
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+}
+
+.courses-sidebar {
+  width: 250px;
+  padding: 20px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.course-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.courses-list {
+  margin-top: 20px;
+}
+
+.course-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.course-item.active {
+  background-color: #f0f0f0;
+}
+
+.course-details {
+  margin-top: 20px;
+}
+
+.course-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.course-tabs {
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.tab-content {
+  padding: 20px;
+  background-color: #f9f9f9;
+}

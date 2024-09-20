@@ -5,7 +5,7 @@ import 'nouislider/dist/nouislider.css';
 import noUiSlider from 'nouislider';
 import '../css/style.css';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header'; 
+import Header from './Header'; 
 
 function CourseCatalogPage() {
   const [courses, setCourses] = useState([]);

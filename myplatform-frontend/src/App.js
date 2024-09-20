@@ -10,6 +10,12 @@ import Register from './components/Register';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import ForgotPassword from './components/ForgotPassword';
+import WorkingWithCourse from './components/WorkingWithCourse';
+import LessonDetail from './components/LessonDetail';
+
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
+
 
 function App() {
   return (
@@ -25,6 +31,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
+        <Route path="/privacy-policy" element={<PrivacyPolicy  />} />
+        <Route path="/terms-of-service" element={<TermsOfService  />} />
+
+        <Route path="/my-courses/:courseId" element={<WorkingWithCourse />} />
+        <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<LessonDetail />} />
       </Routes>
     </Router>
   );

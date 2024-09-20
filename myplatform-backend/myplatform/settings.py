@@ -12,16 +12,16 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0zpwcp8ri9rxstkgq_bodz(2xag(*3cc@@b3ze4uwxd_07^(lh'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,13 +38,22 @@ INSTALLED_APPS = [
 
     'rest_framework',  # якщо ви використовуєте Django REST framework
     'corsheaders',
-
+    'drf_yasg',
     'apps.users',
     'apps.courses',
     'apps.assignments',
     'apps.payments',
     'apps.notifications',
     'apps.enrollments',
+
+    'apps.modules',
+    'apps.lessons',
+
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -52,14 +61,13 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-
     
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     #'django.middleware.csrf.CsrfViewMiddleware',
-
+    'allauth.account.middleware.AccountMiddleware',  # Додайте цей рядок
 ]
 
 
@@ -89,17 +97,17 @@ WSGI_APPLICATION = 'myplatform.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'edu_platform_db_RDS',
-        'USER': 'postgres',
-        'PASSWORD': '1234567890HTML',
-        'HOST': 'edu-platform-db-rds.cjqq6eecqu1g.us-east-2.rds.amazonaws.com',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -156,20 +164,42 @@ CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://b5c7-188-163-27-104.ngrok-free.app",
 ]
 
 # Якщо ви хочете дозволити всі домени (тільки для розробки):
 CORS_ALLOW_ALL_ORIGINS = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '18.188.58.119']
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
+    'http://localhost:3000', 
+    'https://localhost:3000', 
+    'https://b5c7-188-163-27-104.ngrok-free.app',
 ]
 
+
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'boghtml@gmail.com'
-EMAIL_HOST_PASSWORD = 'szpf zjkn azod rbom'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = '/dashboard'
+LOGOUT_REDIRECT_URL = '/'
+
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET')
+
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '18.188.58.119', 'b5c7-188-163-27-104.ngrok-free.app']
+

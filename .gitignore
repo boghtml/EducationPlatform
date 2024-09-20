@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtualenv
+venv/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+/static
+/media
+
+# Add environment variable files
+.env

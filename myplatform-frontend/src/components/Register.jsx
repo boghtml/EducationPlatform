@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_URL from '../api';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -39,11 +39,11 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const csrftoken = getCookie('csrftoken');
-    console.log('Form data before submission:', formData);  // Новий рядок для логування
+    console.log('Form data before submission:', formData);
     axios.post(`${API_URL}/users/register/`, formData, {
       headers: {
         'X-CSRFToken': csrftoken,
-        'Content-Type': 'application/x-www-form-urlencoded',  // Змінено з 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       withCredentials: true
     })
@@ -59,8 +59,22 @@ function Register() {
       });
   };
 
+  const handleGoogleRegister = (credentialResponse) => {
+    axios.post(`${API_URL}/users/register/`, {
+      token: credentialResponse.credential
+    })
+    .then(response => {
+      console.log('User registered via Google successfully', response.data);
+      window.location.href = '/login';
+    })
+    .catch(error => {
+      console.error('There was an error registering via Google!', error);
+    });
+  };
+
   return (
     <div className="container mt-5">
+      
       <h2>Реєстрація</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -97,6 +111,21 @@ function Register() {
         </div>
         <button type="submit" className="btn btn-primary">Зареєструватися</button>
       </form>
+
+       {/* Кнопка "Реєстрація через Google" */}
+       <div className="mt-3">
+       <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+       <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              console.log(credentialResponse);
+              handleGoogleRegister(credentialResponse);
+            }}
+            onError={() => {
+              console.log('Registration Failed');
+            }}
+          />
+        </GoogleOAuthProvider>
+      </div>
     </div>
   );
 }
