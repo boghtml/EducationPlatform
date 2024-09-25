@@ -1,9 +1,6 @@
-from .forms import CustomUserCreationForm
-from django.http import JsonResponse
-from django.contrib.auth import authenticate, login
-from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -13,8 +10,14 @@ from django.db.models import Q
 from django.http import JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.utils.crypto import get_random_string
-from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
+from django.views.decorators.csrf import csrf_exempt
+
+from .models import CustomUser
+from .forms import CustomUserCreationForm, CustomUserUpdateForm
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
 
 logger = logging.getLogger(__name__)
 
