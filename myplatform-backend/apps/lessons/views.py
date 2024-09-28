@@ -11,7 +11,7 @@ from .models import Lesson, LessonFile, LessonLink
 from .serializers import LessonSerializer, LessonFileSerializer, LessonLinkSerializer, MultipleLessonLinksSerializer
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
-from rest_framework import status
+
 
 s3_client = boto3.client(
     's3',
@@ -155,3 +155,60 @@ class LessonLinksView(generics.ListAPIView):
     def get_queryset(self):
         lesson_id = self.kwargs['lesson_id']
         return LessonLink.objects.filter(lesson_id=lesson_id)
+
+# Видалення уроку
+class LessonDeleteView(generics.DestroyAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            lesson = self.get_object()
+            lesson.delete()
+            return Response({"message": "Lesson deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Lesson.DoesNotExist:
+            return Response({"error": "Lesson not found"}, status=status.HTTP_404_NOT_FOUND)
+
+# Редагування уроку
+class LessonUpdateView(generics.UpdateAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+
+class DeleteConfirmedFileView(APIView):
+    def delete(self, request, file_id):
+        try:
+            file = LessonFile.objects.get(id=file_id, is_temp=False)
+        except LessonFile.DoesNotExist:
+            return Response({"error": "Confirmed file not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Отримуємо шлях до файлу в S3
+        s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+
+        try:
+            # Видаляємо файл з S3
+            s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+
+            # Видаляємо запис з бази даних
+            file.delete()
+
+            return Response({"message": "Confirmed file successfully deleted"}, status=status.HTTP_200_OK)
+        except ClientError as e:
+            return Response({"error": f"Error deleting file from S3: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({"error": f"Error deleting file: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class LessonLinkUpdateView(generics.UpdateAPIView):
+    queryset = LessonLink.objects.all()
+    serializer_class = LessonLinkSerializer
+
+class LessonLinkDeleteView(generics.DestroyAPIView):
+    queryset = LessonLink.objects.all()
+    serializer_class = LessonLinkSerializer
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            link = self.get_object()
+            link.delete()
+            return Response({"message": "Lesson link deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except LessonLink.DoesNotExist:
+            return Response({"error": "Lesson link not found"}, status=status.HTTP_404_NOT_FOUND)

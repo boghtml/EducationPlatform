@@ -5,8 +5,13 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
 class LessonSerializer(serializers.ModelSerializer):
-    module_id = serializers.IntegerField(write_only=True)
+    module_id = serializers.IntegerField(write_only=True, required=False)  # Зробимо поле необов'язковим при оновленні
 
+    def update(self, instance, validated_data):
+        # Видаляємо module_id з validated_data, щоб не оновлювати його
+        validated_data.pop('module_id', None)
+        return super().update(instance, validated_data)
+    
     class Meta:
         model = Lesson
         fields = ['id', 'module_id', 'title', 'content', 'duration', 'created_at', 'updated_at']
@@ -16,6 +21,7 @@ class LessonSerializer(serializers.ModelSerializer):
         module = Module.objects.get(id=module_id)
         lesson = Lesson.objects.create(module=module, **validated_data)
         return lesson
+    
 
 class LessonFileSerializer(serializers.ModelSerializer):
     class Meta:
