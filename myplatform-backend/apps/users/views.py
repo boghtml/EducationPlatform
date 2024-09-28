@@ -265,7 +265,7 @@ def test_email(request):
     )
     return JsonResponse({'message': 'Email sent successfully'})
 
-# change th password with a old one
+# change th password with a old one 
 @csrf_exempt
 @login_required
 def change_password(request):

@@ -10,6 +10,8 @@ class Course(models.Model):
     status = models.CharField(max_length=10, choices=[('free', 'Free'), ('premium', 'Premium')], default='free')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     image_url = models.URLField(max_length=255, blank=True, null=True)
+    intro_video_url = models.URLField(max_length=255, blank=True, null=True)  # New field for intro video
+
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
     duration = models.IntegerField()
