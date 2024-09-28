@@ -17,6 +17,8 @@ from .forms import CustomUserCreationForm, CustomUserUpdateForm
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
 logger = logging.getLogger(__name__)
@@ -91,12 +93,12 @@ def login_view(request):
     return render(request, 'users/login.html')
 
 @csrf_exempt
-@login_required
+@api_view(['POST'])
 def update_profile(request, user_id):
     if request.method == 'POST':
         data = json.loads(request.body)
         user = get_object_or_404(CustomUser, id=user_id)
-        
+
         form = CustomUserUpdateForm(data, instance=user)
         if form.is_valid():
             form.save()
