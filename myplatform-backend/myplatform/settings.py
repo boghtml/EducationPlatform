@@ -45,10 +45,11 @@ INSTALLED_APPS = [
     'apps.payments',
     'apps.notifications',
     'apps.enrollments',
-
     'apps.modules',
     'apps.lessons',
 
+    'apps.notes', 
+    
     'django.contrib.sites',
     'allauth',
     'allauth.account',

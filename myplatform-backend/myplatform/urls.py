@@ -52,6 +52,10 @@ urlpatterns = [
     
     path('api/modules/', include('apps.modules.urls')), 
     path('api/lessons/', include('apps.lessons.urls')), 
+
+    path('api/notes/', include('apps.notes.urls')),  # Додаємо новий шлях для нотаток
+
+
     # Документація
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc-ui'),
