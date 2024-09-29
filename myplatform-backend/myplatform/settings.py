@@ -202,7 +202,7 @@ GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = config('GOOGLE_CLIENT_SECRET')
 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '18.188.58.119', 'b5c7-188-163-27-104.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '18.188.58.119', 'b5c7-188-163-27-104.ngrok-free.app', '*']
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
