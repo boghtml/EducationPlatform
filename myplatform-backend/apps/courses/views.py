@@ -88,6 +88,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Course updated successfully', 'course': serializer.data}, status=status.HTTP_200_OK)
 
 class CourseUpdateIntroVideoView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = [AllowAny]
+    
     def post(self, request, pk=None):
         try:
             course = Course.objects.get(pk=pk)
@@ -117,6 +120,9 @@ class CourseUpdateIntroVideoView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CourseUpdateImageView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication,)
+    permission_classes = [AllowAny]
+
     def post(self, request, pk=None):
         try:
             course = Course.objects.get(pk=pk)

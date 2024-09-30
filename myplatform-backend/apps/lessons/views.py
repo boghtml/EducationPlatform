@@ -11,6 +11,8 @@ from .models import Lesson, LessonFile, LessonLink
 from .serializers import LessonSerializer, LessonFileSerializer, LessonLinkSerializer, MultipleLessonLinksSerializer
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from .mixins import CsrfExemptSessionAuthentication
 
 
 s3_client = boto3.client(
@@ -118,6 +120,8 @@ class UploadLessonFileView(APIView):
 class LessonCreateView(generics.CreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -160,6 +164,8 @@ class LessonLinksView(generics.ListAPIView):
 class LessonDeleteView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def delete(self, request, *args, **kwargs):
         try:
@@ -173,6 +179,8 @@ class LessonDeleteView(generics.DestroyAPIView):
 class LessonUpdateView(generics.UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    authentication_classes = (CsrfExemptSessionAuthentication,)
 
 class DeleteConfirmedFileView(APIView):
     def delete(self, request, file_id):
