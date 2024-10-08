@@ -134,7 +134,6 @@ class LessonCreateView(generics.CreateAPIView):
         serializer.save()
 
 
-
 class LessonsByModuleView(generics.ListAPIView):
     serializer_class = LessonSerializer
 

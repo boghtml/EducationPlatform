@@ -4,7 +4,7 @@ from django.urls import path
 from .views import (
     register, login_view, update_profile, delete_user,
     list_teachers, list_students, reset_password_request,
-    reset_password_confirm, change_password, test_email, get_student_details, get_teacher_details, 
+    reset_password_confirm, change_password, test_email, get_student_details, get_teacher_details, change_password_by_id,
   #  google_login
 )
 
@@ -19,6 +19,7 @@ urlpatterns = [
     path('reset-password-confirm/', reset_password_confirm, name='reset_password_confirm'),
     path('test-email/', test_email, name='test_email'),
     path('change-password/', change_password, name='change_password'),
+    path('change-password-id/<int:user_id>/', change_password_by_id, name='change_password_by_id'),
 
     path('student/<int:id>/', get_student_details, name='get_student_details'),
     path('teacher/<int:id>/', get_teacher_details, name='get_teacher_details'),

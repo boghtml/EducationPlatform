@@ -13,6 +13,7 @@ urlpatterns = [
     path('upload-file/<int:lesson_id>/', UploadLessonFileView.as_view(), name='upload-file'),
     path('delete-temp-file/<int:file_id>/', DeleteTempFileView.as_view(), name='delete-temp-file'),
     path('confirm-temp-files/<int:lesson_id>/', ConfirmTempFilesView.as_view(), name='confirm-temp-files'),
+    
     path('add-lesson-links/<int:lesson_id>/', AddLessonLinksView.as_view(), name='add-lesson-links'),
 
         # Видалення та редагування уроків

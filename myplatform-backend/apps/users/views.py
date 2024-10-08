@@ -289,6 +289,35 @@ def change_password(request):
         return JsonResponse({'message': 'Password has been changed successfully'})
     return JsonResponse({'message': 'Invalid request method'}, status=400)
 
+# mobile vesion to change password with a old one 
+@csrf_exempt
+@login_required
+
+def change_password_by_id(request, user_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+        new_password_confirm = data.get('new_password_confirm')
+
+        if new_password != new_password_confirm:
+            return JsonResponse({'errors': 'New passwords do not match'}, status=400)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'errors': 'User not found'}, status=404)
+
+        if not user.check_password(old_password):
+            return JsonResponse({'errors': 'Old password is incorrect'}, status=400)
+
+        # Якщо пароль правильний, змінюємо на новий
+        user.set_password(new_password)
+        user.save()
+        return JsonResponse({'message': 'Password has been changed successfully'}, status=200)
+
+    return JsonResponse({'message': 'Invalid request method'}, status=400)
+
 UserModel = get_user_model()
 
 @csrf_exempt
