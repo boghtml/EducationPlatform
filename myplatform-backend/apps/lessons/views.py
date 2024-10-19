@@ -99,7 +99,7 @@ class UploadLessonFileView(APIView):
             return Response({"error": "Invalid file type"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            s3_file_path = f"Course_{course_id}/lessons/lesson_{lesson_id}/{file.name}"
+            s3_file_path = f"Courses/Course_{course_id}/lessons/lesson_{lesson_id}/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
             
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"

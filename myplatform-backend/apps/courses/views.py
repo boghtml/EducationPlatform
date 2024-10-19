@@ -23,12 +23,14 @@ s3_client = boto3.client(
 
 def create_course_folders_in_s3(course_id):
     try:
-        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'Course_{course_id}/assignments/')
-        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'Course_{course_id}/course_files/')
-        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'Course_{course_id}/lessons/')
-        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'Course_{course_id}/submissions/')
+        base_path = f'Courses/Course_{course_id}/'
+        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'{base_path}assignments/')
+        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'{base_path}course_files/')
+        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'{base_path}lessons/')
+        s3_client.put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=f'{base_path}submissions/')
     except ClientError as e:
         raise Exception(f"Failed to create folders in S3: {e}")
+
     
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -67,7 +69,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def delete_course_files_from_s3(self, course_id):
 
-        course_folder = f"Course_{course_id}/"
+        course_folder = f"Courses/Course_{course_id}/"
 
         response = s3_client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix=course_folder)
 
@@ -107,8 +109,8 @@ class CourseUpdateIntroVideoView(APIView):
                 old_video_key = course.intro_video_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_video_key)
 
-            # Завантаження нового відео у S3
-            s3_file_path = f"Course_{course.id}/course_files/{file.name}"
+             # Завантажуємо нове відео
+            s3_file_path = f"Courses/Course_{course.id}/course_files/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
             # Оновлення URL відео у базі даних
@@ -139,7 +141,7 @@ class CourseUpdateImageView(APIView):
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_image_key)
 
             # Завантаження нового зображення у S3
-            s3_file_path = f"Course_{course.id}/course_files/{file.name}"
+            s3_file_path = f"Courses/Course_{course.id}/course_files/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
             # Оновлення URL зображення у базі даних
