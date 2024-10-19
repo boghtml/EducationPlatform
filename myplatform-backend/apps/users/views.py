@@ -19,9 +19,23 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 logger = logging.getLogger(__name__)
+
+
+# Ініціалізація клієнта S3
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_S3_REGION_NAME
+)
 
 
 @csrf_exempt
@@ -459,3 +473,42 @@ def handle_google_register(request, token):
         logger.warning('Invalid token for Google registration')
         return JsonResponse({'errors': 'Invalid token'}, status=400)
 
+@csrf_exempt
+@api_view(['POST'])
+def upload_profile_image(request, user_id):
+    # Отримуємо користувача
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    # Отримуємо файл із запиту
+    file = request.FILES.get('profile_image')
+    if not file:
+        return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+    file_extension = file.name.split('.')[-1].lower()
+    if file_extension not in ['jpg', 'jpeg', 'png', 'gif']:
+        return Response({'error': 'Invalid file type. Only jpg, jpeg, png, and gif are allowed.'}, 
+                        status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Шлях до файлу у S3
+        s3_file_path = f"Users/User_{user.id}/{file.name}"
+
+        # Завантаження файлу у S3
+        s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
+
+        # Отримання повного URL файлу
+        file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
+
+        # Якщо є старе зображення, видаляємо його
+        if user.profile_image_url:
+            old_image_key = user.profile_image_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+            s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_image_key)
+
+        # Оновлюємо URL зображення профілю
+        user.profile_image_url = file_url
+        user.save()
+
+        return Response({'message': 'Profile image uploaded successfully', 'profile_image_url': file_url}, status=status.HTTP_200_OK)
+
+    except ClientError as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

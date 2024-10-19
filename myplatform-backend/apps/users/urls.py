@@ -5,6 +5,7 @@ from .views import (
     register, login_view, update_profile, delete_user,
     list_teachers, list_students, reset_password_request,
     reset_password_confirm, change_password, test_email, get_student_details, get_teacher_details, change_password_by_id,
+    upload_profile_image,
   #  google_login
 )
 
@@ -23,6 +24,8 @@ urlpatterns = [
 
     path('student/<int:id>/', get_student_details, name='get_student_details'),
     path('teacher/<int:id>/', get_teacher_details, name='get_teacher_details'),
+
+    path('upload-profile-image/<int:user_id>/', upload_profile_image, name='upload_profile_image'),
 
     # path('google-login/', google_login, name='google_login'),
 
