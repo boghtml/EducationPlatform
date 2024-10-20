@@ -2,7 +2,6 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -25,6 +24,9 @@ from django.conf import settings
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.backends import ModelBackend
 
 logger = logging.getLogger(__name__)
 
@@ -414,26 +416,25 @@ def create_success_response(request, user):
         'phone_number': user.phone_number if hasattr(user, 'phone_number') else '',
         'id': user.id
     })
-
-# Реєстрація 
-
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
-        body = request.body.decode('utf-8')
-        data = json.loads(body)
+        if 'application/json' in request.content_type:
+            data = json.loads(request.body)
+        else:
+            data = request.POST
 
         if 'token' in data:  # Перевірка, чи це реєстрація через Google
             return handle_google_register(request, data['token'])
         else:
-            logger.debug(f'Request POST data: {request.POST}')
-            form = CustomUserCreationForm(request.POST)
+            logger.debug(f'Request POST data: {data}')
+            form = CustomUserCreationForm(data)
             if form.is_valid():
                 user = form.save(commit=False)
-                user.role = 'student'  # Встановлюємо роль за замовчуванням
+                user.role = data.get('role', 'student')
                 user.save()
                 logger.info(f'New user created: {user.username}')
-                login(request, user)
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # Вказуємо бекенд явно
                 return JsonResponse({'message': 'User registered successfully'})
             else:
                 logger.error(f'Error in form: {form.errors}')

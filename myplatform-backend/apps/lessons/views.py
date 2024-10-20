@@ -22,6 +22,7 @@ s3_client = boto3.client(
     region_name=settings.AWS_S3_REGION_NAME
 )
 
+
 class AddLessonLinksView(APIView):
     def post(self, request, lesson_id):
         try:
