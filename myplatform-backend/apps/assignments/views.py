@@ -196,3 +196,36 @@ class DeleteAssignmentFileView(APIView):
             return Response({'error': f"Error deleting file from S3: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class StudentAssignmentListView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        student = request.user
+
+        if not Enrollment.objects.filter(course_id=course_id, student=student).exists():
+            return Response({"error": "You are not enrolled in this course"}, status=status.HTTP_403_FORBIDDEN)
+
+        # Отримуємо завдання та відповідні submission для студента
+        submissions = Submission.objects.filter(student=student, assignment__course_id=course_id).select_related('assignment')
+
+        assignment_list = []
+        for submission in submissions:
+            assignment = submission.assignment
+            data = {
+                "id": assignment.id,
+                "title": assignment.title,
+                "description": assignment.description,
+                "due_date": assignment.due_date,
+                "status": submission.status,
+            }
+
+            if submission.status == 'graded':
+                data["grade"] = submission.grade
+                data["feedback"] = submission.feedback
+            elif submission.status == 'returned':
+                data["feedback"] = submission.feedback
+
+            assignment_list.append(data)
+
+        return Response(assignment_list, status=status.HTTP_200_OK)
