@@ -9,6 +9,7 @@ from .views import (
     AssignmentLinkDeleteView,
     DeleteAssignmentFileView,
     StudentAssignmentListView,
+    AssignmentDetailView,
 )
 
 router = DefaultRouter()
@@ -23,7 +24,8 @@ urlpatterns = [
     path('<int:assignment_id>/add-links/', AddAssignmentLinksView.as_view(), name='add_assignment_links'),
     path('links/<int:pk>/delete/', AssignmentLinkDeleteView.as_view(), name='delete_assignment_link'),
     path('files_confirm/<int:file_id>/delete/', DeleteAssignmentFileView.as_view(), name='delete_assignment_file'),
-    
     path('student/course/<int:course_id>/assignments/', StudentAssignmentListView.as_view(), name='student_assignments'),
+
+    path('<int:assignment_id>/detail/', AssignmentDetailView.as_view(), name='assignment_detail'),
 
 ]

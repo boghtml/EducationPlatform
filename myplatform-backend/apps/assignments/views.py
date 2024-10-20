@@ -229,3 +229,77 @@ class StudentAssignmentListView(APIView):
             assignment_list.append(data)
 
         return Response(assignment_list, status=status.HTTP_200_OK)
+
+
+class AssignmentDetailView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, assignment_id):
+        try:
+            assignment = Assignment.objects.get(id=assignment_id)
+        except Assignment.DoesNotExist:
+            return Response({"error": "Assignment not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+
+        # Якщо студент
+        if user.role == 'student':
+            if not Enrollment.objects.filter(course=assignment.course, student=user).exists():
+                return Response({"error": "You do not have access to this assignment"}, status=status.HTTP_403_FORBIDDEN)
+
+            # Отримуємо файли та посилання, прикріплені до завдання
+            files = AssignmentFile.objects.filter(assignment=assignment)
+            links = AssignmentLink.objects.filter(assignment=assignment)
+
+            files_data = AssignmentFileSerializer(files, many=True).data
+            links_data = AssignmentLinkSerializer(links, many=True).data
+
+            assignment_data = {
+                'id': assignment.id,
+                'title': assignment.title,
+                'description': assignment.description,
+                'due_date': assignment.due_date,
+                'files': files_data,
+                'links': links_data
+            }
+
+        # Якщо викладач
+        elif user.role == 'teacher':
+            if assignment.teacher != user:
+                return Response({"error": "You do not have access to this assignment"}, status=status.HTTP_403_FORBIDDEN)
+
+            # Підрахунок студентів для різних статусів
+            total_students = Enrollment.objects.filter(course=assignment.course).count()  # Усі студенти на курсі
+            submitted_students = Submission.objects.filter(assignment=assignment, status='submitted').count()
+            returned_students = Submission.objects.filter(assignment=assignment, status='returned').count()
+            graded_students = Submission.objects.filter(assignment=assignment, status='graded').count()
+            assigned_students = total_students - submitted_students - returned_students - graded_students
+
+            # Отримуємо файли та посилання
+            files = AssignmentFile.objects.filter(assignment=assignment)
+            links = AssignmentLink.objects.filter(assignment=assignment)
+
+            files_data = AssignmentFileSerializer(files, many=True).data
+            links_data = AssignmentLinkSerializer(links, many=True).data
+
+            # Формуємо відповідь
+            assignment_data = {
+                'id': assignment.id,
+                'title': assignment.title,
+                'description': assignment.description,
+                'due_date': assignment.due_date,
+                'files': files_data,
+                'links': links_data,
+                'total_students': total_students,
+                'submitted_students': submitted_students,
+                'returned_students': returned_students,
+                'graded_students': graded_students,
+                'assigned_students': assigned_students
+            }
+
+        else:
+            return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
+
+        return Response(assignment_data, status=status.HTTP_200_OK)
+
