@@ -1,4 +1,5 @@
 
+from django.utils import timezone
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -302,4 +303,158 @@ class AssignmentDetailView(APIView):
             return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
 
         return Response(assignment_data, status=status.HTTP_200_OK)
+
+class SubmitAssignmentView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, assignment_id):
+        user = request.user
+
+        # Перевірка, чи користувач є студентом
+        if user.role != 'student':
+            return Response({"error": "Only students can submit assignments."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            assignment = Assignment.objects.get(id=assignment_id)
+            submission = Submission.objects.get(assignment=assignment, student=user)
+        except Assignment.DoesNotExist:
+            return Response({"error": "Assignment not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Submission.DoesNotExist:
+            return Response({"error": "You do not have access to submit this assignment"}, status=status.HTTP_403_FORBIDDEN)
+
+        # Оновлюємо статус і дату
+        submission.comment = request.data.get('comment', '')
+        submission.status = 'submitted'
+        submission.submission_date = timezone.now()
+        submission.save()
+
+        # Завантажуємо файли на S3 та зберігаємо їх у базі
+        files = request.FILES.getlist('files')
+        saved_files = []
+        for file in files:
+            s3_file_path = f"Courses/Course_{assignment.course.id}/submissions/submission_{submission.id}/{file.name}"
+            s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
+
+            submission_file = SubmissionFile.objects.create(
+                submission=submission,
+                file_url=file_url,
+                file_type=file.name.split('.')[-1].lower(),
+                file_size=file.size
+            )
+            saved_files.append(SubmissionFileSerializer(submission_file).data)
+
+        return Response({
+            'message': 'Assignment submitted successfully',
+            'files': saved_files
+        }, status=status.HTTP_201_CREATED)
+
+class CancelSubmissionView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, submission_id):
+        user = request.user
+        try:
+            submission = Submission.objects.get(id=submission_id, student=user)
+        except Submission.DoesNotExist:
+            return Response({"error": "Submission not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Видаляємо всі файли із S3
+        for file in submission.files.all():
+            s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+            s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+            file.delete()
+
+        # Очищаємо коментар і оновлюємо статус
+        submission.comment = ""
+        submission.status = 'assigned'
+        submission.submission_date = None
+        submission.save()
+
+        return Response({"message": "Submission canceled and files deleted"}, status=status.HTTP_200_OK)
+
+class SubmittedAssignmentsView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, assignment_id):
+        user = request.user
+        if user.role != 'teacher':
+            return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            assignment = Assignment.objects.get(id=assignment_id, teacher=user)
+        except Assignment.DoesNotExist:
+            return Response({"error": "Assignment not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        submissions = Submission.objects.filter(assignment=assignment, status='submitted')
+        submission_data = []
+
+        for submission in submissions:
+            submission_info = {
+                'username': submission.student.username,
+                'email': submission.student.email,
+                'submission_date': submission.submission_date,
+                'on_time': 'вчасно' if submission.submission_date <= assignment.due_date else 'пізно'
+            }
+            submission_data.append(submission_info)
+
+        return Response(submission_data, status=status.HTTP_200_OK)
+
+class SubmissionDetailView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, submission_id):
+        try:
+            submission = Submission.objects.get(id=submission_id)
+        except Submission.DoesNotExist:
+            return Response({"error": "Submission not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Перевіряємо доступ для вчителя
+        if request.user.role != 'teacher':
+            return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
+
+        submission_data = {
+            'username': submission.student.username,
+            'email': submission.student.email,
+            'submission_date': submission.submission_date,
+            'on_time': 'вчасно' if submission.submission_date <= submission.assignment.due_date else 'пізно',
+            'comment': submission.comment,
+            'files': SubmissionFileSerializer(submission.files.all(), many=True).data
+        }
+
+        return Response(submission_data, status=status.HTTP_200_OK)
+    
+class ReviewSubmissionView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, submission_id):
+        try:
+            submission = Submission.objects.get(id=submission_id)
+        except Submission.DoesNotExist:
+            return Response({"error": "Submission not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.role != 'teacher':
+            return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
+
+        action = request.data.get('action')  # Дії: 'return' або 'grade'
+        feedback = request.data.get('feedback', '')
+        grade = request.data.get('grade', None)
+
+        if action == 'return':
+            submission.status = 'returned'
+            submission.feedback = feedback
+        elif action == 'grade':
+            submission.status = 'graded'
+            submission.grade = grade
+            submission.feedback = feedback
+        else:
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+        submission.save()
+        return Response({"message": f"Submission {action}ed successfully"}, status=status.HTTP_200_OK)
 
