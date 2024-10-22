@@ -14,7 +14,8 @@ from .views import (
     CancelSubmissionView,
     SubmittedAssignmentsView,
     SubmissionDetailView,
-    ReviewSubmissionView,
+    ReturnSubmissionView,
+    GradeSubmissionView,
 )
 
 router = DefaultRouter()
@@ -34,10 +35,13 @@ urlpatterns = [
     path('<int:assignment_id>/detail/', AssignmentDetailView.as_view(), name='assignment_detail'),
 
     path('<int:assignment_id>/submit/', SubmitAssignmentView.as_view(), name='submit_assignment'),
-    path('submission/<int:submission_id>/cancel/', CancelSubmissionView.as_view(), name='cancel_submission'),
+    path('submission/<int:submission_id>/cancel/', CancelSubmissionView.as_view(), name='cancel_submission'), # *
     path('<int:assignment_id>/submissions/', SubmittedAssignmentsView.as_view(), name='submitted_assignments'),
     path('submission/<int:submission_id>/detail/', SubmissionDetailView.as_view(), name='submission_detail'),
-    path('submission/<int:submission_id>/review/', ReviewSubmissionView.as_view(), name='review_submission'),
+
+    path('<int:assignment_id>/submissions/<int:student_id>/return/', ReturnSubmissionView.as_view(), name='return_submission'),
+    path('<int:assignment_id>/submissions/<int:student_id>/grade/', GradeSubmissionView.as_view(), name='grade_submission'),
+ 
 
 
 ]

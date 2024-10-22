@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404
 from apps.courses.models import Course
+from apps.users.models import CustomUser
+
 from django.db import transaction
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
@@ -370,10 +372,11 @@ class CancelSubmissionView(APIView):
         # Очищаємо коментар і оновлюємо статус
         submission.comment = ""
         submission.status = 'assigned'
-        submission.submission_date = None
+        submission.submission_date = None  # Очищаємо дату здачі
         submission.save()
 
         return Response({"message": "Submission canceled and files deleted"}, status=status.HTTP_200_OK)
+
 
 class SubmittedAssignmentsView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
@@ -428,33 +431,61 @@ class SubmissionDetailView(APIView):
 
         return Response(submission_data, status=status.HTTP_200_OK)
     
-class ReviewSubmissionView(APIView):
+
+
+class ReturnSubmissionView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, submission_id):
+    def post(self, request, assignment_id, student_id):
+        user = request.user
+
+        # Перевірка прав доступу
+        if user.role != 'teacher':
+            return Response({"error": "Only teachers can return submissions."}, status=status.HTTP_403_FORBIDDEN)
+
         try:
-            submission = Submission.objects.get(id=submission_id)
-        except Submission.DoesNotExist:
-            return Response({"error": "Submission not found"}, status=status.HTTP_404_NOT_FOUND)
+            assignment = Assignment.objects.get(id=assignment_id, teacher=user)
+            student = CustomUser.objects.get(id=student_id)
+            submission = Submission.objects.get(assignment=assignment, student=student)
+        except (Assignment.DoesNotExist, CustomUser.DoesNotExist, Submission.DoesNotExist):
+            return Response({"error": "Submission not found or you do not have permission."}, status=status.HTTP_404_NOT_FOUND)
 
-        if request.user.role != 'teacher':
-            return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
+        feedback = request.data.get('feedback', '')
+        submission.feedback = feedback
+        submission.status = 'returned'
+        submission.save()
 
-        action = request.data.get('action')  # Дії: 'return' або 'grade'
+        return Response({"message": "Submission returned to student."}, status=status.HTTP_200_OK)
+
+
+class GradeSubmissionView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, assignment_id, student_id):
+        user = request.user
+
+        # Перевірка прав доступу
+        if user.role != 'teacher':
+            return Response({"error": "Only teachers can grade submissions."}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            assignment = Assignment.objects.get(id=assignment_id, teacher=user)
+            student = CustomUser.objects.get(id=student_id)
+            submission = Submission.objects.get(assignment=assignment, student=student)
+        except (Assignment.DoesNotExist, CustomUser.DoesNotExist, Submission.DoesNotExist):
+            return Response({"error": "Submission not found or you do not have permission."}, status=status.HTTP_404_NOT_FOUND)
+
         feedback = request.data.get('feedback', '')
         grade = request.data.get('grade', None)
 
-        if action == 'return':
-            submission.status = 'returned'
-            submission.feedback = feedback
-        elif action == 'grade':
-            submission.status = 'graded'
-            submission.grade = grade
-            submission.feedback = feedback
-        else:
-            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+        if grade is None:
+            return Response({"error": "Grade is required."}, status=status.HTTP_400_BAD_REQUEST)
 
+        submission.feedback = feedback
+        submission.grade = grade
+        submission.status = 'graded'
         submission.save()
-        return Response({"message": f"Submission {action}ed successfully"}, status=status.HTTP_200_OK)
 
+        return Response({"message": "Submission graded successfully."}, status=status.HTTP_200_OK)
