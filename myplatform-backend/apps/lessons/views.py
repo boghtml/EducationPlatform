@@ -13,6 +13,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .mixins import CsrfExemptSessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from urllib.parse import urlparse, unquote
 
@@ -152,6 +153,13 @@ class LessonsByModuleView(generics.ListAPIView):
 class LessonDetailView(RetrieveAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
 class LessonFilesView(generics.ListAPIView):
     serializer_class = LessonFileSerializer

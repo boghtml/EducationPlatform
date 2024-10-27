@@ -8,15 +8,18 @@ from apps.enrollments.models import Enrollment
 
 from rest_framework import generics
 from .models import Lesson
-from .serializers import LessonSerializer
+from apps.assignments.mixins import CsrfExemptSessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+# apps/progress_tracking/views.py
 
 class MarkLessonAsCompletedView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, lesson_id):
         user = request.user
 
-        # Перевірка, чи користувач є студентом
+        # Check if the user is a student
         if user.role != 'student':
             return Response({"error": "Only students can mark lessons as completed."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -25,29 +28,31 @@ class MarkLessonAsCompletedView(APIView):
         except Lesson.DoesNotExist:
             return Response({"error": "Lesson not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Перевірка, чи студент записаний на курс
+        # Check if the student is enrolled in the course
         if not Enrollment.objects.filter(course=lesson.module.course, student=user).exists():
             return Response({"error": "You are not enrolled in this course"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Створення або отримання запису про прогрес уроку
+        # Create or get the lesson progress
         lesson_progress, created = LessonProgress.objects.get_or_create(student=user, lesson=lesson)
 
         if created:
-            # Перевірка, чи всі уроки в модулі пройдені
-            total_lessons = lesson.module.lesson_set.count()
+            # Check if all lessons in the module are completed
+            total_lessons = lesson.module.lessons.count()  # Updated line
             completed_lessons = LessonProgress.objects.filter(student=user, lesson__module=lesson.module).count()
 
             if total_lessons == completed_lessons:
-                # Позначаємо модуль як пройдений
+                # Mark the module as completed
                 ModuleProgress.objects.get_or_create(student=user, module=lesson.module)
 
             return Response({"message": "Lesson marked as completed"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Lesson was already marked as completed"}, status=status.HTTP_200_OK)
 
-class CourseProgressView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
+class CourseProgressView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, course_id):
         user = request.user
 

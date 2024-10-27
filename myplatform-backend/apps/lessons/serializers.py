@@ -3,9 +3,13 @@ from .models import Lesson, LessonFile, LessonLink
 from apps.modules.models import Module
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from .models import Lesson
+from apps.progress_tracking.models import LessonProgress
+
 
 class LessonSerializer(serializers.ModelSerializer):
     module_id = serializers.IntegerField(write_only=True, required=False)  # Зробимо поле необов'язковим при оновленні
+    is_completed = serializers.SerializerMethodField()
 
     def update(self, instance, validated_data):
         # Видаляємо module_id з validated_data, щоб не оновлювати його
@@ -14,13 +18,20 @@ class LessonSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Lesson
-        fields = ['id', 'module_id', 'title', 'content', 'duration', 'created_at', 'updated_at']
+        fields = ['id', 'module_id', 'title', 'content', 'duration', 'created_at', 'updated_at', 'is_completed']
 
     def create(self, validated_data):
         module_id = validated_data.pop('module_id')
         module = Module.objects.get(id=module_id)
         lesson = Lesson.objects.create(module=module, **validated_data)
         return lesson
+    
+    def get_is_completed(self, obj):
+        request = self.context.get('request', None)
+        user = request.user if request else None
+        if user and user.is_authenticated and user.role == 'student':
+            return LessonProgress.objects.filter(student=user, lesson=obj).exists()
+        return False
     
 
 class LessonFileSerializer(serializers.ModelSerializer):
