@@ -89,6 +89,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         return Response({'message': 'Course updated successfully', 'course': serializer.data}, status=status.HTTP_200_OK)
 
+import urllib.parse
+
+
 class CourseUpdateIntroVideoView(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = [AllowAny]
@@ -106,15 +109,22 @@ class CourseUpdateIntroVideoView(APIView):
         try:
             # Якщо є попереднє відео, видаляємо його з S3
             if course.intro_video_url:
-                old_video_key = course.intro_video_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+                parsed_url = urllib.parse.urlparse(course.intro_video_url)
+                encoded_old_video_key = parsed_url.path.lstrip('/')
+                old_video_key = urllib.parse.unquote(encoded_old_video_key)
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_video_key)
 
-             # Завантажуємо нове відео
+            # Завантажуємо нове відео
             s3_file_path = f"Courses/Course_{course.id}/course_files/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
+            # Кодуємо шлях файлу для URL
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
+
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
+
             # Оновлення URL відео у базі даних
-            course.intro_video_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
+            course.intro_video_url = file_url
             course.save()
 
             return Response({'message': 'Intro video uploaded successfully', 'course': CourseSerializer(course).data}, status=status.HTTP_200_OK)
@@ -137,15 +147,22 @@ class CourseUpdateImageView(APIView):
 
         try:
             if course.image_url:
-                old_image_key = course.image_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+                parsed_url = urllib.parse.urlparse(course.image_url)
+                encoded_old_image_key = parsed_url.path.lstrip('/')
+                old_image_key = urllib.parse.unquote(encoded_old_image_key)
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_image_key)
 
             # Завантаження нового зображення у S3
             s3_file_path = f"Courses/Course_{course.id}/course_files/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
+            # Кодуємо шлях файлу для URL
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
+
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
+
             # Оновлення URL зображення у базі даних
-            course.image_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
+            course.image_url = file_url
             course.save()
 
             return Response({'message': 'Image uploaded successfully', 'course': CourseSerializer(course).data}, status=status.HTTP_200_OK)

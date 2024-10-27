@@ -31,7 +31,7 @@ urlpatterns = [
     path('links/<int:pk>/delete/', AssignmentLinkDeleteView.as_view(), name='delete_assignment_link'),
     path('files_confirm/<int:file_id>/delete/', DeleteAssignmentFileView.as_view(), name='delete_assignment_file'),
     path('student/course/<int:course_id>/assignments/', StudentAssignmentListView.as_view(), name='student_assignments'),
-
+    
     path('<int:assignment_id>/detail/', AssignmentDetailView.as_view(), name='assignment_detail'),
 
     path('<int:assignment_id>/submit/', SubmitAssignmentView.as_view(), name='submit_assignment'),
@@ -41,7 +41,4 @@ urlpatterns = [
 
     path('<int:assignment_id>/submissions/<int:student_id>/return/', ReturnSubmissionView.as_view(), name='return_submission'),
     path('<int:assignment_id>/submissions/<int:student_id>/grade/', GradeSubmissionView.as_view(), name='grade_submission'),
- 
-
-
 ]

@@ -26,6 +26,7 @@ from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.authentication import TokenAuthentication
+import urllib.parse
 
 # Ініціалізація клієнта S3
 s3_client = boto3.client(
@@ -81,10 +82,13 @@ class UploadAssignmentFileView(APIView):
 
         try:
             s3_file_path = f"Courses/Course_{assignment.course.id}/assignments/assignment_{assignment_id}/{file.name}"
+
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
-            
-            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
-            
+
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
+
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
+
             assignment_file = AssignmentFile.objects.create(
                 assignment=assignment,
                 file_url=file_url,
@@ -96,8 +100,7 @@ class UploadAssignmentFileView(APIView):
             return Response({'file_url': file_url}, status=status.HTTP_201_CREATED)
         except ClientError as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+        
 class DeleteTempAssignmentFileView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
@@ -109,15 +112,23 @@ class DeleteTempAssignmentFileView(APIView):
             return Response({"error": "Temporary file not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            s3_file_path = assignment_file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+            # Отримуємо закодований шлях до файлу з URL
+            encoded_s3_file_path = assignment_file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+
+            # Декодуємо шлях до файлу
+            s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
+
+            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+
+            # Видаляємо запис з бази даних
             assignment_file.delete()
 
             return Response({"message": "Temporary file deleted successfully"}, status=status.HTTP_200_OK)
         except ClientError as e:
             return Response({'error': f"Error deleting file from S3: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
 
-     
 class ConfirmAssignmentFilesView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
@@ -187,10 +198,15 @@ class DeleteAssignmentFileView(APIView):
             return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
+            # Отримуємо закодований шлях до файлу з URL
+            encoded_s3_file_path = assignment_file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+
+            # Декодуємо шлях до файлу
+            s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
+
             # Видаляємо файл з S3
-            s3_file_path = assignment_file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
-            
+
             # Видаляємо файл з бази даних
             assignment_file.delete()
 
@@ -306,6 +322,7 @@ class AssignmentDetailView(APIView):
 
         return Response(assignment_data, status=status.HTTP_200_OK)
 
+
 class SubmitAssignmentView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
@@ -336,9 +353,16 @@ class SubmitAssignmentView(APIView):
         saved_files = []
         for file in files:
             s3_file_path = f"Courses/Course_{assignment.course.id}/submissions/submission_{submission.id}/{file.name}"
-            s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
-            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
 
+            # Завантажуємо файл на S3
+            s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
+
+            # Кодуємо шлях файлу для URL
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
+
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
+
+            # Зберігаємо інформацію про файл у базу даних
             submission_file = SubmissionFile.objects.create(
                 submission=submission,
                 file_url=file_url,
@@ -351,6 +375,7 @@ class SubmitAssignmentView(APIView):
             'message': 'Assignment submitted successfully',
             'files': saved_files
         }, status=status.HTTP_201_CREATED)
+    
 
 class CancelSubmissionView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
@@ -365,8 +390,16 @@ class CancelSubmissionView(APIView):
 
         # Видаляємо всі файли із S3
         for file in submission.files.all():
-            s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+            # Отримуємо закодований шлях до файлу з URL
+            encoded_s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+
+            # Декодуємо шлях до файлу
+            s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
+
+            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+
+            # Видаляємо запис з бази даних
             file.delete()
 
         # Очищаємо коментар і оновлюємо статус

@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .mixins import CsrfExemptSessionAuthentication
 
+from urllib.parse import urlparse, unquote
 
 s3_client = boto3.client(
     's3',
@@ -67,8 +68,10 @@ class DeleteTempFileView(APIView):
         except LessonFile.DoesNotExist:
             return Response({"error": "Temporary file not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Отримуємо шлях до файлу в S3
-        s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+        # Парсимо URL файлу
+        parsed_url = urlparse(file.file_url)
+        encoded_s3_file_path = parsed_url.path.lstrip('/')
+        s3_file_path = unquote(encoded_s3_file_path)
 
         try:
             # Видаляємо файл з S3
@@ -82,7 +85,9 @@ class DeleteTempFileView(APIView):
             return Response({"error": f"Error deleting file from S3: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": f"Error deleting file: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+    
+import urllib.parse
+
 class UploadLessonFileView(APIView):
     def post(self, request, lesson_id):
         try:
@@ -103,7 +108,10 @@ class UploadLessonFileView(APIView):
             s3_file_path = f"Courses/Course_{course_id}/lessons/lesson_{lesson_id}/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
             
-            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
+            # Кодуємо шлях файлу для URL
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
+
+            file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
             
             lesson_file = LessonFile.objects.create(
                 lesson=lesson,
@@ -189,14 +197,13 @@ class DeleteConfirmedFileView(APIView):
         except LessonFile.DoesNotExist:
             return Response({"error": "Confirmed file not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Отримуємо шлях до файлу в S3
-        s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+        parsed_url = urlparse(file.file_url)
+        encoded_s3_file_path = parsed_url.path.lstrip('/')
+        s3_file_path = unquote(encoded_s3_file_path)
 
         try:
-            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
 
-            # Видаляємо запис з бази даних
             file.delete()
 
             return Response({"message": "Confirmed file successfully deleted"}, status=status.HTTP_200_OK)

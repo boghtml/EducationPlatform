@@ -474,6 +474,9 @@ def handle_google_register(request, token):
         logger.warning('Invalid token for Google registration')
         return JsonResponse({'errors': 'Invalid token'}, status=400)
 
+import urllib.parse
+
+
 @csrf_exempt
 @api_view(['POST'])
 def upload_profile_image(request, user_id):
@@ -497,12 +500,16 @@ def upload_profile_image(request, user_id):
         # Завантаження файлу у S3
         s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-        # Отримання повного URL файлу
-        file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{s3_file_path}"
+        # Кодування шляху файлу для URL
+        encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
+
+        file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
         # Якщо є старе зображення, видаляємо його
         if user.profile_image_url:
-            old_image_key = user.profile_image_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+            parsed_url = urllib.parse.urlparse(user.profile_image_url)
+            encoded_old_image_key = parsed_url.path.lstrip('/')
+            old_image_key = urllib.parse.unquote(encoded_old_image_key)
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_image_key)
 
         # Оновлюємо URL зображення профілю
