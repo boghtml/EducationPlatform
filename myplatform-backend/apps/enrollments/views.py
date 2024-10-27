@@ -53,9 +53,11 @@ class EnrollCourseView(APIView):
         serializer = EnrollmentSerializer(enrollment)
         return Response({'message': 'Enrollment successful', 'enrollment': serializer.data}, status=status.HTTP_201_CREATED)
 
+from rest_framework.permissions import IsAuthenticated
+
 class UserEnrolledCoursesView(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -68,6 +70,10 @@ class UserEnrolledCoursesView(APIView):
         }
     )
     def get(self, request, user_id, *args, **kwargs):
+        # Перевірка, чи запитує поточний користувач свої курси
+        if request.user.id != user_id:
+            return Response({'error': 'You are not authorized to view these courses'}, status=status.HTTP_403_FORBIDDEN)
+
         try:
             student = CustomUser.objects.get(id=user_id, role='student')
         except CustomUser.DoesNotExist:
@@ -75,5 +81,6 @@ class UserEnrolledCoursesView(APIView):
 
         enrollments = Enrollment.objects.filter(student=student)
         courses = [enrollment.course for enrollment in enrollments]
-        serializer = CourseSerializer(courses, many=True)
+
+        serializer = CourseSerializer(courses, many=True, context={'request': request})
         return Response({'courses': serializer.data}, status=status.HTTP_200_OK)
