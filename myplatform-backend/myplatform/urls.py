@@ -45,17 +45,17 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/get-csrf-token/', get_csrf_token),  # Додайте цей маршрут
+    path('api/get-csrf-token/', get_csrf_token),
     path('api/', include('apps.courses.urls')),  
     path('api/users/', include('apps.users.urls')),
     path('api/enrollments/', include('apps.enrollments.urls')),
-    
     path('api/modules/', include('apps.modules.urls')), 
     path('api/lessons/', include('apps.lessons.urls')), 
+    path('api/notes/', include('apps.notes.urls')),
+    path('api/assignments/', include('apps.assignments.urls')), 
 
-    path('api/notes/', include('apps.notes.urls')),  # Додаємо новий шлях для нотаток
+    path('api/progress/', include('apps.progress_tracking.urls')),
 
-    path('api/assignments/', include('apps.assignments.urls')),  # Додаємо новий шлях для нотаток
     # Документація
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc-ui'),

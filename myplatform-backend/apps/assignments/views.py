@@ -12,7 +12,7 @@ from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from .models import Assignment, AssignmentFile, AssignmentLink, Submission, SubmissionFile
 from .serializers import AssignmentSerializer, AssignmentFileSerializer, AssignmentLinkSerializer, SubmissionSerializer, SubmissionFileSerializer, MultipleAssignmentLinksSerializer
-from apps.enrollments.models import Enrollment  # Для отримання студентів, записаних на курс
+from apps.enrollments.models import Enrollment
 from rest_framework.views import APIView
 import boto3
 from django.conf import settings
@@ -28,7 +28,6 @@ from django.utils.decorators import method_decorator
 from rest_framework.authentication import TokenAuthentication
 import urllib.parse
 
-# Ініціалізація клієнта S3
 s3_client = boto3.client(
     's3',
     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -115,15 +114,12 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         import botocore
 
         try:
-            # Парсимо URL файлу
             parsed_url = urlparse(file_url)
             encoded_s3_file_path = parsed_url.path.lstrip('/')
             s3_file_path = unquote(encoded_s3_file_path)
 
-            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
         except botocore.exceptions.ClientError as e:
-            # Логування помилки
             print(f"Error deleting file from S3: {e}")
 
 
@@ -174,16 +170,12 @@ class DeleteTempAssignmentFileView(APIView):
             return Response({"error": "Temporary file not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            # Отримуємо закодований шлях до файлу з URL
             encoded_s3_file_path = assignment_file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
 
-            # Декодуємо шлях до файлу
             s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
 
-            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
 
-            # Видаляємо запис з бази даних
             assignment_file.delete()
 
             return Response({"message": "Temporary file deleted successfully"}, status=status.HTTP_200_OK)
@@ -227,7 +219,7 @@ class AddAssignmentLinksView(APIView):
                 assignment_link = AssignmentLink.objects.create(
                     assignment=assignment,
                     link_url=link_url,
-                    description=""  # Ви можете додати логіку для опису, якщо потрібно
+                    description=""
                 )
                 created_links.append(AssignmentLinkSerializer(assignment_link).data)
             return Response(created_links, status=status.HTTP_201_CREATED)
@@ -260,16 +252,13 @@ class DeleteAssignmentFileView(APIView):
             return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            # Отримуємо закодований шлях до файлу з URL
+            
             encoded_s3_file_path = assignment_file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
 
-            # Декодуємо шлях до файлу
             s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
 
-            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
 
-            # Видаляємо файл з бази даних
             assignment_file.delete()
 
             return Response({"message": "File deleted successfully"}, status=status.HTTP_200_OK)
@@ -287,7 +276,6 @@ class StudentAssignmentListView(APIView):
         if not Enrollment.objects.filter(course_id=course_id, student=student).exists():
             return Response({"error": "You are not enrolled in this course"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Отримуємо завдання та відповідні submission для студента
         submissions = Submission.objects.filter(student=student, assignment__course_id=course_id).select_related('assignment')
 
         assignment_list = []
@@ -324,12 +312,10 @@ class AssignmentDetailView(APIView):
 
         user = request.user
 
-        # Якщо студент
         if user.role == 'student':
             if not Enrollment.objects.filter(course=assignment.course, student=user).exists():
                 return Response({"error": "You do not have access to this assignment"}, status=status.HTTP_403_FORBIDDEN)
 
-            # Отримуємо файли та посилання, прикріплені до завдання
             files = AssignmentFile.objects.filter(assignment=assignment)
             links = AssignmentLink.objects.filter(assignment=assignment)
 
@@ -345,26 +331,22 @@ class AssignmentDetailView(APIView):
                 'links': links_data
             }
 
-        # Якщо викладач
         elif user.role == 'teacher':
             if assignment.teacher != user:
                 return Response({"error": "You do not have access to this assignment"}, status=status.HTTP_403_FORBIDDEN)
 
-            # Підрахунок студентів для різних статусів
             total_students = Enrollment.objects.filter(course=assignment.course).count()  # Усі студенти на курсі
             submitted_students = Submission.objects.filter(assignment=assignment, status='submitted').count()
             returned_students = Submission.objects.filter(assignment=assignment, status='returned').count()
             graded_students = Submission.objects.filter(assignment=assignment, status='graded').count()
             assigned_students = total_students - submitted_students - returned_students - graded_students
 
-            # Отримуємо файли та посилання
             files = AssignmentFile.objects.filter(assignment=assignment)
             links = AssignmentLink.objects.filter(assignment=assignment)
 
             files_data = AssignmentFileSerializer(files, many=True).data
             links_data = AssignmentLinkSerializer(links, many=True).data
 
-            # Формуємо відповідь
             assignment_data = {
                 'id': assignment.id,
                 'title': assignment.title,
@@ -392,7 +374,6 @@ class SubmitAssignmentView(APIView):
     def post(self, request, assignment_id):
         user = request.user
 
-        # Перевірка, чи користувач є студентом
         if user.role != 'student':
             return Response({"error": "Only students can submit assignments."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -404,27 +385,22 @@ class SubmitAssignmentView(APIView):
         except Submission.DoesNotExist:
             return Response({"error": "You do not have access to submit this assignment"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Оновлюємо статус і дату
         submission.comment = request.data.get('comment', '')
         submission.status = 'submitted'
         submission.submission_date = timezone.now()
         submission.save()
 
-        # Завантажуємо файли на S3 та зберігаємо їх у базі
         files = request.FILES.getlist('files')
         saved_files = []
         for file in files:
             s3_file_path = f"Courses/Course_{assignment.course.id}/submissions/submission_{submission.id}/{file.name}"
 
-            # Завантажуємо файл на S3
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-            # Кодуємо шлях файлу для URL
             encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
-            # Зберігаємо інформацію про файл у базу даних
             submission_file = SubmissionFile.objects.create(
                 submission=submission,
                 file_url=file_url,
@@ -450,24 +426,19 @@ class CancelSubmissionView(APIView):
         except Submission.DoesNotExist:
             return Response({"error": "Submission not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Видаляємо всі файли із S3
         for file in submission.files.all():
-            # Отримуємо закодований шлях до файлу з URL
+            
             encoded_s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
 
-            # Декодуємо шлях до файлу
             s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
 
-            # Видаляємо файл з S3
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
 
-            # Видаляємо запис з бази даних
             file.delete()
 
-        # Очищаємо коментар і оновлюємо статус
         submission.comment = ""
         submission.status = 'assigned'
-        submission.submission_date = None  # Очищаємо дату здачі
+        submission.submission_date = None
         submission.save()
 
         return Response({"message": "Submission canceled and files deleted"}, status=status.HTTP_200_OK)
@@ -511,7 +482,6 @@ class SubmissionDetailView(APIView):
         except Submission.DoesNotExist:
             return Response({"error": "Submission not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Перевіряємо доступ для вчителя
         if request.user.role != 'teacher':
             return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -535,7 +505,6 @@ class ReturnSubmissionView(APIView):
     def post(self, request, assignment_id, student_id):
         user = request.user
 
-        # Перевірка прав доступу
         if user.role != 'teacher':
             return Response({"error": "Only teachers can return submissions."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -561,7 +530,6 @@ class GradeSubmissionView(APIView):
     def post(self, request, assignment_id, student_id):
         user = request.user
 
-        # Перевірка прав доступу
         if user.role != 'teacher':
             return Response({"error": "Only teachers can grade submissions."}, status=status.HTTP_403_FORBIDDEN)
 
