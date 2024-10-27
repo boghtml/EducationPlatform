@@ -66,6 +66,68 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def update(self, request, *args, **kwargs):
+        assignment = self.get_object()
+
+        self.check_object_permissions(request, assignment)
+
+        serializer = self.get_serializer(assignment, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        assignment = self.get_object()
+
+        self.check_object_permissions(request, assignment)
+
+        self.perform_destroy(assignment)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        self.delete_assignment_files(instance)
+        instance.links.all().delete()
+
+        submissions = instance.submissions.all()  # Використовуємо 'submissions' замість 'submission_set'
+        for submission in submissions:
+            self.delete_submission_files(submission)
+            submission.delete()
+
+        instance.delete()
+
+
+    def delete_assignment_files(self, assignment):
+        assignment_files = assignment.files.all()
+        for file in assignment_files:
+            self.delete_file_from_s3(file.file_url)
+            file.delete()
+
+    def delete_submission_files(self, submission):
+        submission_files = submission.files.all()
+        for file in submission_files:
+            self.delete_file_from_s3(file.file_url)
+            file.delete()
+
+    def delete_file_from_s3(self, file_url):
+        from urllib.parse import urlparse, unquote
+        import botocore
+
+        try:
+            # Парсимо URL файлу
+            parsed_url = urlparse(file_url)
+            encoded_s3_file_path = parsed_url.path.lstrip('/')
+            s3_file_path = unquote(encoded_s3_file_path)
+
+            # Видаляємо файл з S3
+            s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+        except botocore.exceptions.ClientError as e:
+            # Логування помилки
+            print(f"Error deleting file from S3: {e}")
+
+
+
 class UploadAssignmentFileView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
