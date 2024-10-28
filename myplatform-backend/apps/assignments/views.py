@@ -299,6 +299,44 @@ class StudentAssignmentListView(APIView):
 
         return Response(assignment_list, status=status.HTTP_200_OK)
 
+class TeacherAssignmentListView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        teacher = request.user
+
+        # Перевірка, чи користувач є вчителем
+        if teacher.role != 'teacher':
+            return Response({"error": "You are not authorized to view this."}, status=status.HTTP_403_FORBIDDEN)
+
+        course = Course.objects.get(id=course_id)
+        
+        assignments = Assignment.objects.filter(course=course)
+
+        assignment_list = []
+
+        for assignment in assignments:
+            # Отримуємо кількість поданих, оцінених та повернених робіт
+            total_submissions = Submission.objects.filter(assignment=assignment).count()
+            graded_submissions = Submission.objects.filter(assignment=assignment, status='graded').count()
+            returned_submissions = Submission.objects.filter(assignment=assignment, status='returned').count()
+
+            data = {
+                "id": assignment.id,
+                "title": assignment.title,
+                "description": assignment.description,
+                "due_date": assignment.due_date,
+                "created_at": assignment.created_at,
+                "total_submissions": total_submissions,
+                "graded_submissions": graded_submissions,
+                "returned_submissions": returned_submissions,
+            }
+
+            assignment_list.append(data)
+
+        return Response(assignment_list, status=status.HTTP_200_OK)
+
 
 class AssignmentDetailView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]

@@ -78,7 +78,6 @@ class MaterialUpdateView(APIView):
     def put(self, request, material_id):
         user = request.user
 
-        # Check if material exists and belongs to the teacher
         material = get_object_or_404(Material, id=material_id)
 
         if user.role != 'teacher' or material.course.teacher != user:
@@ -108,7 +107,6 @@ class MaterialDeleteView(APIView):
         if user.role != 'teacher' or material.course.teacher != user:
             return Response({'error': 'You are not authorized to delete this material.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Delete files from S3
         for file in material.files.all():
             self.delete_file_from_s3(file.file_url)
             file.delete()
@@ -152,7 +150,6 @@ class MaterialAddFilesView(APIView):
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
-            # Create MaterialFile record
             MaterialFile.objects.create(
                 material=material,
                 file_url=file_url,
@@ -200,12 +197,12 @@ class MaterialFileDeleteView(APIView):
 
     def delete_files_from_s3(self, prefix):
         try:
-            # Отримуємо список всіх об'єктів з префіксом
+            
             response = s3_client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix=prefix)
             if 'Contents' in response:
-                # Створюємо список об'єктів для видалення
+                
                 objects_to_delete = [{'Key': obj['Key']} for obj in response['Contents']]
-                # Видаляємо об'єкти
+                
                 s3_client.delete_objects(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Delete={'Objects': objects_to_delete})
                 print(f"Deleted all objects under prefix {prefix}")
             else:
@@ -222,10 +219,9 @@ class MaterialListView(ListAPIView):
         user = self.request.user
 
         if user.role == 'teacher':
-            # Teachers see materials for their courses
+            
             return Material.objects.filter(course__teacher=user)
         elif user.role == 'student':
-            # Students see materials for courses they're enrolled in
             enrolled_courses = Enrollment.objects.filter(student=user).values_list('course', flat=True)
             return Material.objects.filter(course__in=enrolled_courses)
         else:
@@ -245,7 +241,7 @@ class MaterialDetailView(RetrieveAPIView):
         if user.role == 'teacher' and material.course.teacher == user:
             return super().get(request, *args, **kwargs)
         elif user.role == 'student':
-            # Check if student is enrolled in the course
+            
             is_enrolled = Enrollment.objects.filter(course=material.course, student=user).exists()
             if is_enrolled:
                 return super().get(request, *args, **kwargs)
