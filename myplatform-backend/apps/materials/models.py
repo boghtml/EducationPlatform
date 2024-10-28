@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from apps.courses.models import Course  # Імпортуємо модель курсів
+from apps.courses.models import Course  
 
 class Material(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='materials')
