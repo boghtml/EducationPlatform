@@ -15,6 +15,8 @@ from rest_framework.generics import ListAPIView
 from apps.enrollments.models import Enrollment
 from rest_framework.generics import RetrieveAPIView
 
+import urllib.parse
+
 s3_client = boto3.client(
     's3',
     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -51,10 +53,11 @@ class MaterialCreateView(APIView):
         )
 
         for file in files:
-            s3_file_path = f"materials/material_{material.id}/{file.name}"
+            s3_file_path = f"Courses/Course_{course.id}/materials/material_{material.id}/{file.name}"
+
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-            encoded_file_path = s3_file_path.replace(' ', '+')
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
@@ -141,11 +144,11 @@ class MaterialAddFilesView(APIView):
             return Response({'error': 'No files provided.'}, status=status.HTTP_400_BAD_REQUEST)
 
         for file in files:
-            s3_file_path = f"materials/material_{material.id}/{file.name}"
+            s3_file_path = f"Courses/Course_{material.course.id}/materials/material_{material.id}/{file.name}"
+
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-            # Encode the file path
-            encoded_file_path = s3_file_path.replace(' ', '+')
+            encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
@@ -173,19 +176,42 @@ class MaterialFileDeleteView(APIView):
         if user.role != 'teacher' or material.course.teacher != user:
             return Response({'error': 'You are not authorized to delete this file.'}, status=status.HTTP_403_FORBIDDEN)
 
+        print("Calling delete_file_from_s3...")
         self.delete_file_from_s3(material_file.file_url)
+        print("Returned from delete_file_from_s3.")
 
         material_file.delete()
         return Response({'message': 'File deleted successfully.'}, status=status.HTTP_200_OK)
 
+
     def delete_file_from_s3(self, file_url):
+        print(f"Deleting file from S3: {file_url}")
         parsed_url = urlparse(file_url)
+        print(f"Parsed URL: {parsed_url}")
         s3_file_path = unquote(parsed_url.path.lstrip('/'))
+        print(f"S3 file path: {s3_file_path}")
 
         try:
-            s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+            response = s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+            print(f"Deleted {s3_file_path} from S3. Response: {response}")
         except Exception as e:
             print(f"Error deleting file from S3: {e}")
+
+
+    def delete_files_from_s3(self, prefix):
+        try:
+            # Отримуємо список всіх об'єктів з префіксом
+            response = s3_client.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix=prefix)
+            if 'Contents' in response:
+                # Створюємо список об'єктів для видалення
+                objects_to_delete = [{'Key': obj['Key']} for obj in response['Contents']]
+                # Видаляємо об'єкти
+                s3_client.delete_objects(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Delete={'Objects': objects_to_delete})
+                print(f"Deleted all objects under prefix {prefix}")
+            else:
+                print(f"No objects found under prefix {prefix}")
+        except Exception as e:
+            print(f"Error deleting files from S3: {e}")
 
 class MaterialListView(ListAPIView):
     serializer_class = MaterialSerializer
