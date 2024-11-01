@@ -451,7 +451,35 @@ class SubmitAssignmentView(APIView):
             'message': 'Assignment submitted successfully',
             'files': saved_files
         }, status=status.HTTP_201_CREATED)
-    
+
+class CancelSubmissionViewByAssigment(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, assignment_id):
+        user = request.user
+        try:
+            submission = Submission.objects.get(assignment_id=assignment_id, student=user)
+        except Submission.DoesNotExist:
+            return Response({"error": "Submission not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Видаляємо файли з S3 та записи з бази даних
+        for file in submission.files.all():
+            encoded_s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+            s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
+            s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
+            file.delete()
+
+        # Скидаємо поля подачі
+        submission.comment = ""
+        submission.status = 'assigned'
+        submission.submission_date = None
+        submission.grade = None  # Якщо є поле оцінки
+        submission.feedback = ""  # Якщо є поле відгуку
+        submission.save()
+
+        return Response({"message": "Submission canceled and files deleted"}, status=status.HTTP_200_OK)
+
 
 class CancelSubmissionView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
