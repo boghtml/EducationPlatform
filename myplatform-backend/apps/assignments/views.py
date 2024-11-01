@@ -481,7 +481,6 @@ class CancelSubmissionView(APIView):
 
         return Response({"message": "Submission canceled and files deleted"}, status=status.HTTP_200_OK)
 
-
 class SubmittedAssignmentsView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
     permission_classes = [IsAuthenticated]
@@ -501,6 +500,7 @@ class SubmittedAssignmentsView(APIView):
 
         for submission in submissions:
             submission_info = {
+                'id': submission.id,
                 'username': submission.student.username,
                 'email': submission.student.email,
                 'submission_date': submission.submission_date,
@@ -509,6 +509,7 @@ class SubmittedAssignmentsView(APIView):
             submission_data.append(submission_info)
 
         return Response(submission_data, status=status.HTTP_200_OK)
+
 
 class SubmissionDetailView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]
