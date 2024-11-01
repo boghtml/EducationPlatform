@@ -145,10 +145,18 @@ class LessonCreateView(generics.CreateAPIView):
 
 class LessonsByModuleView(generics.ListAPIView):
     serializer_class = LessonSerializer
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         module_id = self.kwargs['module_id']
         return Lesson.objects.filter(module_id=module_id)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
 
 class LessonDetailView(RetrieveAPIView):
     queryset = Lesson.objects.all()
