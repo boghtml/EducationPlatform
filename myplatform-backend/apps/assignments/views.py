@@ -298,7 +298,6 @@ class StudentAssignmentListView(APIView):
                 data["feedback"] = submission.feedback
                 data["returned_at"] = submission.returned_at
 
-
             assignment_list.append(data)
 
         return Response(assignment_list, status=status.HTTP_200_OK)

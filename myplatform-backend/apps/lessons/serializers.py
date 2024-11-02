@@ -5,14 +5,15 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from .models import Lesson
 from apps.progress_tracking.models import LessonProgress
+import urllib.parse
 
 
 class LessonSerializer(serializers.ModelSerializer):
-    module_id = serializers.IntegerField(write_only=True, required=False)  # Зробимо поле необов'язковим при оновленні
+    module_id = serializers.IntegerField(write_only=True, required=False)
     is_completed = serializers.SerializerMethodField()
 
     def update(self, instance, validated_data):
-        # Видаляємо module_id з validated_data, щоб не оновлювати його
+        
         validated_data.pop('module_id', None)
         return super().update(instance, validated_data)
     
@@ -35,9 +36,16 @@ class LessonSerializer(serializers.ModelSerializer):
     
 
 class LessonFileSerializer(serializers.ModelSerializer):
+    file_name = serializers.SerializerMethodField() 
+
     class Meta:
         model = LessonFile
-        fields = ['id', 'lesson_id', 'file_url', 'file_type', 'file_size', 'is_temp', 'created_at']
+        fields = ['id', 'lesson_id', 'file_url', 'file_type', 'file_size', 'is_temp', 'created_at', 'file_name']
+
+    def get_file_name(self, obj):
+        
+        parsed_url = urllib.parse.urlparse(obj.file_url)
+        return urllib.parse.unquote(parsed_url.path.split('/')[-1])
 
 class LessonLinkSerializer(serializers.ModelSerializer):
     class Meta:
