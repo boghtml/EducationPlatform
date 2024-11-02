@@ -296,6 +296,8 @@ class StudentAssignmentListView(APIView):
                 data["feedback"] = submission.feedback
             elif submission.status == 'returned':
                 data["feedback"] = submission.feedback
+                data["returned_at"] = submission.returned_at
+
 
             assignment_list.append(data)
 
