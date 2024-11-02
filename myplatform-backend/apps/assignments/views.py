@@ -28,6 +28,8 @@ from django.utils.decorators import method_decorator
 from rest_framework.authentication import TokenAuthentication
 import urllib.parse
 
+from django.utils import timezone
+
 s3_client = boto3.client(
     's3',
     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -587,6 +589,7 @@ class ReturnSubmissionView(APIView):
         feedback = request.data.get('feedback', '')
         submission.feedback = feedback
         submission.status = 'returned'
+        submission.returned_at = timezone.now() 
         submission.save()
 
         return Response({"message": "Submission returned to student."}, status=status.HTTP_200_OK)
