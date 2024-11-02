@@ -553,6 +553,8 @@ class SubmissionDetailView(APIView):
             return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
 
         submission_data = {
+            'student_id': submission.student.id, 
+
             'username': submission.student.username,
             'email': submission.student.email,
             'submission_date': submission.submission_date,
