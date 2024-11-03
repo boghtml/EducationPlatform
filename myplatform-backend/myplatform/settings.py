@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     'apps.lessons',
     'apps.notes', 
     'apps.progress_tracking',
-    
     'apps.materials',
+    'apps.questions',
 
     'django.contrib.sites',
     'allauth',

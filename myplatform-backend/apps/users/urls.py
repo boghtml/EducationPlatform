@@ -13,9 +13,9 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),
     path('update-profile/<int:user_id>/', update_profile, name='update_profile'),
-    path('delete-user/<int:user_id>/', delete_user, name='delete_user'),  # New URL pattern for deleting a user
-    path('teachers/', list_teachers, name='list_teachers'),  # New URL pattern for listing teachers
-    path('students/', list_students, name='list_students'),  # New URL pattern for listing students
+    path('delete-user/<int:user_id>/', delete_user, name='delete_user'), 
+    path('teachers/', list_teachers, name='list_teachers'),   
+    path('students/', list_students, name='list_students'),  
     path('reset-password-request/', reset_password_request, name='reset_password_request'),
     path('reset-password-confirm/', reset_password_confirm, name='reset_password_confirm'),
     path('test-email/', test_email, name='test_email'),
@@ -26,7 +26,4 @@ urlpatterns = [
     path('teacher/<int:id>/', get_teacher_details, name='get_teacher_details'),
 
     path('upload-profile-image/<int:user_id>/', upload_profile_image, name='upload_profile_image'),
-
-    # path('google-login/', google_login, name='google_login'),
-
 ]
