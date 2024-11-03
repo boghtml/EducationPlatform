@@ -57,6 +57,8 @@ urlpatterns = [
     path('api/progress/', include('apps.progress_tracking.urls')),
     path('api/materials/', include('apps.materials.urls')),
 
+    path('api/questions/', include('apps.questions.urls')),
+
     # Документація
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc-ui'),
