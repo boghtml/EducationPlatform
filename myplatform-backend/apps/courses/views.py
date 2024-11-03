@@ -15,6 +15,15 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 
 from apps.categories.models import CourseCategoryRelation, CourseCategory
+from apps.enrollments.models import Enrollment
+from apps.users.models import CustomUser
+from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from apps.courses.models import Course
+from apps.assignments.models import Assignment
+from apps.questions.models import Question
+from .serializers import UserSerializer
+
 
 s3_client = boto3.client(
     's3',
@@ -64,7 +73,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         course = self.perform_create(serializer)
-        # Create folders in S3
+
         try:
             create_course_folders_in_s3(course.id)
         except Exception as e:
@@ -125,23 +134,21 @@ class CourseUpdateIntroVideoView(APIView):
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Якщо є попереднє відео, видаляємо його з S3
+            
             if course.intro_video_url:
                 parsed_url = urllib.parse.urlparse(course.intro_video_url)
                 encoded_old_video_key = parsed_url.path.lstrip('/')
                 old_video_key = urllib.parse.unquote(encoded_old_video_key)
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_video_key)
 
-            # Завантажуємо нове відео
+
             s3_file_path = f"Courses/Course_{course.id}/course_files/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-            # Кодуємо шлях файлу для URL
             encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
-            # Оновлення URL відео у базі даних
             course.intro_video_url = file_url
             course.save()
 
@@ -170,19 +177,47 @@ class CourseUpdateImageView(APIView):
                 old_image_key = urllib.parse.unquote(encoded_old_image_key)
                 s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_image_key)
 
-            # Завантаження нового зображення у S3
             s3_file_path = f"Courses/Course_{course.id}/course_files/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-            # Кодуємо шлях файлу для URL
             encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
-            # Оновлення URL зображення у базі даних
             course.image_url = file_url
             course.save()
 
             return Response({'message': 'Image uploaded successfully', 'course': CourseSerializer(course).data}, status=status.HTTP_200_OK)
         except ClientError as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class CourseParticipantsView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+
+        students = CustomUser.objects.filter(
+            id__in=Enrollment.objects.filter(course=course).values_list('student_id', flat=True)
+        )
+
+        teachers_ids = set()
+        teachers_ids.add(course.teacher.id)
+        teachers_ids.update(Assignment.objects.filter(course=course).values_list('teacher_id', flat=True))
+        teachers_ids.update(Question.objects.filter(course=course).values_list('teacher_id', flat=True))
+
+        teachers = CustomUser.objects.filter(id__in=teachers_ids)
+
+        admins = CustomUser.objects.filter(role='admin')
+
+        students_data = UserSerializer(students, many=True).data
+        teachers_data = UserSerializer(teachers, many=True).data
+        admins_data = UserSerializer(admins, many=True).data
+
+        return Response({
+            'students': students_data,
+            'teachers': teachers_data,
+            'admins': admins_data  
+        }, status=status.HTTP_200_OK)

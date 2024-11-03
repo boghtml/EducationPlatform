@@ -60,3 +60,11 @@ class CourseSerializer(serializers.ModelSerializer):
         return Lesson.objects.filter(
             module__course=obj
         ).count()
+    
+
+from apps.users.models import CustomUser  # Імпортуємо модель користувача
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'profile_image_url']

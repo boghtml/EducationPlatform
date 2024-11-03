@@ -11,7 +11,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'content', 'created_at', 'updated_at', 'profile_image_url']
 
     def get_profile_image_url(self, obj):
-        return obj.user.profile_image_url  # Повертаємо URL зображення профілю користувача
+        return obj.user.profile_image_url
 
 class QuestionSerializer(serializers.ModelSerializer):
     teacher = serializers.StringRelatedField(read_only=True)
