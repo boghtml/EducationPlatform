@@ -53,11 +53,11 @@ urlpatterns = [
     path('api/lessons/', include('apps.lessons.urls')), 
     path('api/notes/', include('apps.notes.urls')),
     path('api/assignments/', include('apps.assignments.urls')), 
-
     path('api/progress/', include('apps.progress_tracking.urls')),
     path('api/materials/', include('apps.materials.urls')),
-
     path('api/questions/', include('apps.questions.urls')),
+    
+    path('api/categories/', include('apps.categories.urls')),
 
     # Документація
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

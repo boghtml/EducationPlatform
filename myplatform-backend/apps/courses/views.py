@@ -12,7 +12,9 @@ from django.conf import settings
 from botocore.exceptions import ClientError
 
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 
+from apps.categories.models import CourseCategoryRelation, CourseCategory
 
 s3_client = boto3.client(
     's3',
@@ -39,6 +41,22 @@ class CourseViewSet(viewsets.ModelViewSet):
     authentication_classes = (CsrfExemptSessionAuthentication,)
     permission_classes = [AllowAny]
 
+    @action(detail=True, methods=['post'], url_path='add-categories')
+    def add_categories(self, request, pk=None):
+        course = self.get_object()
+        category_ids = request.data.get('category_ids', [])
+        for category_id in category_ids:
+            category = CourseCategory.objects.get(id=category_id)
+            CourseCategoryRelation.objects.get_or_create(course=course, category=category)
+        return Response({'message': 'Categories added successfully'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='remove-categories')
+    def remove_categories(self, request, pk=None):
+        course = self.get_object()
+        category_ids = request.data.get('category_ids', [])
+        CourseCategoryRelation.objects.filter(course=course, category_id__in=category_ids).delete()
+        return Response({'message': 'Categories removed successfully'}, status=status.HTTP_200_OK)
+    
     def perform_create(self, serializer):
         return serializer.save()
 
