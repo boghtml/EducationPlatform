@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',  # якщо ви використовуєте Django REST framework
+    'rest_framework',
     'corsheaders',
     'drf_yasg',
     'apps.users',
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'apps.materials',
     'apps.questions',
 
+    'apps.categories',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
