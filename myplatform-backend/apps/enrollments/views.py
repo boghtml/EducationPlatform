@@ -53,6 +53,7 @@ class EnrollCourseView(APIView):
         serializer = EnrollmentSerializer(enrollment)
         return Response({'message': 'Enrollment successful', 'enrollment': serializer.data}, status=status.HTTP_201_CREATED)
 
+
 from rest_framework.permissions import IsAuthenticated
 
 class UserEnrolledCoursesView(APIView):
@@ -70,7 +71,6 @@ class UserEnrolledCoursesView(APIView):
         }
     )
     def get(self, request, user_id, *args, **kwargs):
-        # Перевірка, чи запитує поточний користувач свої курси
         if request.user.id != user_id:
             return Response({'error': 'You are not authorized to view these courses'}, status=status.HTTP_403_FORBIDDEN)
 

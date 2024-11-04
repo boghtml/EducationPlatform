@@ -416,6 +416,7 @@ def create_success_response(request, user):
         'phone_number': user.phone_number if hasattr(user, 'phone_number') else '',
         'id': user.id
     })
+
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
@@ -424,7 +425,7 @@ def register(request):
         else:
             data = request.POST
 
-        if 'token' in data:  # Перевірка, чи це реєстрація через Google
+        if 'token' in data: 
             return handle_google_register(request, data['token'])
         else:
             logger.debug(f'Request POST data: {data}')
@@ -434,8 +435,9 @@ def register(request):
                 user.role = data.get('role', 'student')
                 user.save()
                 logger.info(f'New user created: {user.username}')
-                login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # Вказуємо бекенд явно
-                return JsonResponse({'message': 'User registered successfully'})
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                return JsonResponse({'message': 'User registered successfully', 'user_id': user.id})
+
             else:
                 logger.error(f'Error in form: {form.errors}')
                 return JsonResponse({'errors': form.errors}, status=400)
@@ -455,11 +457,10 @@ def handle_google_register(request, token):
         email = idinfo['email']
         name = idinfo.get('name', '')
         
-        # Перевірка, чи існує користувач із таким email
         user, created = UserModel.objects.get_or_create(email=email)
         
         if created:
-            # Якщо користувач новий, встановлюємо додаткові дані
+
             user.username = email.split('@')[0]
             user.first_name = idinfo.get('given_name', '')
             user.last_name = idinfo.get('family_name', '')
