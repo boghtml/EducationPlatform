@@ -56,7 +56,8 @@ urlpatterns = [
     path('api/progress/', include('apps.progress_tracking.urls')),
     path('api/materials/', include('apps.materials.urls')),
     path('api/questions/', include('apps.questions.urls')),
-    
+    path('api/payments/', include('apps.payments.urls')),
+
     path('api/categories/', include('apps.categories.urls')),
 
     # Документація

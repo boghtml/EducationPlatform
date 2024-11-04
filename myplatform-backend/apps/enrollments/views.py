@@ -40,6 +40,9 @@ class EnrollCourseView(APIView):
         except Course.DoesNotExist:
             return Response({'error': 'Course not found or not free'}, status=status.HTTP_404_NOT_FOUND)
 
+        if course.status == 'premium':
+            return Response({'error': 'Cannot enroll in premium course directly. Please purchase the course.'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             student = CustomUser.objects.get(id=student_id, role='student')
         except CustomUser.DoesNotExist:
