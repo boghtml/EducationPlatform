@@ -3,3 +3,6 @@ djangorestframework
 psycopg2-binary
 gunicorn
 django-cors-headers
+drf-yasg
+python-decouple
+boto3
