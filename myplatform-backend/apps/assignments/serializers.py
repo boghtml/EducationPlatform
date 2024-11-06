@@ -1,3 +1,5 @@
+# apps->assigments->serializers.py
+
 from rest_framework import serializers
 from .models import Assignment, AssignmentFile, AssignmentLink, Submission, SubmissionFile
 from apps.users.serializers import CustomUserSerializer
