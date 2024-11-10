@@ -579,11 +579,11 @@ class AnalyticsDataView(APIView):
         courses = Course.objects.annotate(
             student_count=Count('enrollment'),
             completed_modules=Count(
-                'modules__moduleprogress',  # Виправлено назву
+                'modules__moduleprogress',  
                 filter=~Q(modules__moduleprogress__completed_at=None)
             ),
             average_grade=Avg(
-                'assignments__submissions__grade',  # Виправлено шлях
+                'assignments__submissions__grade',  
                 filter=Q(assignments__submissions__status='graded')
             )
         )
@@ -613,7 +613,7 @@ class AnalyticsDataView(APIView):
         students = CustomUser.objects.filter(role='student').annotate(
             courses_enrolled=Count('enrollment'),
             completed_modules=Count(
-                'moduleprogress',  # Виправлено назву
+                'moduleprogress', 
                 filter=~Q(moduleprogress__completed_at=None)
             ),
             completed_lessons=Count(
@@ -627,7 +627,6 @@ class AnalyticsDataView(APIView):
             )
         )
 
-        # Групуємо студентів за прогресом
         progress_groups = {
             'Excellent': 0,
             'Good': 0,
@@ -653,10 +652,10 @@ class AnalyticsDataView(APIView):
             'datasets': [{
                 'data': list(progress_groups.values()),
                 'backgroundColor': [
-                    '#4CAF50',  # Excellent - Green
-                    '#2196F3',  # Good - Blue
-                    '#FFC107',  # Average - Yellow
-                    '#F44336'   # Below Average - Red
+                    '#4CAF50', 
+                    '#2196F3',  
+                    '#FFC107', 
+                    '#F44336'  
                 ]
             }]
         }
@@ -664,16 +663,14 @@ class AnalyticsDataView(APIView):
     def get_assignment_completion_stats(self):
         """Статистика виконання завдань"""
         try:
-            # Статистика по статусам
+            
             status_stats = Submission.objects.values('status').annotate(
                 count=Count('id')
             ).order_by('status')
 
-            # Отримуємо загальну кількість завдань і здач
             total_assignments = Assignment.objects.count()
             total_submissions = Submission.objects.count()
 
-            # Статистика по статусу
             submission_status_data = {
                 'labels': [],
                 'data': [],
@@ -681,10 +678,10 @@ class AnalyticsDataView(APIView):
             }
 
             status_colors = {
-                'assigned': '#9E9E9E',    # Gray
-                'submitted': '#2196F3',    # Blue
-                'graded': '#4CAF50',      # Green
-                'returned': '#FFC107'      # Yellow
+                'assigned': '#9E9E9E',   
+                'submitted': '#2196F3',    
+                'graded': '#4CAF50',      
+                'returned': '#FFC107'     
             }
 
             for stat in status_stats:
@@ -694,7 +691,6 @@ class AnalyticsDataView(APIView):
                     status_colors.get(stat['status'], '#9E9E9E')
                 )
 
-            # Статистика по часу здачі
             time_stats = {
                 'on_time': Submission.objects.filter(
                     submission_date__lte=F('assignment__due_date')
@@ -704,7 +700,6 @@ class AnalyticsDataView(APIView):
                 ).count()
             }
 
-            # Додаткова статистика
             grade_stats = Submission.objects.filter(
                 status='graded'
             ).aggregate(
@@ -779,7 +774,6 @@ class AnalyticsDataView(APIView):
         end_date = timezone.now()
         start_date = end_date - timedelta(days=int(period))
         
-        # Активність по днях
         daily_activity = CustomUser.objects.filter(
             last_login__gte=start_date
         ).annotate(
@@ -788,7 +782,6 @@ class AnalyticsDataView(APIView):
             count=Count('id')
         ).order_by('date')
 
-        # Активність по ролях
         role_activity = CustomUser.objects.filter(
             last_login__gte=start_date
         ).values('role').annotate(
@@ -812,9 +805,9 @@ class AnalyticsDataView(APIView):
                 'datasets': [{
                     'data': [act['count'] for act in role_activity],
                     'backgroundColor': [
-                        '#4CAF50',  # student
-                        '#2196F3',  # teacher
-                        '#FFC107'   # admin
+                        '#4CAF50',  
+                        '#2196F3', 
+                        '#FFC107'   
                     ]
                 }]
             }
