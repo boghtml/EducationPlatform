@@ -310,7 +310,6 @@ class TeacherAssignmentListView(APIView):
     def get(self, request, course_id):
         teacher = request.user
 
-        # Перевірка, чи користувач є вчителем
         if teacher.role != 'teacher':
             return Response({"error": "You are not authorized to view this."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -321,7 +320,7 @@ class TeacherAssignmentListView(APIView):
         assignment_list = []
 
         for assignment in assignments:
-            # Отримуємо кількість поданих, оцінених та повернених робіт
+            
             total_submissions = Submission.objects.filter(assignment=assignment).count()
             graded_submissions = Submission.objects.filter(assignment=assignment, status='graded').count()
             returned_submissions = Submission.objects.filter(assignment=assignment, status='returned').count()
@@ -467,19 +466,17 @@ class CancelSubmissionViewByAssigment(APIView):
         except Submission.DoesNotExist:
             return Response({"error": "Submission not found or access denied"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Видаляємо файли з S3 та записи з бази даних
         for file in submission.files.all():
             encoded_s3_file_path = file.file_url.split(f"{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/")[-1]
             s3_file_path = urllib.parse.unquote(encoded_s3_file_path)
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
             file.delete()
 
-        # Скидаємо поля подачі
         submission.comment = ""
         submission.status = 'assigned'
         submission.submission_date = None
-        submission.grade = None  # Якщо є поле оцінки
-        submission.feedback = ""  # Якщо є поле відгуку
+        submission.grade = None  
+        submission.feedback = "" 
         submission.save()
 
         return Response({"message": "Submission canceled and files deleted"}, status=status.HTTP_200_OK)

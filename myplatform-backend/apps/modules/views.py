@@ -8,7 +8,7 @@ from .mixins import CsrfExemptSessionAuthentication
 
 class ModulesByCourseView(generics.ListAPIView):
     serializer_class = ModuleSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny] 
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def get_queryset(self):
@@ -18,19 +18,19 @@ class ModulesByCourseView(generics.ListAPIView):
 class ModuleCreateView(generics.CreateAPIView):
     queryset = Module.objects.all()
     serializer_class = ModuleSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny]  
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
 class ModuleUpdateView(generics.UpdateAPIView):
     queryset = Module.objects.all()
     serializer_class = ModuleSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny] 
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
 class ModuleDeleteView(generics.DestroyAPIView):
     queryset = Module.objects.all()
     serializer_class = ModuleSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny] 
     authentication_classes = (CsrfExemptSessionAuthentication,)
     
     def destroy(self, request, *args, **kwargs):

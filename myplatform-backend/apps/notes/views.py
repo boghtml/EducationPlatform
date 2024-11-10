@@ -6,7 +6,6 @@ from .serializers import UserNoteSerializer, NoteFolderSerializer
 from rest_framework.permissions import IsAuthenticated
 from .mixins import CsrfExemptSessionAuthentication
 
-# CRUD для нотаток
 class UserNoteCreateView(generics.CreateAPIView):
     queryset = UserNote.objects.all()
     serializer_class = UserNoteSerializer
@@ -30,7 +29,6 @@ class UserNoteDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
-# CRUD для папок
 class NoteFolderCreateView(generics.CreateAPIView):
     queryset = NoteFolder.objects.all()
     serializer_class = NoteFolderSerializer

@@ -39,7 +39,7 @@ class AddLessonLinksView(APIView):
                 lesson_link = LessonLink.objects.create(
                     lesson=lesson,
                     link_url=link_url,
-                    description=""  # Явно вказуємо порожній рядок
+                    description="" 
                 )
                 created_links.append(LessonLinkSerializer(lesson_link).data)
             return Response(created_links, status=status.HTTP_201_CREATED)
@@ -68,16 +68,14 @@ class DeleteTempFileView(APIView):
         except LessonFile.DoesNotExist:
             return Response({"error": "Temporary file not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Парсимо URL файлу
         parsed_url = urlparse(file.file_url)
         encoded_s3_file_path = parsed_url.path.lstrip('/')
         s3_file_path = unquote(encoded_s3_file_path)
 
         try:
-            # Видаляємо файл з S3
+            
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=s3_file_path)
             
-            # Видаляємо запис з бази даних
             file.delete()
 
             return Response({"message": "Temporary file successfully deleted"}, status=status.HTTP_200_OK)
@@ -108,7 +106,6 @@ class UploadLessonFileView(APIView):
             s3_file_path = f"Courses/Course_{course_id}/lessons/lesson_{lesson_id}/{file.name}"
             s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
             
-            # Кодуємо шлях файлу для URL
             encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
             file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
@@ -129,7 +126,7 @@ class UploadLessonFileView(APIView):
 class LessonCreateView(generics.CreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny] 
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def create(self, request, *args, **kwargs):
@@ -183,11 +180,10 @@ class LessonLinksView(generics.ListAPIView):
         lesson_id = self.kwargs['lesson_id']
         return LessonLink.objects.filter(lesson_id=lesson_id)
 
-# Видалення уроку
 class LessonDeleteView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny] 
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def delete(self, request, *args, **kwargs):
@@ -198,11 +194,10 @@ class LessonDeleteView(generics.DestroyAPIView):
         except Lesson.DoesNotExist:
             return Response({"error": "Lesson not found"}, status=status.HTTP_404_NOT_FOUND)
 
-# Редагування уроку
 class LessonUpdateView(generics.UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [AllowAny]  # Відкритий доступ для всіх
+    permission_classes = [AllowAny] 
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
 class DeleteConfirmedFileView(APIView):

@@ -23,6 +23,7 @@ from datetime import timedelta
 
 from apps.assignments.mixins import CsrfExemptSessionAuthentication
 
+from django.db.models import F, Count, Avg, Sum, Q, Max, Min
 
 class AdminAnalyticsView(APIView):
     authentication_classes = [CsrfExemptSessionAuthentication]

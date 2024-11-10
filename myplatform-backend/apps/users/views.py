@@ -31,7 +31,6 @@ from django.contrib.auth.backends import ModelBackend
 logger = logging.getLogger(__name__)
 
 
-# Ініціалізація клієнта S3
 s3_client = boto3.client(
     's3',
     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -47,7 +46,7 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = 'student'  # Встановлюємо роль за замовчуванням
+            user.role = 'student' 
             user.save()
             logger.info(f'New user created: {user.username}')
             login(request, user)
@@ -68,7 +67,7 @@ def login_view(request):
         
         try:
             data = json.loads(request.body)
-            username_or_email = data.get('username')  # Це поле може містити або username, або email
+            username_or_email = data.get('username') 
             password = data.get('password')
         except json.JSONDecodeError:
             logger.error('Invalid JSON in request body')
@@ -78,7 +77,7 @@ def login_view(request):
         
         UserModel = get_user_model()
         try:
-            # Шукаємо користувача за username або email
+            
             user = UserModel.objects.get(Q(username=username_or_email) | Q(email=username_or_email))
             # Перевіряємо пароль
             if user.check_password(password):
@@ -221,8 +220,6 @@ def get_teacher_details(request, id):
         return JsonResponse({'error': f'An error occurred: {str(e)}'}, status=500)
 
 
-# Password Reset (Forgot Password)
-
 @csrf_exempt
 def reset_password_request(request):
     if request.method == 'POST':
@@ -281,7 +278,7 @@ def test_email(request):
     )
     return JsonResponse({'message': 'Email sent successfully'})
 
-# change th password with a old one 
+
 @csrf_exempt
 @login_required
 def change_password(request):
@@ -305,7 +302,7 @@ def change_password(request):
         return JsonResponse({'message': 'Password has been changed successfully'})
     return JsonResponse({'message': 'Invalid request method'}, status=400)
 
-# mobile vesion to change password with a old one 
+
 @csrf_exempt
 @login_required
 
@@ -327,7 +324,6 @@ def change_password_by_id(request, user_id):
         if not user.check_password(old_password):
             return JsonResponse({'errors': 'Old password is incorrect'}, status=400)
 
-        # Якщо пароль правильний, змінюємо на новий
         user.set_password(new_password)
         user.save()
         return JsonResponse({'message': 'Password has been changed successfully'}, status=200)
@@ -344,7 +340,6 @@ def login_view(request):
             body = request.body.decode('utf-8')
             data = json.loads(body)
             
-            # Перевіряємо, чи це Google авторизація
             if 'token' in data:
                 return handle_google_login(request, data['token'])
             else:
@@ -465,7 +460,7 @@ def handle_google_register(request, token):
             user.first_name = idinfo.get('given_name', '')
             user.last_name = idinfo.get('family_name', '')
             user.profile_image_url = idinfo.get('picture', '')
-            user.set_unusable_password()  # Пароль залишається незаданий
+            user.set_unusable_password() 
             user.save()
 
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -481,10 +476,9 @@ import urllib.parse
 @csrf_exempt
 @api_view(['POST'])
 def upload_profile_image(request, user_id):
-    # Отримуємо користувача
+
     user = get_object_or_404(CustomUser, id=user_id)
 
-    # Отримуємо файл із запиту
     file = request.FILES.get('profile_image')
     if not file:
         return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
@@ -495,25 +489,22 @@ def upload_profile_image(request, user_id):
                         status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        # Шлях до файлу у S3
+        
         s3_file_path = f"Users/User_{user.id}/{file.name}"
 
-        # Завантаження файлу у S3
+
         s3_client.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, s3_file_path)
 
-        # Кодування шляху файлу для URL
         encoded_file_path = urllib.parse.quote(s3_file_path, safe='/')
 
         file_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{encoded_file_path}"
 
-        # Якщо є старе зображення, видаляємо його
         if user.profile_image_url:
             parsed_url = urllib.parse.urlparse(user.profile_image_url)
             encoded_old_image_key = parsed_url.path.lstrip('/')
             old_image_key = urllib.parse.unquote(encoded_old_image_key)
             s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_image_key)
 
-        # Оновлюємо URL зображення профілю
         user.profile_image_url = file_url
         user.save()
 

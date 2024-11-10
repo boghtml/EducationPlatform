@@ -6,3 +6,10 @@ django-cors-headers
 drf-yasg
 python-decouple
 boto3
+xlsxwriter
+openpyxl
+pandas
+pytest
+pytest-django
+factory-boy
+coverage
