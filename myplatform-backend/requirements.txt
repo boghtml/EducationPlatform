@@ -13,3 +13,8 @@ pytest
 pytest-django
 factory-boy
 coverage
+allauth
+requests
+PyJWT
+cryptography
+google-auth
