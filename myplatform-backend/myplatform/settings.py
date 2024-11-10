@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'apps.progress_tracking',
     'apps.materials',
     'apps.questions',
+    'apps.analytics',
 
     'apps.categories',
     'django.contrib.sites',

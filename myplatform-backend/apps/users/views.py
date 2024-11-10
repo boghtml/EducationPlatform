@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import CustomUser
-from .forms import CustomUserCreationForm, CustomUserUpdateForm
+from .forms import CustomUserCreationForm, CustomUserUpdateForm, CustomUserChangeForm
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -521,3 +521,70 @@ def upload_profile_image(request, user_id):
 
     except ClientError as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+@login_required
+@csrf_exempt
+def create_teacher(request):
+    if request.user.role != 'admin':
+        return JsonResponse({'error': 'Only admins can create teachers.'}, status=403)
+
+    if request.method == 'POST':
+        if 'application/json' in request.content_type:
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+
+        form = CustomUserCreationForm(data)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = 'teacher'
+            user.save()
+            return JsonResponse({'message': 'Teacher created successfully', 'user_id': user.id})
+        else:
+            return JsonResponse({'errors': form.errors}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+    
+@login_required
+@csrf_exempt
+def edit_teacher(request, teacher_id):
+    if request.user.role != 'admin':
+        return JsonResponse({'error': 'Only admins can edit teachers.'}, status=403)
+
+    try:
+        teacher = get_user_model().objects.get(id=teacher_id, role='teacher')
+    except get_user_model().DoesNotExist:
+        return JsonResponse({'error': 'Teacher not found.'}, status=404)
+
+    if request.method == 'POST':
+        if 'application/json' in request.content_type:
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+
+        form = CustomUserChangeForm(data, instance=teacher)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message': 'Teacher updated successfully', 'user_id': teacher.id})
+        else:
+            return JsonResponse({'errors': form.errors}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+    
+@login_required
+@csrf_exempt
+def delete_teacher(request, teacher_id):
+    if request.user.role != 'admin':
+        return JsonResponse({'error': 'Only admins can delete teachers.'}, status=403)
+
+    try:
+        teacher = get_user_model().objects.get(id=teacher_id, role='teacher')
+    except get_user_model().DoesNotExist:
+        return JsonResponse({'error': 'Teacher not found.'}, status=404)
+
+    if request.method == 'DELETE':
+        teacher.delete()
+        return JsonResponse({'message': 'Teacher deleted successfully.'})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)

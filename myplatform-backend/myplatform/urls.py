@@ -57,8 +57,9 @@ urlpatterns = [
     path('api/materials/', include('apps.materials.urls')),
     path('api/questions/', include('apps.questions.urls')),
     path('api/payments/', include('apps.payments.urls')),
-
     path('api/categories/', include('apps.categories.urls')),
+
+    path('api/analytics/', include('apps.analytics.urls')),
 
     # Документація
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
