@@ -399,7 +399,9 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
 
 <hr>
 
-<h2>Overview of Apps and Their Endpoints</h2>
+<h2>Overview of applications and their BASIC endpoints</h2>
+
+**More than 100 endpoints have been developed on the backend** and here short list of them:
 
 <h3>1. Users App</h3>
 <p>Manages user accounts, authentication, and profiles.</p>
@@ -503,7 +505,6 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
     <li>Redoc: <code>http://localhost:8000/redoc/</code></li>
 </ul>
 <p>These tools simplify API exploration and reduce integration errors.</p>
-
 
 <hr>
 
