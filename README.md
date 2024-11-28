@@ -270,7 +270,7 @@
 <hr>
 
 <h2 id="installation">Installation</h2>
-![image](https://github.com/user-attachments/assets/c55abf9c-d435-43a5-873f-6100c7a9abe2)
+![image](https://github.com/user-attachments/assets/7db0d86b-2a4f-4be5-a212-a786981d1f7f)
 
 <h3 id="prerequisites">Prerequisites</h3>
 
@@ -441,28 +441,18 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
 <hr>
 
 <h2 id="project-structure">Project Structure</h2>
-
 <pre><code>EducationPlatform/
 │
 ├── myplatform-backend/
 │   ├── myplatform/
 │   │   ├── __init__.py
+│   │   ├── asgi.py
 │   │   ├── settings.py
 │   │   ├── urls.py
 │   │   └── wsgi.py
 │   ├── apps/
-│   │   ├── users/
+│   │   ├── analytics/
 │   │   │   ├── migrations/
-│   │   │   ├── templates/
-│   │   │   ├── forms.py
-│   │   │   ├── models.py
-│   │   │   ├── serializers.py
-│   │   │   ├── urls.py
-│   │   │   └── views.py
-│   │   ├── courses/
-│   │   │   ├── migrations/
-│   │   │   ├── templates/
-│   │   │   ├── models.py
 │   │   │   ├── serializers.py
 │   │   │   ├── urls.py
 │   │   │   └── views.py
@@ -472,43 +462,85 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
 │   │   │   ├── serializers.py
 │   │   │   ├── urls.py
 │   │   │   └── views.py
-│   │   ├── analytics/
+│   │   ├── categories/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
 │   │   │   ├── urls.py
 │   │   │   └── views.py
-│   │   ├── media/
-│   │   │   ├── utils.py
-│   │   │   └── aws.py
-│   │   └── notifications/
-│   │       ├── email.py
-│   │       └── sms.py
+│   │   ├── courses/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── enrollments/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── lessons/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── materials/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── modules/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── notes/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── notifications/
+│   │   │   ├── migrations/
+│   │   │   ├── email.py
+│   │   │   ├── sms.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── payments/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── progress_tracking/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── questions/
+│   │   │   ├── migrations/
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   │   ├── users/
+│   │   │   ├── migrations/
+│   │   │   ├── templates/
+│   │   │   ├── forms.py
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── urls.py
+│   │   │   └── views.py
+│   ├── media/
+│   │   ├── aws.py
+│   │   └── utils.py
 │   ├── manage.py
 │   ├── requirements.txt
-│   └── .env
-│
-├── myplatform-frontend/
-│   ├── public/
-│   │   ├── index.html
-│   │   └── favicon.ico
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Auth/
-│   │   │   ├── Courses/
-│   │   │   ├── Dashboard/
-│   │   │   ├── Layout/
-│   │   │   └── Users/
-│   │   ├── pages/
-│   │   │   ├── Home.js
-│   │   │   ├── Login.js
-│   │   │   ├── Register.js
-│   │   │   └── CourseDetail.js
-│   │   ├── services/
-│   │   │   ├── api.js
-│   │   │   └── auth.js
-│   │   ├── utils/
-│   │   │   └── helpers.js
-│   │   ├── App.js
-│   │   └── index.js
-│   ├── package.json
 │   └── .env
 │
 ├── .gitignore
