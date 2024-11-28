@@ -389,54 +389,121 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
 <hr>
 
 <h2 id="api-documentation">API Documentation</h2>
-
-<p>The platform's API follows RESTful principles and is documented using Swagger/OpenAPI.</p>
-
-<ul>
-  <li><strong>Base URL</strong>: <code>http://localhost:8000/api/</code></li>
-</ul>
-
-<h3>Authentication Endpoints</h3>
+<p>The platform's API follows RESTful principles and provides over 100 endpoints to manage its various features. It is documented using <strong>Swagger</strong> and <strong>Redoc</strong> for ease of access and testing.</p>
 
 <ul>
-  <li><strong>User Registration</strong>: <code>POST /api/users/register/</code></li>
-  <li><strong>User Login</strong>: <code>POST /api/users/login/</code></li>
-  <li><strong>Password Reset Request</strong>: <code>POST /api/users/reset-password-request/</code></li>
-  <li><strong>Password Reset Confirm</strong>: <code>POST /api/users/reset-password-confirm/</code></li>
+    <li><strong>Base URL</strong>: <code>http://localhost:8000/api/</code></li>
 </ul>
 
-<h3>User Endpoints</h3>
+<p>Swagger and Redoc allow developers to explore and test all endpoints interactively. Swagger offers a user-friendly UI for live testing and debugging of API endpoints, while Redoc provides a clean, structured view of the API documentation.</p>
 
+<hr>
+
+<h2>Overview of Apps and Their Endpoints</h2>
+
+<h3>1. Users App</h3>
+<p>Manages user accounts, authentication, and profiles.</p>
 <ul>
-  <li><strong>Update Profile</strong>: <code>PUT /api/users/update-profile/&lt;int:user_id&gt;/</code></li>
-  <li><strong>Upload Profile Image</strong>: <code>POST /api/users/upload-profile-image/&lt;int:user_id&gt;/</code></li>
-  <li><strong>Get Student Details</strong>: <code>GET /api/users/student/&lt;int:id&gt;/</code></li>
-  <li><strong>Get Teacher Details</strong>: <code>GET /api/users/teacher/&lt;int:id&gt;/</code></li>
+    <li><strong>Authentication Endpoints</strong>:
+        <ul>
+            <li>User Registration: <code>POST /api/users/register/</code></li>
+            <li>User Login: <code>POST /api/users/login/</code></li>
+            <li>Password Reset Request: <code>POST /api/users/reset-password-request/</code></li>
+            <li>Password Reset Confirm: <code>POST /api/users/reset-password-confirm/</code></li>
+        </ul>
+    </li>
+    <li><strong>User Management Endpoints</strong>:
+        <ul>
+            <li>Update Profile: <code>PUT /api/users/update-profile/&lt;int:user_id&gt;/</code></li>
+            <li>Upload Profile Image: <code>POST /api/users/upload-profile-image/&lt;int:user_id&gt;/</code></li>
+            <li>Get Student Details: <code>GET /api/users/student/&lt;int:id&gt;/</code></li>
+            <li>Get Teacher Details: <code>GET /api/users/teacher/&lt;int:id&gt;/</code></li>
+        </ul>
+    </li>
 </ul>
 
-<h3>Course Endpoints</h3>
-
+<h3>2. Courses App</h3>
+<p>Handles course creation, management, and enrollment.</p>
 <ul>
-  <li><strong>Course List</strong>: <code>GET /api/courses/</code></li>
-  <li><strong>Course Detail</strong>: <code>GET /api/courses/&lt;int:course_id&gt;/</code></li>
-  <li><strong>Add Course</strong>: <code>POST /api/courses/</code></li>
-  <li><strong>Update Course</strong>: <code>PUT /api/courses/&lt;int:course_id&gt;/</code></li>
-  <li><strong>Delete Course</strong>: <code>DELETE /api/courses/&lt;int:course_id&gt;/</code></li>
+    <li>Course List: <code>GET /api/courses/</code></li>
+    <li>Course Detail: <code>GET /api/courses/&lt;int:course_id&gt;/</code></li>
+    <li>Add Course: <code>POST /api/courses/</code></li>
+    <li>Update Course: <code>PUT /api/courses/&lt;int:course_id&gt;/</code></li>
+    <li>Delete Course: <code>DELETE /api/courses/&lt;int:course_id&gt;/</code></li>
 </ul>
 
-<h3>Assignment Endpoints</h3>
-
+<h3>3. Assignments App</h3>
+<p>Facilitates assignment creation, submission, and feedback.</p>
 <ul>
-  <li><strong>Assignment List</strong>: <code>GET /api/assignments/</code></li>
-  <li><strong>Assignment Detail</strong>: <code>GET /api/assignments/&lt;int:assignment_id&gt;/</code></li>
-  <li><strong>Submit Assignment</strong>: <code>POST /api/assignments/submit/</code></li>
+    <li>Assignment List: <code>GET /api/assignments/</code></li>
+    <li>Assignment Detail: <code>GET /api/assignments/&lt;int:assignment_id&gt;/</code></li>
+    <li>Submit Assignment: <code>POST /api/assignments/submit/</code></li>
 </ul>
 
-<h3>Analytics Endpoint</h3>
-
+<h3>4. Analytics App</h3>
+<p>Provides analytical insights and reports for administrators.</p>
 <ul>
-  <li><strong>Admin Analytics</strong>: <code>GET /api/analytics/admin-analytics/</code></li>
+    <li>Admin Analytics: <code>GET /api/analytics/admin-analytics/</code></li>
 </ul>
+
+<h3>5. Progress Tracking App</h3>
+<p>Monitors student progress in courses, lessons, and assignments.</p>
+<ul>
+    <li>Get Progress: <code>GET /api/progress/&lt;int:student_id&gt;/</code></li>
+    <li>Update Progress: <code>PUT /api/progress/&lt;int:student_id&gt;/</code></li>
+</ul>
+
+<h3>6. Notifications App</h3>
+<p>Manages real-time and scheduled notifications for users.</p>
+<ul>
+    <li>List Notifications: <code>GET /api/notifications/</code></li>
+    <li>Mark as Read: <code>PUT /api/notifications/&lt;int:id&gt;/read/</code></li>
+</ul>
+
+<h3>7. Notes App</h3>
+<p>Allows students to create and manage personal notes.</p>
+<ul>
+    <li>List Notes: <code>GET /api/notes/</code></li>
+    <li>Add Note: <code>POST /api/notes/</code></li>
+    <li>Update Note: <code>PUT /api/notes/&lt;int:note_id&gt;/</code></li>
+    <li>Delete Note: <code>DELETE /api/notes/&lt;int:note_id&gt;/</code></li>
+</ul>
+
+<h3>8. Materials App</h3>
+<p>Facilitates the management of lesson materials and additional resources.</p>
+<ul>
+    <li>List Materials: <code>GET /api/materials/&lt;int:lesson_id&gt;/</code></li>
+    <li>Upload Material: <code>POST /api/materials/&lt;int:lesson_id&gt;/</code></li>
+</ul>
+
+<h3>9. Payments App</h3>
+<p>Handles payment processing and course enrollment fees.</p>
+<ul>
+    <li>Initiate Payment: <code>POST /api/payments/initiate/</code></li>
+    <li>Verify Payment: <code>POST /api/payments/verify/</code></li>
+</ul>
+
+<h3>10. Forum/Questions App</h3>
+<p>Supports discussions and Q&A among students and teachers.</p>
+<ul>
+    <li>Post Question: <code>POST /api/questions/</code></li>
+    <li>Answer Question: <code>POST /api/questions/&lt;int:question_id&gt;/answers/</code></li>
+    <li>List Questions: <code>GET /api/questions/</code></li>
+</ul>
+
+<h2>Swagger and Redoc Integration</h2>
+<p>The platform uses Swagger and Redoc to document and test APIs:</p>
+<ul>
+    <li><strong>Swagger</strong>: Provides an interactive API interface to test endpoints directly from the browser.</li>
+    <li><strong>Redoc</strong>: Offers clean, structured documentation for developers and stakeholders.</li>
+</ul>
+<p>To access the documentation:</p>
+<ul>
+    <li>Swagger: <code>http://localhost:8000/swagger/</code></li>
+    <li>Redoc: <code>http://localhost:8000/redoc/</code></li>
+</ul>
+<p>These tools simplify API exploration and reduce integration errors.</p>
+
 
 <hr>
 
