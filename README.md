@@ -278,7 +278,7 @@
 
 <ol>
   <li><strong>Clone the Repository</strong>
-    <pre><code>git clone https://github.com/yourusername/education-platform.git
+    <pre><code>git clone https://github.com/boghtml/education-platform.git
 cd education-platform/myplatform-backend
 </code></pre>
   </li>
@@ -518,7 +518,7 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
     <p>Click the "Fork" button at the top-right corner of the repository page.</p>
   </li>
   <li><strong>Clone Your Fork</strong>
-    <pre><code>git clone https://github.com/yourusername/education-platform.git
+    <pre><code>git clone https://github.com/boghtml/education-platform.git
 </code></pre>
   </li>
   <li><strong>Create a New Branch</strong>
@@ -540,23 +540,6 @@ AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
     <p>Go to the original repository and open a pull request.</p>
   </li>
 </ol>
-
-<hr>
-
-<h2 id="license">License</h2>
-
-<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
-
-<hr>
-
-<h2 id="contact-information">Contact Information</h2>
-
-<p>For questions, suggestions, or support, please contact:</p>
-
-<ul>
-  <li><strong>Email</strong>: support@educationplatform.com</li>
-  <li><strong>GitHub Issues</strong>: <a href="https://github.com/yourusername/education-platform/issues">Create an Issue</a></li>
-</ul>
 
 <hr>
 
