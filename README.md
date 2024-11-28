@@ -72,7 +72,7 @@
 <h2 id="overview">Overview</h2>
 
 <p>The <strong>Education Platform</strong> is a comprehensive web application designed to facilitate online learning. It offers a wide range of functionalities for students, teachers, and administrators. Built using modern technologies like Django for the backend and React for the frontend, the platform aims to provide an interactive and user-friendly experience.</p>
-
+<b> To view the functionality, go to the MASTER branch </b>
 <hr>
 
 <h2 id="features">Features</h2>
