@@ -222,6 +222,8 @@
   <li><code>media</code>: Media file management</li>
 </ul>
 
+![image](https://github.com/user-attachments/assets/01a20435-969d-4591-90db-c3173446b13f)
+
 <h3 id="frontend">Frontend</h3>
 
 <p>The frontend is developed using React, providing a responsive and interactive user interface. It communicates with the backend via RESTful APIs.</p>
@@ -238,6 +240,9 @@
   <li><code>enrollments</code>: Tracks student course enrollments</li>
   <li><code>analytics</code>: Stores aggregated data for reporting</li>
 </ul>
+
+![image](https://github.com/user-attachments/assets/8fedca2b-c2d3-4bfc-8d85-895c90eca3c8)
+
 
 <h3 id="file-storage-structure">File Storage Structure</h3>
 
@@ -260,9 +265,12 @@
     - documents/
 </code></pre>
 
+![image](https://github.com/user-attachments/assets/3878e432-01dd-48f7-a854-5cffc8598fa0)
+
 <hr>
 
 <h2 id="installation">Installation</h2>
+![image](https://github.com/user-attachments/assets/c55abf9c-d435-43a5-873f-6100c7a9abe2)
 
 <h3 id="prerequisites">Prerequisites</h3>
 
