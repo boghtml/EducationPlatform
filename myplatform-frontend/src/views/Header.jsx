@@ -1,7 +1,7 @@
 // src/components/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { NavbarItem } from './ui/NavbarItem';
+import { NavbarItem } from '../components/NavbarItem';
 
 const Header = () => (
   <nav className="navbar navbar-expand-lg navbar-light bg-light">

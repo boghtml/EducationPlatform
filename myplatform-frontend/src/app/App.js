@@ -1,20 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import CourseCatalogPage from './components/CourseCatalogPage';
-import About from './components/About';
-import Events from './components/Events';
-import Blog from './components/Blog';
-import Reviews from './components/Reviews';
-import CourseDetail from './components/CourseDetail';
-import Register from './components/Register';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import ForgotPassword from './components/ForgotPassword';
-import WorkingWithCourse from './components/WorkingWithCourse';
-import LessonDetail from './components/LessonDetail';
+import CourseCatalogPage from '../views/CourseCatalogPage';
+import About from '../views/About';
+import Events from '../views/Events';
+import Blog from '../views/Blog';
+import Reviews from '../views/Reviews';
+import CourseDetail from '../views/CourseDetail';
+import Register from '../views/Register';
+import Login from '../views/Login';
+import Dashboard from '../views/Dashboard';
+import ForgotPassword from '../views/ForgotPassword';
+import WorkingWithCourse from '../views/WorkingWithCourse';
+import LessonDetail from '../views/LessonDetail';
 
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TermsOfService from './components/TermsOfService';
+import PrivacyPolicy from '../views/PrivacyPolicy';
+import TermsOfService from '../views/TermsOfService';
 
 
 function App() {
