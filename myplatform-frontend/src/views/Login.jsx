@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { login } from '../features/user/userSlice';
 
 function Login() {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
   useEffect(() => {
     getCSRFToken();
   }, []);
@@ -42,11 +47,8 @@ function Login() {
     })
       .then(response => {
         console.log('User logged in successfully', response.data);
-        sessionStorage.setItem('userName', response.data.userName);
-        sessionStorage.setItem('userId', response.data.id); 
-        sessionStorage.setItem('userEmail', response.data.userEmail);
-        sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
-        window.location.href = '/dashboard';
+        dispatch(login(response.data));
+        navigate(response.data.role === 'teacher' ? '/teacher-dashboard' : '/');
       })
       .catch(error => {
         console.error('There was an error logging in the user!', error);
