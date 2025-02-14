@@ -6,16 +6,13 @@ import reportWebVitals from './reportWebVitals';
 import './css/style.css'; 
 import './css/dashboard.css';
 import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react';
 import { store } from './app/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <PersistGate>
     <Provider store={store}>
       <App />
     </Provider>
-  </PersistGate>
 );
 
 reportWebVitals();

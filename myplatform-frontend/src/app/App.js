@@ -15,6 +15,7 @@ import LessonDetail from '../views/LessonDetail';
 
 import PrivacyPolicy from '../views/PrivacyPolicy';
 import TermsOfService from '../views/TermsOfService';
+import UserProfile from '../views/profile/ProfilePage';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<UserProfile />} />
 
         <Route path="/privacy-policy" element={<PrivacyPolicy  />} />
         <Route path="/terms-of-service" element={<TermsOfService  />} />

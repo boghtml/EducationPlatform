@@ -1,0 +1,50 @@
+/* UserProfile.css */
+.profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+  }
+  
+  .profile-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 4px solid #007bff;
+  }
+  
+  .profile-card h2 {
+    margin: 10px 0;
+    color: #333;
+    font-size: 28px;
+  }
+  
+  .username {
+    color: #777;
+    margin-bottom: 20px;
+  }
+  
+  .profile-card p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .profile-card p:last-child {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #999;
+  }
+  
