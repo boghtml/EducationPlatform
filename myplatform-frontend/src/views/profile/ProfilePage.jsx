@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Mail, Phone, User2, IdCard } from "lucide-react";
+import { Mail, Phone, User2, IdCard, ArrowLeft } from "lucide-react";
 import { logout } from '../../features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,14 @@ const UserProfile = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6">
+        <button 
+          className="flex items-center text-gray-600 hover:text-gray-900 mb-4" 
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Назад
+        </button>
+
         <div className="flex flex-col items-center space-y-4 pb-6">
           <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden">
             {user.profileImageUrl ? (
@@ -58,11 +66,16 @@ const UserProfile = () => {
             </div>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={() =>{
-             dispatch(logout());
-             navigate("/")
-        } }>Вийти</button>
 
+        <button 
+          className="w-full mt-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+          onClick={() => {
+            dispatch(logout());
+            navigate("/");
+          }}
+        >
+          Вийти
+        </button>
       </div>
     </div>
   );

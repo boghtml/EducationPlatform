@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import API_URL from '../api';
 import Header from './Header';
 import '../css/style.css';
@@ -8,16 +8,14 @@ import '../css/style.css';
 function CourseDetail() {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
-  const [showForm, setShowForm] = useState(false);
+  const [, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: ''
   });
-  const navigate = useNavigate();
   
-  // Create a ref for the payment form section
   const paymentFormRef = useRef(null);
 
   useEffect(() => {
@@ -32,10 +30,8 @@ function CourseDetail() {
 
   const handleSignUp = () => {
     if (course.status === 'free') {
-      // Add the course to user's library (implementation to be added later)
       console.log('Course added to user library');
     } else {
-      // Show payment form and scroll to it
       setShowForm(true);
       if (paymentFormRef.current) {
         paymentFormRef.current.scrollIntoView({ behavior: 'smooth' });

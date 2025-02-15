@@ -77,34 +77,42 @@ function Login() {
 
   return (
     <div className="container mt-5">
-      <h2>Авторизація</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Email або ім'я користувача</label>
-          <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleChange} required />
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <h2 className="text-center">Авторизація</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="username">Email або ім'я користувача</label>
+                  <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="password">Пароль</label>
+                  <input type="password" className="form-control" id="password" name="password" value={formData.password} onChange={handleChange} required autoComplete="current-password" />
+                </div>
+                <button type="submit" className="btn btn-primary btn-block">Увійти</button>
+              </form>
+              <div className="mt-3">
+                <button className="btn btn-secondary btn-block" onClick={() => window.location.href = '/forgot-password'}>Забули пароль?</button>
+                <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      console.log(credentialResponse);
+                      handleGoogleLogin(credentialResponse);
+                    }}
+                    onError={() => {
+                      console.log('Login Failed');
+                    }}
+                  />
+                </GoogleOAuthProvider>
+              </div>
+              <div className="mt-3">
+                <button className="btn btn-link" onClick={() => navigate(-1)}>Назад</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Пароль</label>
-          <input type="password" className="form-control" id="password" name="password" value={formData.password} onChange={handleChange} required autoComplete="current-password" />
-        </div>
-        <button type="submit" className="btn btn-primary">Увійти</button>
-      </form>
-
-      <div className="mt-3">
-        <button className="btn btn-secondary" onClick={() => window.location.href = '/forgot-password'}>Забули пароль?</button>
-        
-        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-        <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              console.log(credentialResponse);
-              handleGoogleLogin(credentialResponse);
-            }}
-            
-            onError={() => {
-              console.log('Login Failed');
-            }}
-          />
-        </GoogleOAuthProvider>
       </div>
     </div>
   );
