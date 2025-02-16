@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { login } from '../features/user/userSlice';
+import Cookies from 'js-cookie';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -47,6 +48,10 @@ function Login() {
     })
       .then(response => {
         console.log('User logged in successfully', response.data);
+        const sessionId = Cookies.get('sessionId');
+        if (sessionId) {
+          localStorage.setItem('sessionId', sessionId);
+        }
         dispatch(login(response.data));
         navigate(response.data.role === 'teacher' ? '/teacher-dashboard' : '/');
       })
