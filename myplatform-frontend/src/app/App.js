@@ -17,6 +17,8 @@ import PrivacyPolicy from '../views/PrivacyPolicy';
 import TermsOfService from '../views/TermsOfService';
 import UserProfile from '../views/profile/ProfilePage';
 import TeacherDashboard from '../views/users/teacher/TeacherCourses';
+import TeacherCoursePage from '../views/users/teacher/TeacherCourseDetails';
+import CreateCourse from '../views/courses/CreateCoursePage';
 
 
 function App() {
@@ -38,8 +40,12 @@ function App() {
 
         <Route path="/privacy-policy" element={<PrivacyPolicy  />} />
         <Route path="/terms-of-service" element={<TermsOfService  />} />
+        <Route path="/create-course" element={<CreateCourse  />} />
+
 
         <Route path="/my-courses/:courseId" element={<WorkingWithCourse />} />
+        <Route path="/teacher-courses/:courseId" element={<TeacherCoursePage />} />
+
         <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<LessonDetail />} />
       </Routes>
     </Router>
