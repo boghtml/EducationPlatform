@@ -16,6 +16,7 @@ import LessonDetail from '../views/LessonDetail';
 import PrivacyPolicy from '../views/PrivacyPolicy';
 import TermsOfService from '../views/TermsOfService';
 import UserProfile from '../views/profile/ProfilePage';
+import TeacherDashboard from '../views/users/teacher/TeacherCourses';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/dashboard-teacher" element={<TeacherDashboard />} />
 
         <Route path="/privacy-policy" element={<PrivacyPolicy  />} />
         <Route path="/terms-of-service" element={<TermsOfService  />} />

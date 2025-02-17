@@ -14,10 +14,21 @@ const Header = () => {
             <Link className="nav-link" to="/">Курси</Link>
           </li>
           {user ?(
-            <li className="nav-item">
-            <Link className="nav-link" to="/dashboard">Кабінет користувача</Link>
-          </li>
-          ):("")}
+            <div>
+              {
+                user.role === "student"?(
+                  <li className="nav-item">
+                  <Link className="nav-link" to="/dashboard">Кабінет користувача</Link>
+                </li>
+                ):(<li className="nav-item">
+                  <Link className="nav-link" to="/dashboard-teacher">Кабінет викладача</Link>
+                </li>
+                )
+              } 
+            </div>
+          ):(
+          ""
+          )}
           <li className="nav-item">
             <Link className="nav-link" to="/events">Найближчі заходи</Link>
           </li>

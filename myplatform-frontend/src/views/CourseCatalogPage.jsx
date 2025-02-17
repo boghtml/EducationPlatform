@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import API_URL from '../api';
+import { useDispatch, useSelector } from 'react-redux';
 import 'nouislider/dist/nouislider.css';
-import noUiSlider from 'nouislider';
 import '../css/style.css';
 import { Link } from 'react-router-dom';
-import Header from './Header'; 
+import Header from './Header';
+import { fetchCourses } from '../features/courses/courseSlice';
+
 
 function CourseCatalogPage() {
-  const [courses, setCourses] = useState([]);
+  const dispatch = useDispatch();
+  const { courses, status, error } = useSelector((state) => state.courses);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [priceRange, setPriceRange] = useState([0, 5000]);
@@ -16,59 +17,10 @@ function CourseCatalogPage() {
   const [sortOption, setSortOption] = useState('newest');
 
   useEffect(() => {
-    axios.get(`${API_URL}/courses/`)
-      .then(response => {
-        setCourses(response.data);
-        setFilteredCourses(response.data);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the courses!', error);
-      });
-
-    const priceSlider = document.getElementById('price-slider');
-    const durationSlider = document.getElementById('duration-slider');
-
-    if (priceSlider && !priceSlider.noUiSlider) {
-      noUiSlider.create(priceSlider, {
-        start: [0, 5000],
-        connect: true,
-        range: {
-          'min': 0,
-          'max': 5000
-        },
-        format: {
-          to: value => Math.round(value),
-          from: value => Number(value)
-        }
-      }).on('update', (values, handle) => {
-        const newPriceRange = [parseInt(values[0]), parseInt(values[1])];
-        setPriceRange(newPriceRange);
-        document.getElementById('price-from').value = newPriceRange[0];
-        document.getElementById('price-to').value = newPriceRange[1];
-      });
+    if (status === 'idle') {
+      dispatch(fetchCourses());
     }
-
-    if (durationSlider && !durationSlider.noUiSlider) {
-      noUiSlider.create(durationSlider, {
-        start: [1, 20],
-        connect: true,
-        range: {
-          'min': 1,
-          'max': 20
-        },
-        format: {
-          to: value => Math.round(value),
-          from: value => Number(value)
-        }
-      }).on('update', (values, handle) => {
-        const newDurationRange = [parseInt(values[0]), parseInt(values[1])];
-        setDurationRange(newDurationRange);
-        document.getElementById('duration-from').value = newDurationRange[0];
-        document.getElementById('duration-to').value = newDurationRange[1];
-      });
-    }
-
-  }, []);
+  }, [status, dispatch]);
 
   useEffect(() => {
     filterAndSortCourses();
@@ -81,7 +33,7 @@ function CourseCatalogPage() {
       filtered = filtered.filter(course => course.status === statusFilter);
     }
 
-    filtered = filtered.filter(course => 
+    filtered = filtered.filter(course =>
       course.price >= priceRange[0] && course.price <= priceRange[1] &&
       course.duration >= durationRange[0] && course.duration <= durationRange[1]
     );
@@ -96,6 +48,16 @@ function CourseCatalogPage() {
 
     setFilteredCourses(filtered);
   };
+
+  if (status === 'loading') {
+    return <div>Завантаження курсів...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Помилка завантаження курсів: {error}</div>;
+  }
+
+
 
   const handlePriceChange = (e) => {
     const newPriceRange = [parseInt(document.getElementById('price-from').value), parseInt(document.getElementById('price-to').value)];

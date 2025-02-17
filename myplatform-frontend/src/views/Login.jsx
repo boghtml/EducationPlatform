@@ -53,7 +53,7 @@ function Login() {
           localStorage.setItem('sessionId', sessionId);
         }
         dispatch(login(response.data));
-        navigate(response.data.role === 'teacher' ? '/teacher-dashboard' : '/');
+        navigate( '/');
       })
       .catch(error => {
         console.error('There was an error logging in the user!', error);
