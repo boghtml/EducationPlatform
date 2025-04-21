@@ -19,6 +19,7 @@ import TermsOfService from './components/TermsOfService';
 import './css/auth.css';
 import './css/courseCatalog.css';
 import './css/header.css';
+import './css/dashboard.css';
 
 function App() {
   return (

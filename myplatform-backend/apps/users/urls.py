@@ -9,6 +9,8 @@ from .views import (
   #  google_login
 )
 
+from .dashboard_views import DashboardStatsView
+
 urlpatterns = [
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),
@@ -30,5 +32,7 @@ urlpatterns = [
     path('create-teacher/', create_teacher, name='create_teacher'),
     path('edit-teacher/<int:teacher_id>/', edit_teacher, name='edit_teacher'),
     path('delete-teacher/<int:teacher_id>/', delete_teacher, name='delete_teacher'),
+
+    path('dashboard-stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
 
 ]

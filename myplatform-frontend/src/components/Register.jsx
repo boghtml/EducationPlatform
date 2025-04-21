@@ -4,7 +4,6 @@ import axios from 'axios';
 import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-// Іконки
 import { 
   FaGoogle, 
   FaEnvelope, 
@@ -36,7 +35,7 @@ function Register() {
   const [showPassword1, setShowPassword1] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
   const [registrationMessage, setRegistrationMessage] = useState({ type: '', message: '' });
-  const [step, setStep] = useState(1); // Багатокрокова форма
+  const [step, setStep] = useState(1); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,7 +59,6 @@ function Register() {
       [name]: value,
     });
     
-    // Очищення помилок при зміні поля
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -364,7 +362,6 @@ function Register() {
     </>
   );
 
-  // Рендеринг другого кроку (паролі)
   const renderStep2 = () => (
     <>
       <div className="form-group position-relative">

@@ -3,8 +3,10 @@ import axios from 'axios';
 import API_URL from '../api';
 import { Link } from 'react-router-dom';
 import Header from './Header';
-import { FaSearch, FaFilter, FaSort, FaStar, FaUsers, FaClock, FaCalendarAlt, FaTag } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaSort, FaStar, FaUsers, FaClock, FaCalendarAlt, FaTag, FaChalkboardTeacher } from 'react-icons/fa';
 import { TiArrowSortedUp, TiArrowSortedDown } from 'react-icons/ti';
+import 'nouislider/dist/nouislider.css';
+import noUiSlider from 'nouislider';
 import '../css/courseCatalog.css';
 
 function CourseCatalogPage() {
@@ -22,15 +24,15 @@ function CourseCatalogPage() {
   const [selectedRating, setSelectedRating] = useState(0);
   const [error, setError] = useState(null);
 
-  // Refs для sliders
+  // Refs for sliders
   const priceSliderRef = useRef(null);
   const durationSliderRef = useRef(null);
 
-  // Додатковий стан для інтерфейсу
+  // Additional state for UI
   const [hoveredCourse, setHoveredCourse] = useState(null);
 
   useEffect(() => {
-    // Завантаження курсів
+    // Loading courses
     const fetchCourses = async () => {
       try {
         setIsLoading(true);
@@ -40,12 +42,12 @@ function CourseCatalogPage() {
         setIsLoading(false);
       } catch (error) {
         console.error('There was an error fetching the courses!', error);
-        setError('Помилка при завантаженні курсів. Спробуйте пізніше.');
+        setError('Error loading courses. Please try again later.');
         setIsLoading(false);
       }
     };
 
-    // Завантаження категорій
+    // Loading categories
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${API_URL}/categories/`);
@@ -58,11 +60,11 @@ function CourseCatalogPage() {
     fetchCourses();
     fetchCategories();
 
-    // Ініціалізація слайдерів
+    // Initialize sliders
     const initSliders = () => {
       if (typeof window !== 'undefined' && window.noUiSlider) {
         if (priceSliderRef.current && !priceSliderRef.current.noUiSlider) {
-          window.noUiSlider.create(priceSliderRef.current, {
+          noUiSlider.create(priceSliderRef.current, {
             start: [0, 5000],
             connect: true,
             range: {
@@ -81,7 +83,7 @@ function CourseCatalogPage() {
         }
 
         if (durationSliderRef.current && !durationSliderRef.current.noUiSlider) {
-          window.noUiSlider.create(durationSliderRef.current, {
+          noUiSlider.create(durationSliderRef.current, {
             start: [1, 20],
             connect: true,
             range: {
@@ -101,14 +103,14 @@ function CourseCatalogPage() {
       }
     };
 
-    // Ініціалізувати слайдери після завантаження сторінки
+    // Initialize sliders after the page loads
     const timer = setTimeout(() => {
       initSliders();
     }, 500);
 
     return () => {
       clearTimeout(timer);
-      // Знищити слайдери при розмонтуванні компонента
+      // Destroy sliders when unmounting component
       if (priceSliderRef.current && priceSliderRef.current.noUiSlider) {
         priceSliderRef.current.noUiSlider.destroy();
       }
@@ -118,7 +120,7 @@ function CourseCatalogPage() {
     };
   }, []);
 
-  // Фільтрація та сортування курсів при зміні параметрів
+  // Filter and sort courses when parameters change
   useEffect(() => {
     filterAndSortCourses();
   }, [
@@ -137,7 +139,7 @@ function CourseCatalogPage() {
     
     let filtered = [...courses];
 
-    // Фільтр за пошуковим запитом
+    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(course => 
@@ -146,23 +148,23 @@ function CourseCatalogPage() {
       );
     }
 
-    // Фільтр за статусом
+    // Filter by status
     if (statusFilter) {
       filtered = filtered.filter(course => course.status === statusFilter);
     }
 
-    // Фільтр за ціною
+    // Filter by price
     filtered = filtered.filter(course => {
-      const price = course.status === 'premium' ? course.price : 0;
+      const price = course.status === 'premium' ? parseFloat(course.price) : 0;
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
-    // Фільтр за тривалістю
+    // Filter by duration
     filtered = filtered.filter(course => 
       course.duration >= durationRange[0] && course.duration <= durationRange[1]
     );
 
-    // Фільтр за категоріями
+    // Filter by categories
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(course => {
         if (!course.categories) return false;
@@ -172,14 +174,14 @@ function CourseCatalogPage() {
       });
     }
 
-    // Фільтр за рейтингом
+    // Filter by rating (placeholder since we don't have this in the API yet)
     if (selectedRating > 0) {
       filtered = filtered.filter(course => 
-        (course.rating || 0) >= selectedRating
+        (course.rating || 4.5) >= selectedRating
       );
     }
 
-    // Сортування
+    // Sorting
     switch (sortOption) {
       case 'newest':
         filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -189,15 +191,15 @@ function CourseCatalogPage() {
         break;
       case 'priceAsc':
         filtered.sort((a, b) => {
-          const aPrice = a.status === 'premium' ? a.price : 0;
-          const bPrice = b.status === 'premium' ? b.price : 0;
+          const aPrice = a.status === 'premium' ? parseFloat(a.price) : 0;
+          const bPrice = b.status === 'premium' ? parseFloat(b.price) : 0;
           return aPrice - bPrice;
         });
         break;
       case 'priceDesc':
         filtered.sort((a, b) => {
-          const aPrice = a.status === 'premium' ? a.price : 0;
-          const bPrice = b.status === 'premium' ? b.price : 0;
+          const aPrice = a.status === 'premium' ? parseFloat(a.price) : 0;
+          const bPrice = b.status === 'premium' ? parseFloat(b.price) : 0;
           return bPrice - aPrice;
         });
         break;
@@ -275,7 +277,7 @@ function CourseCatalogPage() {
     setSelectedCategories([]);
     setSelectedRating(0);
 
-    // Скидання слайдерів
+    // Reset sliders
     if (priceSliderRef.current && priceSliderRef.current.noUiSlider) {
       priceSliderRef.current.noUiSlider.set([0, 5000]);
     }
@@ -284,10 +286,10 @@ function CourseCatalogPage() {
     }
   };
 
-  // Функція для рендерингу зірочок рейтингу
+  // Function to render rating stars
   const renderRatingStars = (rating) => {
     const totalStars = 5;
-    const fullStars = Math.floor(rating || 0);
+    const fullStars = Math.floor(rating || 4.5);
     const emptyStars = totalStars - fullStars;
     
     return (
@@ -302,22 +304,10 @@ function CourseCatalogPage() {
     );
   };
 
-  // Функція для відображення форматованої ціни
+  // Function to display formatted price
   const formatPrice = (price, status) => {
-    if (status === 'free') return 'Безкоштовно';
-    return `${price} грн`;
-  };
-
-  // Функція для відображення кількості занять (заглушка)
-  const getLessonsCount = (course) => {
-    // У реальному застосунку ця інформація має бути отримана з API
-    return course.lessons_count || Math.floor(Math.random() * 20) + 5;
-  };
-
-  // Функція для відображення кількості студентів (заглушка)
-  const getStudentsCount = (course) => {
-    // У реальному застосунку ця інформація має бути отримана з API
-    return course.students_count || Math.floor(Math.random() * 100) + 10;
+    if (status === 'free') return 'Free';
+    return `${price} UAH`;
   };
 
   return (
@@ -327,8 +317,8 @@ function CourseCatalogPage() {
       <div className="hero-section">
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">Знайдіть ідеальний курс для навчання</h1>
-            <p className="hero-subtitle">Розвивайте свої навички з нашими професійними онлайн-курсами</p>
+            <h1 className="hero-title">Find the Perfect Course to Learn</h1>
+            <p className="hero-subtitle">Develop your skills with our professional online courses</p>
             
             <div className="search-bar">
               <div className="search-input-wrapper">
@@ -336,7 +326,7 @@ function CourseCatalogPage() {
                 <input
                   type="text"
                   className="search-input"
-                  placeholder="Пошук курсів за назвою або описом..."
+                  placeholder="Search courses by title or description..."
                   value={searchQuery}
                   onChange={handleSearchChange}
                 />
@@ -345,7 +335,7 @@ function CourseCatalogPage() {
                 className="filter-toggle-button"
                 onClick={() => setShowFilters(!showFilters)}
               >
-                <FaFilter /> {showFilters ? 'Сховати фільтри' : 'Показати фільтри'}
+                <FaFilter /> {showFilters ? 'Hide Filters' : 'Show Filters'}
               </button>
             </div>
           </div>
@@ -361,12 +351,12 @@ function CourseCatalogPage() {
         
         <div className="courses-header">
           <div className="courses-count">
-            <h4>Знайдено курсів: {filteredCourses.length}</h4>
+            <h4>Found courses: {filteredCourses.length}</h4>
           </div>
           
           <div className="sort-options">
             <label htmlFor="sort" className="sort-label">
-              <FaSort /> Сортування:
+              <FaSort /> Sort by:
             </label>
             <select
               id="sort"
@@ -374,31 +364,31 @@ function CourseCatalogPage() {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
             >
-              <option value="newest">Спочатку нові</option>
-              <option value="oldest">Спочатку старі</option>
-              <option value="priceAsc">За ціною: від дешевих до дорогих</option>
-              <option value="priceDesc">За ціною: від дорогих до дешевих</option>
-              <option value="duration">За тривалістю</option>
-              <option value="name">За назвою</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="priceAsc">Price: Low to High</option>
+              <option value="priceDesc">Price: High to Low</option>
+              <option value="duration">Duration</option>
+              <option value="name">Name</option>
             </select>
           </div>
         </div>
         
         <div className="course-catalog-container">
-          {/* Sidebar з фільтрами */}
+          {/* Sidebar with filters */}
           <div className={`courses-sidebar ${showFilters ? 'show' : ''}`}>
             <div className="filters-header">
-              <h4>Фільтри</h4>
+              <h4>Filters</h4>
               <button 
                 className="btn btn-outline-secondary btn-sm"
                 onClick={handleResetFilters}
               >
-                Скинути фільтри
+                Reset Filters
               </button>
             </div>
             
             <div className="filter-section">
-              <h5>Статус курсу</h5>
+              <h5>Course Status</h5>
               <div className="status-filters">
                 <div className="form-check">
                   <input
@@ -409,7 +399,7 @@ function CourseCatalogPage() {
                     checked={statusFilter === ''}
                     onChange={() => setStatusFilter('')}
                   />
-                  <label className="form-check-label" htmlFor="status-all">Всі</label>
+                  <label className="form-check-label" htmlFor="status-all">All</label>
                 </div>
                 <div className="form-check">
                   <input
@@ -420,7 +410,7 @@ function CourseCatalogPage() {
                     checked={statusFilter === 'free'}
                     onChange={() => setStatusFilter('free')}
                   />
-                  <label className="form-check-label" htmlFor="status-free">Безкоштовні</label>
+                  <label className="form-check-label" htmlFor="status-free">Free</label>
                 </div>
                 <div className="form-check">
                   <input
@@ -431,13 +421,13 @@ function CourseCatalogPage() {
                     checked={statusFilter === 'premium'}
                     onChange={() => setStatusFilter('premium')}
                   />
-                  <label className="form-check-label" htmlFor="status-premium">Преміум</label>
+                  <label className="form-check-label" htmlFor="status-premium">Premium</label>
                 </div>
               </div>
             </div>
             
             <div className="filter-section">
-              <h5>Цінова категорія</h5>
+              <h5>Price Range</h5>
               <div className="range-inputs">
                 <input
                   type="number"
@@ -449,7 +439,7 @@ function CourseCatalogPage() {
                   min="0"
                   max={priceRange[1]}
                 />
-                <span className="range-separator">до</span>
+                <span className="range-separator">to</span>
                 <input
                   type="number"
                   id="price-to"
@@ -463,13 +453,13 @@ function CourseCatalogPage() {
               </div>
               <div ref={priceSliderRef} className="noUiSlider"></div>
               <div className="range-values">
-                <span>Від: {priceRange[0]} грн</span>
-                <span>До: {priceRange[1]} грн</span>
+                <span>From: {priceRange[0]} UAH</span>
+                <span>To: {priceRange[1]} UAH</span>
               </div>
             </div>
             
             <div className="filter-section">
-              <h5>Тривалість курсу (тижнів)</h5>
+              <h5>Course Duration (weeks)</h5>
               <div className="range-inputs">
                 <input
                   type="number"
@@ -481,7 +471,7 @@ function CourseCatalogPage() {
                   min="1"
                   max={durationRange[1]}
                 />
-                <span className="range-separator">до</span>
+                <span className="range-separator">to</span>
                 <input
                   type="number"
                   id="duration-to"
@@ -495,14 +485,14 @@ function CourseCatalogPage() {
               </div>
               <div ref={durationSliderRef} className="noUiSlider"></div>
               <div className="range-values">
-                <span>Від: {durationRange[0]} тижнів</span>
-                <span>До: {durationRange[1]} тижнів</span>
+                <span>From: {durationRange[0]} weeks</span>
+                <span>To: {durationRange[1]} weeks</span>
               </div>
             </div>
             
             {categories.length > 0 && (
               <div className="filter-section">
-                <h5>Категорії</h5>
+                <h5>Categories</h5>
                 <div className="categories-list">
                   {categories.map(category => (
                     <div className="form-check" key={category.id}>
@@ -526,7 +516,7 @@ function CourseCatalogPage() {
             )}
             
             <div className="filter-section">
-              <h5>Рейтинг</h5>
+              <h5>Rating</h5>
               <div className="rating-filters">
                 {[5, 4, 3, 2, 1].map(rating => (
                   <div 
@@ -535,28 +525,28 @@ function CourseCatalogPage() {
                     onClick={() => handleRatingChange(rating)}
                   >
                     {renderRatingStars(rating)}
-                    <span>{rating} і вище</span>
+                    <span>{rating} & above</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
           
-          {/* Основний контент */}
+          {/* Main content */}
           <div className="courses-content">
             {isLoading ? (
               <div className="courses-loading">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="sr-only">Завантаження...</span>
+                  <span className="sr-only">Loading...</span>
                 </div>
-                <span>Завантаження курсів...</span>
+                <span>Loading courses...</span>
               </div>
             ) : filteredCourses.length === 0 ? (
               <div className="no-courses-found">
-                <h3>Курси не знайдено</h3>
-                <p>Спробуйте змінити параметри пошуку або фільтрів</p>
+                <h3>No courses found</h3>
+                <p>Try changing your search parameters or filters</p>
                 <button className="btn btn-primary" onClick={handleResetFilters}>
-                  Скинути всі фільтри
+                  Reset all filters
                 </button>
               </div>
             ) : (
@@ -570,18 +560,18 @@ function CourseCatalogPage() {
                   >
                     <div className="course-image-container">
                       <img 
-                        src={course.image_url || 'https://via.placeholder.com/300x200?text=Курс'} 
+                        src={course.image_url || 'https://via.placeholder.com/300x200?text=Course'} 
                         alt={course.title} 
                         className="course-image" 
                       />
                       <div className={`course-status ${course.status}`}>
-                        {course.status === 'free' ? 'Безкоштовно' : 'Преміум'}
+                        {course.status === 'free' ? 'Free' : 'Premium'}
                       </div>
                       
                       {hoveredCourse === course.id && (
                         <div className="course-hover-actions">
                           <Link to={`/courses/${course.id}`} className="btn btn-primary">
-                            Детальніше
+                            View Details
                           </Link>
                         </div>
                       )}
@@ -589,11 +579,14 @@ function CourseCatalogPage() {
                     
                     <div className="course-content">
                       <div className="course-categories">
-                        {course.categories && course.categories.map(category => (
+                        {course.categories && course.categories.slice(0, 2).map(category => (
                           <span className="course-category" key={category.id}>
                             <FaTag /> {category.name}
                           </span>
                         ))}
+                        {course.categories && course.categories.length > 2 && (
+                          <span className="course-category more">+{course.categories.length - 2}</span>
+                        )}
                       </div>
                       
                       <h3 className="course-title">
@@ -609,11 +602,15 @@ function CourseCatalogPage() {
                       
                       <div className="course-meta">
                         <div className="meta-item">
-                          <FaClock /> {course.duration} тижнів
+                          <FaClock /> {course.duration} weeks
                         </div>
                         <div className="meta-item">
-                          <FaUsers /> {getStudentsCount(course)} студентів
+                          <FaUsers /> {course.students_count || 0} students
                         </div>
+                      </div>
+                      
+                      <div className="course-teacher">
+                        <FaChalkboardTeacher /> {course.teacher ? course.teacher.full_name || `${course.teacher.first_name} ${course.teacher.last_name}` : 'Unknown Teacher'}
                       </div>
                       
                       <div className="course-footer">
@@ -621,7 +618,7 @@ function CourseCatalogPage() {
                           {formatPrice(course.price, course.status)}
                         </div>
                         <div className="course-lessons">
-                          {getLessonsCount(course)} занять
+                          {course.total_lessons || 0} lessons
                         </div>
                       </div>
                     </div>
