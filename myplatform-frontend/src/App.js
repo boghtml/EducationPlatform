@@ -17,6 +17,8 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 
 import './css/auth.css';
+import './css/courseCatalog.css';
+import './css/header.css';
 
 function App() {
   return (
