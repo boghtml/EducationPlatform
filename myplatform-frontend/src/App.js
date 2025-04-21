@@ -16,6 +16,7 @@ import LessonDetail from './components/LessonDetail';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 
+import './css/auth.css';
 
 function App() {
   return (

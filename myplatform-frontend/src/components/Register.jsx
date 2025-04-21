@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+
+// Іконки
+import { 
+  FaGoogle, 
+  FaEnvelope, 
+  FaLock, 
+  FaEye, 
+  FaEyeSlash, 
+  FaUser, 
+  FaUserTag, 
+  FaPhone, 
+  FaImage,
+  FaArrowLeft
+} from 'react-icons/fa';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -13,7 +28,16 @@ function Register() {
     profile_image_url: '',
     password1: '',
     password2: '',
+    role: 'student'
   });
+  
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+  const [registrationMessage, setRegistrationMessage] = useState({ type: '', message: '' });
+  const [step, setStep] = useState(1); // Багатокрокова форма
+  const navigate = useNavigate();
 
   useEffect(() => {
     getCSRFToken();
@@ -30,101 +54,467 @@ function Register() {
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    
+    // Очищення помилок при зміні поля
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: ''
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateStep1 = () => {
+    const newErrors = {};
+    
+    if (!formData.username.trim()) {
+      newErrors.username = 'Ім\'я користувача обов\'язкове';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Ім\'я користувача повинно містити мінімум 3 символи';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email обов\'язковий';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Введіть коректний email';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const newErrors = {};
+    
+    if (!formData.password1) {
+      newErrors.password1 = 'Пароль обов\'язковий';
+    } else if (formData.password1.length < 8) {
+      newErrors.password1 = 'Пароль повинен містити мінімум 8 символів';
+    }
+    
+    if (!formData.password2) {
+      newErrors.password2 = 'Підтвердження паролю обов\'язкове';
+    } else if (formData.password1 !== formData.password2) {
+      newErrors.password2 = 'Паролі не співпадають';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    if (step === 1 && validateStep1()) {
+      setStep(2);
+    }
+  };
+
+  const prevStep = () => {
+    setStep(1);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (step === 1) {
+      nextStep();
+      return;
+    }
+    
+    if (!validateStep2()) return;
+    
+    setIsLoading(true);
+    setRegistrationMessage({ type: '', message: '' });
+    
     const csrftoken = getCookie('csrftoken');
-    console.log('Form data before submission:', formData);
-    axios.post(`${API_URL}/users/register/`, formData, {
-      headers: {
-        'X-CSRFToken': csrftoken,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      withCredentials: true
-    })
-      .then(response => {
-        console.log('User registered successfully', response.data);
-        window.location.href = '/login';
-      })
-      .catch(error => {
-        console.error('There was an error registering the user!', error);
-        if (error.response && error.response.data) {
-          console.log('Error in form:', error.response.data);
-        }
+    
+    try {
+      const response = await axios.post(`${API_URL}/users/register/`, formData, {
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
       });
+      
+      console.log('User registered successfully', response.data);
+      
+      setRegistrationMessage({ 
+        type: 'success', 
+        message: 'Реєстрація успішна! Перенаправлення на сторінку входу...' 
+      });
+      
+      // Затримка перед перенаправленням для відображення повідомлення
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('There was an error registering the user!', error);
+      
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        setRegistrationMessage({ 
+          type: 'error', 
+          message: 'Помилка реєстрації. Будь ласка, перевірте ваші дані.' 
+        });
+      }
+      
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleRegister = (credentialResponse) => {
+    setIsLoading(true);
+    setRegistrationMessage({ type: '', message: '' });
+    
     axios.post(`${API_URL}/users/register/`, {
       token: credentialResponse.credential
     })
     .then(response => {
       console.log('User registered via Google successfully', response.data);
-      window.location.href = '/login';
+      
+      setRegistrationMessage({ 
+        type: 'success', 
+        message: 'Реєстрація через Google успішна! Перенаправлення на сторінку входу...' 
+      });
+      
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     })
     .catch(error => {
       console.error('There was an error registering via Google!', error);
+      
+      setRegistrationMessage({ 
+        type: 'error', 
+        message: 'Помилка реєстрації через Google.' 
+      });
+    })
+    .finally(() => {
+      setIsLoading(false);
     });
   };
 
-  return (
-    <div className="container mt-5">
-      
-      <h2>Реєстрація</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Ім'я користувача</label>
-          <input type="text" className="form-control" id="username" name="username" value={formData.username} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input type="email" className="form-control" id="email" name="email" value={formData.email} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="first_name">Ім'я</label>
-          <input type="text" className="form-control" id="first_name" name="first_name" value={formData.first_name} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="last_name">Прізвище</label>
-          <input type="text" className="form-control" id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="phone_number">Номер телефону</label>
-          <input type="text" className="form-control" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="profile_image_url">URL зображення профілю</label>
-          <input type="text" className="form-control" id="profile_image_url" name="profile_image_url" value={formData.profile_image_url} onChange={handleChange} />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password1">Пароль</label>
-          <input type="password" className="form-control" id="password1" name="password1" value={formData.password1} onChange={handleChange} required />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password2">Підтвердіть пароль</label>
-          <input type="password" className="form-control" id="password2" name="password2" value={formData.password2} onChange={handleChange} required />
-        </div>
-        <button type="submit" className="btn btn-primary">Зареєструватися</button>
-      </form>
+  const togglePassword1Visibility = () => {
+    setShowPassword1(!showPassword1);
+  };
 
-       {/* Кнопка "Реєстрація через Google" */}
-       <div className="mt-3">
-       <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-       <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              console.log(credentialResponse);
-              handleGoogleRegister(credentialResponse);
-            }}
-            onError={() => {
-              console.log('Registration Failed');
-            }}
+  const togglePassword2Visibility = () => {
+    setShowPassword2(!showPassword2);
+  };
+
+  // Рендеринг першого кроку (особиста інформація)
+  const renderStep1 = () => (
+    <>
+      <div className="form-group position-relative">
+        <label htmlFor="username">
+          <FaUserTag className="input-icon" />
+          <span>Ім'я користувача*</span>
+        </label>
+        <input 
+          type="text" 
+          className={`form-control ${errors.username ? 'is-invalid' : ''}`} 
+          id="username" 
+          name="username" 
+          value={formData.username} 
+          onChange={handleChange} 
+          placeholder="Введіть ім'я користувача"
+          disabled={isLoading} 
+        />
+        {errors.username && <div className="invalid-feedback">{errors.username}</div>}
+      </div>
+      
+      <div className="form-group position-relative">
+        <label htmlFor="email">
+          <FaEnvelope className="input-icon" />
+          <span>Email*</span>
+        </label>
+        <input 
+          type="email" 
+          className={`form-control ${errors.email ? 'is-invalid' : ''}`} 
+          id="email" 
+          name="email" 
+          value={formData.email} 
+          onChange={handleChange} 
+          placeholder="Введіть email"
+          disabled={isLoading} 
+        />
+        {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+      </div>
+      
+      <div className="form-group position-relative">
+        <label htmlFor="first_name">
+          <FaUser className="input-icon" />
+          <span>Ім'я</span>
+        </label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="first_name" 
+          name="first_name" 
+          value={formData.first_name} 
+          onChange={handleChange} 
+          placeholder="Введіть ваше ім'я"
+          disabled={isLoading} 
+        />
+      </div>
+      
+      <div className="form-group position-relative">
+        <label htmlFor="last_name">
+          <FaUser className="input-icon" />
+          <span>Прізвище</span>
+        </label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="last_name" 
+          name="last_name" 
+          value={formData.last_name} 
+          onChange={handleChange} 
+          placeholder="Введіть ваше прізвище"
+          disabled={isLoading} 
+        />
+      </div>
+      
+      <div className="form-group position-relative">
+        <label htmlFor="phone_number">
+          <FaPhone className="input-icon" />
+          <span>Номер телефону</span>
+        </label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="phone_number" 
+          name="phone_number" 
+          value={formData.phone_number} 
+          onChange={handleChange} 
+          placeholder="Введіть номер телефону"
+          disabled={isLoading} 
+        />
+      </div>
+      
+      <div className="form-group position-relative">
+        <label htmlFor="profile_image_url">
+          <FaImage className="input-icon" />
+          <span>URL зображення профілю</span>
+        </label>
+        <input 
+          type="text" 
+          className="form-control" 
+          id="profile_image_url" 
+          name="profile_image_url" 
+          value={formData.profile_image_url} 
+          onChange={handleChange} 
+          placeholder="Введіть URL зображення"
+          disabled={isLoading} 
+        />
+      </div>
+      
+      <div className="form-group">
+        <label>Роль</label>
+        <div className="role-selection">
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="role"
+              id="role-student"
+              value="student"
+              checked={formData.role === 'student'}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            <label className="form-check-label" htmlFor="role-student">
+              Студент
+            </label>
+          </div>
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="role"
+              id="role-teacher"
+              value="teacher"
+              checked={formData.role === 'teacher'}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            <label className="form-check-label" htmlFor="role-teacher">
+              Викладач
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <button 
+        type="button" 
+        className="btn btn-primary btn-block"
+        onClick={nextStep}
+        disabled={isLoading}
+      >
+        Продовжити
+      </button>
+    </>
+  );
+
+  // Рендеринг другого кроку (паролі)
+  const renderStep2 = () => (
+    <>
+      <div className="form-group position-relative">
+        <label htmlFor="password1">
+          <FaLock className="input-icon" />
+          <span>Пароль*</span>
+        </label>
+        <div className="password-input-container">
+          <input 
+            type={showPassword1 ? "text" : "password"} 
+            className={`form-control ${errors.password1 ? 'is-invalid' : ''}`} 
+            id="password1" 
+            name="password1" 
+            value={formData.password1} 
+            onChange={handleChange} 
+            placeholder="Введіть пароль"
+            disabled={isLoading} 
           />
-        </GoogleOAuthProvider>
+          <button 
+            type="button" 
+            className="btn password-toggle-btn" 
+            onClick={togglePassword1Visibility}
+          >
+            {showPassword1 ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+        {errors.password1 && <div className="invalid-feedback">{errors.password1}</div>}
+      </div>
+      
+      <div className="form-group position-relative">
+        <label htmlFor="password2">
+          <FaLock className="input-icon" />
+          <span>Підтвердження паролю*</span>
+        </label>
+        <div className="password-input-container">
+          <input 
+            type={showPassword2 ? "text" : "password"} 
+            className={`form-control ${errors.password2 ? 'is-invalid' : ''}`} 
+            id="password2" 
+            name="password2" 
+            value={formData.password2} 
+            onChange={handleChange} 
+            placeholder="Підтвердіть пароль"
+            disabled={isLoading} 
+          />
+          <button 
+            type="button" 
+            className="btn password-toggle-btn" 
+            onClick={togglePassword2Visibility}
+          >
+            {showPassword2 ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+        {errors.password2 && <div className="invalid-feedback">{errors.password2}</div>}
+      </div>
+      
+      <div className="form-buttons">
+        <button 
+          type="button" 
+          className="btn btn-secondary"
+          onClick={prevStep}
+          disabled={isLoading}
+        >
+          <FaArrowLeft className="mr-2" /> Назад
+        </button>
+        <button 
+          type="submit" 
+          className="btn btn-primary ml-2"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Реєстрація...' : 'Зареєструватися'}
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="auth-container container mt-5">
+      <div className="auth-form-container">
+        <div className="auth-header">
+          <h2>Реєстрація</h2>
+          <p>Створіть свій обліковий запис</p>
+          <div className="step-indicator">
+            <div className={`step ${step === 1 ? 'active' : ''}`}>
+              <span className="step-number">1</span>
+              <span className="step-text">Особиста інформація</span>
+            </div>
+            <div className="step-divider"></div>
+            <div className={`step ${step === 2 ? 'active' : ''}`}>
+              <span className="step-number">2</span>
+              <span className="step-text">Безпека</span>
+            </div>
+          </div>
+        </div>
+        
+        {registrationMessage.message && (
+          <div className={`alert ${registrationMessage.type === 'success' ? 'alert-success' : 'alert-danger'}`}>
+            {registrationMessage.message}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="auth-form">
+          {step === 1 ? renderStep1() : renderStep2()}
+        </form>
+        
+        {step === 1 && (
+          <>
+            <div className="divider">
+              <span>або</span>
+            </div>
+            
+            <div className="social-login">
+              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+                <div className="google-btn-container">
+                  <GoogleLogin
+                    onSuccess={handleGoogleRegister}
+                    onError={() => {
+                      console.log('Registration Failed');
+                      setRegistrationMessage({ 
+                        type: 'error', 
+                        message: 'Не вдалося зареєструватися через Google' 
+                      });
+                    }}
+                    type="standard"
+                    theme="filled_blue"
+                    size="large"
+                    text="signup_with"
+                    shape="rectangular"
+                    logo_alignment="left"
+                    width="100%"
+                  />
+                </div>
+              </GoogleOAuthProvider>
+            </div>
+          </>
+        )}
+        
+        <div className="auth-footer">
+          <p>
+            Вже маєте обліковий запис? <Link to="/login">Увійти</Link>
+          </p>
+          <p className="mt-2">
+            <small>
+              Реєструючись, ви погоджуєтесь з 
+              <Link to="/terms-of-service" className="mx-1">Умовами використання</Link>
+              та
+              <Link to="/privacy-policy" className="mx-1">Політикою конфіденційності</Link>
+            </small>
+          </p>
+        </div>
       </div>
     </div>
   );
