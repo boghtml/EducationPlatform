@@ -12,12 +12,18 @@ import Dashboard from './components/Dashboard';
 import ForgotPassword from './components/ForgotPassword';
 import WorkingWithCourse from './components/WorkingWithCourse';
 import LessonDetail from './components/LessonDetail';
-
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import AssignmentDetails from './components/AssignmentDetails';
 import QADetails from './components/QADetails';
 import Profile from './components/Profile';
+import LessonsTab from './components/LessonsTab';
+import AssignmentsTab from './components/AssignmentsTab';
+import TestsTab from './components/TestsTab';
+import DiscussionsTab from './components/DiscussionsTab';
+import QATab from './components/QATab';
+import ParticipantsTab from './components/ParticipantsTab';
+import GradesTab from './components/GradesTab';
 
 import './css/auth.css';
 import './css/courseCatalog.css';
@@ -38,13 +44,19 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
-
-        <Route path="/privacy-policy" element={<PrivacyPolicy  />} />
-        <Route path="/terms-of-service" element={<TermsOfService  />} />
-
-        <Route path="/my-courses/:courseId" element={<WorkingWithCourse />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/my-courses/:courseId" element={<WorkingWithCourse />}>
+          <Route index element={<LessonsTab />} />
+          <Route path="lessons" element={<LessonsTab />} />
+          <Route path="assignments" element={<AssignmentsTab />} />
+          <Route path="tests" element={<TestsTab />} />
+          <Route path="discussions" element={<DiscussionsTab />} />
+          <Route path="qa" element={<QATab />} />
+          <Route path="participants" element={<ParticipantsTab />} />
+          <Route path="grades" element={<GradesTab />} />
+        </Route>
         <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<LessonDetail />} />
-
         <Route path="/assignments/:assignmentId" element={<AssignmentDetails />} />
         <Route path="/qa/:questionId" element={<QADetails />} />
         <Route path="/profile/:userId" element={<Profile />} />
