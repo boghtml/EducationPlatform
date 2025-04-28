@@ -1170,6 +1170,27 @@
   transform: translateY(-2px);
 }
 
+
+.course-wc-qa-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.course-wc-qa-header {
+  margin-bottom: 20px;
+}
+
+.course-wc-qa-create-form h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+
 /* Стилі для секції учасників */
 .course-wc-participants-container {
   display: flex;
@@ -1424,3 +1445,32 @@
   height: 200px;
   border-radius: 8px;
 }
+
+
+/* Assignments tab */
+.course-wc-assignments-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.course-wc-assignments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.course-wc-assignments-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.course-wc-assignments-filter {
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+

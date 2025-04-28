@@ -15,6 +15,9 @@ import LessonDetail from './components/LessonDetail';
 
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
+import AssignmentDetails from './components/AssignmentDetails';
+import QADetails from './components/QADetails';
+import Profile from './components/Profile';
 
 import './css/auth.css';
 import './css/courseCatalog.css';
@@ -41,6 +44,10 @@ function App() {
 
         <Route path="/my-courses/:courseId" element={<WorkingWithCourse />} />
         <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<LessonDetail />} />
+
+        <Route path="/assignments/:assignmentId" element={<AssignmentDetails />} />
+        <Route path="/qa/:questionId" element={<QADetails />} />
+        <Route path="/profile/:userId" element={<Profile />} />
       </Routes>
     </Router>
   );

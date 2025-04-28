@@ -23,7 +23,8 @@ import {
   Users,
   HelpCircle,
   File,
-  Paperclip
+  Paperclip,
+  Search
 } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
@@ -44,6 +45,9 @@ function WorkingWithCourse() {
   const [error, setError] = useState(null);
   const [completingLesson, setCompletingLesson] = useState(false);
   const [assignments, setAssignments] = useState([]);
+  const [filteredAssignments, setFilteredAssignments] = useState([]);
+  const [assignmentFilter, setAssignmentFilter] = useState('all');
+  const [assignmentSearch, setAssignmentSearch] = useState('');
   const [materials, setMaterials] = useState([]);
   const [participants, setParticipants] = useState({
     students: [],
@@ -51,11 +55,12 @@ function WorkingWithCourse() {
     admins: []
   });
   const [discussions, setDiscussions] = useState([]);
+  const [newQuestion, setNewQuestion] = useState({ title: '', description: '' });
   const [csrfToken, setCsrfToken] = useState('');
   const { courseId } = useParams();
   const navigate = useNavigate();
 
-  // Отримати CSRF токен
+  // Get CSRF token
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -70,21 +75,18 @@ function WorkingWithCourse() {
     return null;
   };
 
-  // Налаштування axios для використання credentials
+  // Initial data fetching
   useEffect(() => {
     axios.defaults.withCredentials = true;
     
     const fetchInitialData = async () => {
       try {
         setLoading(true);
-        // Отримання CSRF токену перед будь-якими запитами
         await getCsrfToken();
         
-        // Отримання інформації про курс
         const courseResponse = await axios.get(`${API_URL}/courses/${courseId}/`);
         setCourse(courseResponse.data);
         
-        // Отримання прогресу курсу
         try {
           const progressResponse = await axios.get(`${API_URL}/progress/courses/${courseId}/progress/`);
           setCourseProgress(progressResponse.data);
@@ -92,7 +94,6 @@ function WorkingWithCourse() {
           console.error("Error fetching course progress:", progressError);
         }
         
-        // Отримання матеріалів курсу
         try {
           const materialsResponse = await axios.get(`${API_URL}/materials/?course=${courseId}`);
           setMaterials(materialsResponse.data || []);
@@ -100,7 +101,6 @@ function WorkingWithCourse() {
           console.error("Error fetching course materials:", materialsError);
         }
         
-        // Отримання учасників курсу
         try {
           const participantsResponse = await axios.get(`${API_URL}/course/${courseId}/participants/`);
           setParticipants({
@@ -112,7 +112,6 @@ function WorkingWithCourse() {
           console.error("Error fetching participants:", participantsError);
         }
         
-        // Завантаження обговорень (якщо є)
         try {
           const discussionsResponse = await axios.get(`${API_URL}/questions/course/${courseId}/`);
           setDiscussions(discussionsResponse.data || []);
@@ -131,7 +130,7 @@ function WorkingWithCourse() {
     fetchInitialData();
   }, [courseId]);
 
-  // Завантаження модулів при зміні активної вкладки
+  // Fetch modules or assignments based on active tab
   useEffect(() => {
     if (activeTab === 'lessons' && course && !loading) {
       fetchModules();
@@ -142,17 +141,10 @@ function WorkingWithCourse() {
 
   const fetchModules = async () => {
     try {
-      // Оновлення CSRF токену перед запитом
       await getCsrfToken();
-      
-      const response = await axios.get(`${API_URL}/modules/get_modules/${courseId}/`, {
-        withCredentials: true
-      });
-      
+      const response = await axios.get(`${API_URL}/modules/get_modules/${courseId}/`, { withCredentials: true });
       if (response.data && Array.isArray(response.data)) {
         setModules(response.data);
-        
-        // Автоматично розгортаємо перший модуль
         if (response.data.length > 0) {
           fetchLessons(response.data[0].id);
         }
@@ -167,95 +159,56 @@ function WorkingWithCourse() {
 
   const fetchAssignments = async () => {
     try {
-      // Оновлення CSRF токену перед запитом
       await getCsrfToken();
-      
-      const response = await axios.get(`${API_URL}/assignments/student/course/${courseId}/assignments/`, {
-        withCredentials: true
-      });
-      
+      const response = await axios.get(`${API_URL}/assignments/student/course/${courseId}/assignments/`, { withCredentials: true });
       if (Array.isArray(response.data)) {
         setAssignments(response.data);
+        setFilteredAssignments(response.data);
       } else {
         console.error("Invalid assignments data format:", response.data);
         setAssignments([]);
+        setFilteredAssignments([]);
       }
     } catch (error) {
       console.error("Error fetching assignments:", error);
       setAssignments([]);
+      setFilteredAssignments([]);
     }
   };
 
   const fetchLessons = async (moduleId) => {
-    // Якщо модуль вже розгорнутий, просто перемикаємо видимість
     if (expandedModules[moduleId]) {
-      setExpandedModules(prev => ({
-        ...prev,
-        [moduleId]: !prev[moduleId]
-      }));
+      setExpandedModules(prev => ({ ...prev, [moduleId]: !prev[moduleId] }));
       return;
     }
-
     try {
-      // Оновлення CSRF токену перед запитом
       await getCsrfToken();
-      
-      const response = await axios.get(`${API_URL}/lessons/get_lessons/${moduleId}/`, {
-        withCredentials: true
-      });
-      
+      const response = await axios.get(`${API_URL}/lessons/get_lessons/${moduleId}/`, { withCredentials: true });
       if (response.data) {
-        // Оновлення модулів з уроками
         setModules(prevModules => 
           prevModules.map(module => 
-            module.id === moduleId 
-              ? { ...module, lessons: response.data } 
-              : module
+            module.id === moduleId ? { ...module, lessons: response.data } : module
           )
         );
-        
-        // Позначаємо як розгорнутий
-        setExpandedModules(prev => ({
-          ...prev,
-          [moduleId]: true
-        }));
+        setExpandedModules(prev => ({ ...prev, [moduleId]: true }));
       }
     } catch (error) {
       console.error("Error fetching lessons:", error);
-      // Показуємо повідомлення про помилку користувачу
       setModules(prevModules => 
         prevModules.map(module => 
-          module.id === moduleId 
-            ? { ...module, error: "Не вдалося завантажити заняття. Спробуйте знову." } 
-            : module
+          module.id === moduleId ? { ...module, error: "Не вдалося завантажити заняття. Спробуйте знову." } : module
         )
       );
     }
   };
 
   const handleLessonClick = async (moduleId, lesson) => {
-    setSelectedLesson(null); // Очищаємо поточний урок для відображення завантаження
-    
+    setSelectedLesson(null);
     try {
-      // Оновлення CSRF токену перед запитом
       await getCsrfToken();
-      
-      // Отримання детальної інформації про урок
-      const detailsResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/`, {
-        withCredentials: true
-      });
-      
-      // Отримання файлів уроку
-      const filesResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/files/`, {
-        withCredentials: true
-      });
-      
-      // Отримання посилань уроку
-      const linksResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/links/`, {
-        withCredentials: true
-      });
-      
-      // Оновлюємо вибраний урок з усіма даними
+      const detailsResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/`, { withCredentials: true });
+      const filesResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/files/`, { withCredentials: true });
+      const linksResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/links/`, { withCredentials: true });
       setSelectedLesson({
         ...detailsResponse.data,
         files: filesResponse.data || [],
@@ -263,55 +216,29 @@ function WorkingWithCourse() {
       });
     } catch (error) {
       console.error("Error fetching lesson details:", error);
-      // Все одно встановлюємо урок з базовою інформацією
-      setSelectedLesson({
-        ...lesson,
-        error: "Не вдалося завантажити деталі уроку. Спробуйте знову."
-      });
+      setSelectedLesson({ ...lesson, error: "Не вдалося завантажити деталі уроку. Спробуйте знову." });
     }
   };
 
   const markLessonAsCompleted = async () => {
     if (!selectedLesson) return;
-    
     setCompletingLesson(true);
-    
     try {
-      // Оновлення CSRF токену перед запитом
       await getCsrfToken();
-      
-      await axios.post(`${API_URL}/progress/lessons/${selectedLesson.id}/complete/`, {}, {
-        withCredentials: true
-      });
-      
-      // Оновлення статусу уроку
-      setSelectedLesson(prev => ({
-        ...prev,
-        is_completed: true
-      }));
-      
-      // Оновлення статусу уроку в списку модулів
+      await axios.post(`${API_URL}/progress/lessons/${selectedLesson.id}/complete/`, {}, { withCredentials: true });
+      setSelectedLesson(prev => ({ ...prev, is_completed: true }));
       setModules(prevModules => 
         prevModules.map(module => {
           if (!module.lessons) return module;
-          
           return {
             ...module,
             lessons: module.lessons.map(lesson => 
-              lesson.id === selectedLesson.id 
-                ? { ...lesson, is_completed: true } 
-                : lesson
+              lesson.id === selectedLesson.id ? { ...lesson, is_completed: true } : lesson
             )
           };
         })
       );
-      
-      // Оновлення загального прогресу
-      setCourseProgress(prev => ({
-        ...prev,
-        completed_lessons: prev.completed_lessons + 1
-      }));
-      
+      setCourseProgress(prev => ({ ...prev, completed_lessons: prev.completed_lessons + 1 }));
       setCompletingLesson(false);
     } catch (error) {
       console.error("Error marking lesson as completed:", error);
@@ -319,25 +246,43 @@ function WorkingWithCourse() {
     }
   };
 
-  // Форматування тривалості в зручний формат
-  const formatDuration = (minutes) => {
-    if (!minutes) return "N/A";
-    
-    if (minutes < 60) {
-      return `${minutes} хв`;
+  // Assignment filtering and search
+  useEffect(() => {
+    let filtered = assignments;
+    if (assignmentFilter !== 'all') {
+      filtered = filtered.filter(a => a.status === assignmentFilter);
     }
-    
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    
-    if (remainingMinutes === 0) {
-      return `${hours} год`;
+    if (assignmentSearch) {
+      filtered = filtered.filter(a => 
+        a.title.toLowerCase().includes(assignmentSearch.toLowerCase()) ||
+        a.description?.toLowerCase().includes(assignmentSearch.toLowerCase())
+      );
     }
-    
-    return `${hours} год ${remainingMinutes} хв`;
+    setFilteredAssignments(filtered);
+  }, [assignmentFilter, assignmentSearch, assignments]);
+
+  // Create new question
+  const handleCreateQuestion = async (e) => {
+    e.preventDefault();
+    try {
+      await getCsrfToken();
+      const response = await axios.post(`${API_URL}/questions/course/${courseId}/`, newQuestion, { withCredentials: true });
+      setDiscussions(prev => [...prev, response.data]);
+      setNewQuestion({ title: '', description: '' });
+    } catch (error) {
+      console.error("Error creating question:", error);
+      setError("Не вдалося створити запитання. Спробуйте знову.");
+    }
   };
 
-  // Отримання імені файлу з URL
+  const formatDuration = (minutes) => {
+    if (!minutes) return "N/A";
+    if (minutes < 60) return `${minutes} хв`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes === 0 ? `${hours} год` : `${hours} год ${remainingMinutes} хв`;
+  };
+
   const getFilenameFromUrl = (url) => {
     if (!url) return "Файл";
     try {
@@ -348,90 +293,53 @@ function WorkingWithCourse() {
     }
   };
 
-  // Визначення іконки файлу за типом
   const getFileIcon = (fileType) => {
     if (!fileType) return <File className="course-wc-file-icon" />;
-    
     const type = fileType.toLowerCase();
-    
-    if (type.includes('pdf')) {
-      return <FileText className="course-wc-file-icon" />;
-    } else if (type.includes('doc')) {
-      return <FileText className="course-wc-file-icon" />;
-    } else if (type.includes('vid') || type.includes('mp4')) {
-      return <PlayCircle className="course-wc-file-icon" />;
-    } else if (type.includes('xls') || type.includes('sheet')) {
-      return <FileText className="course-wc-file-icon" />;
-    } else {
-      return <Paperclip className="course-wc-file-icon" />;
-    }
+    if (type.includes('pdf')) return <FileText className="course-wc-file-icon" />;
+    if (type.includes('doc')) return <FileText className="course-wc-file-icon" />;
+    if (type.includes('vid') || type.includes('mp4')) return <PlayCircle className="course-wc-file-icon" />;
+    if (type.includes('xls') || type.includes('sheet')) return <FileText className="course-wc-file-icon" />;
+    return <Paperclip className="course-wc-file-icon" />;
   };
 
-  // Розрахунок відсотка прогресу
   const calculateProgress = () => {
     if (!courseProgress.total_lessons || courseProgress.total_lessons === 0) return 0;
     return Math.round((courseProgress.completed_lessons / courseProgress.total_lessons) * 100);
   };
 
-  // Перевірка, чи урок завершено
   const isLessonCompleted = (lessonId) => {
-    if (selectedLesson && selectedLesson.id === lessonId) {
-      return selectedLesson.is_completed;
-    }
-    
-    // Перевіряємо в модулях
+    if (selectedLesson && selectedLesson.id === lessonId) return selectedLesson.is_completed;
     for (const module of modules) {
       if (!module.lessons) continue;
-      
       const lesson = module.lessons.find(l => l.id === lessonId);
-      if (lesson && lesson.is_completed) {
-        return true;
-      }
+      if (lesson && lesson.is_completed) return true;
     }
-    
     return false;
   };
 
-  // Форматування статусу завдання
   const formatAssignmentStatus = (status) => {
     switch(status) {
-      case 'assigned':
-        return { label: 'Призначено', color: '#6c757d' };
-      case 'submitted':
-        return { label: 'Надіслано', color: '#007bff' };
-      case 'graded':
-        return { label: 'Оцінено', color: '#28a745' };
-      case 'returned':
-        return { label: 'Повернуто', color: '#ffc107' };
-      default:
-        return { label: status, color: '#6c757d' };
+      case 'assigned': return { label: 'Призначено', color: '#6c757d' };
+      case 'submitted': return { label: 'Надіслано', color: '#007bff' };
+      case 'graded': return { label: 'Оцінено', color: '#28a745' };
+      case 'returned': return { label: 'Повернуто', color: '#ffc107' };
+      default: return { label: status, color: '#6c757d' };
     }
   };
 
-  // Обчислення часу, що залишився
   const getTimeRemaining = (dueDate) => {
     if (!dueDate) return "Немає терміну";
-    
     const due = new Date(dueDate);
     const now = new Date();
-    
-    if (due < now) {
-      return "Прострочено";
-    }
-    
+    if (due < now) return "Прострочено";
     const diffTime = Math.abs(due - now);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-      return "Сьогодні";
-    } else if (diffDays === 1) {
-      return "Завтра";
-    } else {
-      return `${diffDays} днів`;
-    }
+    if (diffDays === 0) return "Сьогодні";
+    if (diffDays === 1) return "Завтра";
+    return `${diffDays} днів`;
   };
 
-  // Якщо завантажується
   if (loading) {
     return (
       <div className="course-wc-interface-container">
@@ -443,7 +351,6 @@ function WorkingWithCourse() {
     );
   }
 
-  // Якщо виникла помилка
   if (error) {
     return (
       <div className="course-wc-interface-container">
@@ -459,7 +366,6 @@ function WorkingWithCourse() {
     );
   }
 
-  // Якщо курс не знайдено
   if (!course) {
     return (
       <div className="course-wc-interface-container">
@@ -600,7 +506,6 @@ function WorkingWithCourse() {
             
             {!selectedLesson ? (
               <div className="course-wc-lessons-content">
-                {/* Секція з матеріалами курсу */}
                 {materials && materials.length > 0 && (
                   <div className="course-wc-materials-section">
                     <h3 className="course-wc-section-title">
@@ -639,7 +544,6 @@ function WorkingWithCourse() {
                   </div>
                 )}
 
-                {/* Модулі та уроки */}
                 <div className="course-wc-modules-section">
                   <h3 className="course-wc-section-title">
                     <Book className="course-wc-section-icon" />
@@ -715,7 +619,6 @@ function WorkingWithCourse() {
                 </div>
               </div>
             ) : (
-              // Вид уроку
               <div className="course-wc-lesson-view">
                 <div className="course-wc-lesson-header">
                   <button 
@@ -824,18 +727,44 @@ function WorkingWithCourse() {
             <div className="course-wc-content-header">
               <h2>Завдання курсу</h2>
               <div className="course-wc-content-meta">
-                <span><ClipboardList className="course-wc-meta-icon" /> {assignments.length} завдань</span>
+                <span><ClipboardList className="course-wc-meta-icon" /> {filteredAssignments.length} завдань</span>
               </div>
             </div>
             
+            <div className="course-wc-assignments-header">
+              <div className="course-wc-assignments-filters">
+                <select 
+                  className="course-wc-assignments-filter"
+                  value={assignmentFilter}
+                  onChange={(e) => setAssignmentFilter(e.target.value)}
+                >
+                  <option value="all">Всі завдання</option>
+                  <option value="assigned">Призначено</option>
+                  <option value="submitted">Надіслано</option>
+                  <option value="graded">Оцінено</option>
+                  <option value="returned">Повернуто</option>
+                </select>
+                <div className="course-wc-assignments-search-container">
+                  <Search className="course-wc-search-icon" />
+                  <input
+                    type="text"
+                    className="course-wc-assignments-search"
+                    placeholder="Пошук завдань..."
+                    value={assignmentSearch}
+                    onChange={(e) => setAssignmentSearch(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="course-wc-assignments-list">
-              {assignments.length === 0 ? (
+              {filteredAssignments.length === 0 ? (
                 <div className="course-wc-no-content-message">
                   <h3>Немає доступних завдань</h3>
-                  <p>У цьому курсі поки що немає завдань. Перевірте пізніше або зв'яжіться з викладачем.</p>
+                  <p>У цьому курсі поки що немає завдань або жодне завдання не відповідає вашим критеріям пошуку.</p>
                 </div>
               ) : (
-                assignments.map(assignment => {
+                filteredAssignments.map(assignment => {
                   const statusInfo = formatAssignmentStatus(assignment.status);
                   const timeRemaining = getTimeRemaining(assignment.due_date);
                   
@@ -977,7 +906,31 @@ function WorkingWithCourse() {
             
             <div className="course-wc-qa-container">
               <div className="course-wc-qa-header">
-                <button className="course-wc-btn-qa-create">Створити запитання</button>
+                <div className="course-wc-qa-create-form">
+                  <h3>Створити нове запитання</h3>
+                  <div className="course-wc-qa-form">
+                    <input
+                      type="text"
+                      placeholder="Заголовок запитання"
+                      value={newQuestion.title}
+                      onChange={(e) => setNewQuestion(prev => ({ ...prev, title: e.target.value }))}
+                      className="course-wc-qa-input"
+                    />
+                    <textarea
+                      placeholder="Опишіть ваше запитання"
+                      value={newQuestion.description}
+                      onChange={(e) => setNewQuestion(prev => ({ ...prev, description: e.target.value }))}
+                      className="course-wc-qa-textarea"
+                    />
+                    <button 
+                      className="course-wc-btn-qa-create"
+                      onClick={handleCreateQuestion}
+                      disabled={!newQuestion.title || !newQuestion.description}
+                    >
+                      Опублікувати запитання
+                    </button>
+                  </div>
+                </div>
                 <div className="course-wc-qa-filters">
                   <select className="course-wc-qa-filter">
                     <option value="all">Всі запитання</option>
@@ -1016,7 +969,9 @@ function WorkingWithCourse() {
                       <h3 className="course-wc-qa-title">{discussion.title}</h3>
                       <p className="course-wc-qa-description">{discussion.description}</p>
                       <div className="course-wc-qa-actions">
-                        <button className="course-wc-btn-qa">Переглянути деталі</button>
+                        <Link to={`/qa/${discussion.id}`} className="course-wc-btn-qa">
+                          Переглянути деталі
+                        </Link>
                       </div>
                     </div>
                   ))}
@@ -1112,7 +1067,7 @@ function WorkingWithCourse() {
                           alt={admin.username} 
                           className="course-wc-participant-avatar" 
                         />
-                        <div className="course-wc-participant-info">
+                        <div className="course-wc-part personally identifiable information was removed for privacy reasons -participant-info">
                           <h4 className="course-wc-participant-name">
                             {admin.first_name && admin.last_name 
                               ? `${admin.first_name} ${admin.last_name}` 
