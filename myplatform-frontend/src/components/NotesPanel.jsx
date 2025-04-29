@@ -11,7 +11,6 @@ import {
   FolderPlus,
   ChevronDown,
   ChevronRight,
-  MoreHorizontal,
   AlertTriangle,
   Check,
   RefreshCw,
@@ -32,14 +31,13 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [expandedFolders, setExpandedFolders] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saveStatus, setSaveStatus] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleteNoteDialog, setShowDeleteNoteDialog] = useState(false);
   const [showDeleteFolderDialog, setShowDeleteFolderDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
   const notePanelRef = useRef(null);
 
   const getCsrfToken = async () => {
@@ -64,16 +62,13 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
   const fetchNotesAndFolders = async () => {
     setLoading(true);
     setError(null);
-    setInitialFetchComplete(false);
     try {
       await getCsrfToken();
 
-      const foldersResponse = await axios.get(`${API_URL}/notes/folders/`, {
-        withCredentials: true,
-      });
-      const notesResponse = await axios.get(`${API_URL}/notes/`, {
-        withCredentials: true,
-      });
+      const [foldersResponse, notesResponse] = await Promise.all([
+        axios.get(`${API_URL}/notes/folders/`, { withCredentials: true }),
+        axios.get(`${API_URL}/notes/`, { withCredentials: true }),
+      ]);
 
       const filteredNotes = lessonId
         ? notesResponse.data.filter((note) => note.lesson_id === parseInt(lessonId))
@@ -89,12 +84,10 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
       setExpandedFolders(expanded);
 
       setLoading(false);
-      setInitialFetchComplete(true);
     } catch (error) {
       console.error('Помилка завантаження нотаток:', error);
       setError('Не вдалося завантажити нотатки. Спробуйте знову.');
       setLoading(false);
-      setInitialFetchComplete(true);
     }
   };
 
@@ -445,14 +438,9 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                 <AlertTriangle size={20} />
                 <span>{error}</span>
               </div>
-            ) : !initialFetchComplete ? (
-              <div className="notes-loading">
-                <RefreshCw className="loading-icon" size={20} />
-                <span>Завантаження...</span>
-              </div>
             ) : (
               <div className="notes-list-container">
-                {folders.length > 0 ? (
+                {folders.length > 0 && (
                   <div className="notes-folders">
                     {folders.map((folder) => {
                       const folderNotes = getNotesForFolder(folder.id);
@@ -505,35 +493,33 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                       );
                     })}
                   </div>
-                ) : null}
+                )}
 
-                {getUngroupedNotes().length > 0 || folders.length === 0 ? (
-                  <div className="ungrouped-notes">
-                    <div className="ungrouped-header">
-                      <span>Всі нотатки</span>
-                    </div>
-                    {getUngroupedNotes().length > 0 ? (
-                      <div className="ungrouped-list">
-                        {getUngroupedNotes().map((note) => (
-                          <div
-                            key={note.id}
-                            className={`note-item ${activeNote === note.id ? 'active' : ''}`}
-                            onClick={() => selectNote(note.id)}
-                          >
-                            <div className="note-item-content">
-                              <span className="note-title">{note.title}</span>
-                              <span className="note-date">{formatDate(note.updated_at)}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="no-notes-message">
-                        <span>Немає нотаток</span>
-                      </div>
-                    )}
+                <div className="ungrouped-notes">
+                  <div className="ungrouped-header">
+                    <span>Всі нотатки</span>
                   </div>
-                ) : null}
+                  {getUngroupedNotes().length > 0 ? (
+                    <div className="ungrouped-list">
+                      {getUngroupedNotes().map((note) => (
+                        <div
+                          key={note.id}
+                          className={`note-item ${activeNote === note.id ? 'active' : ''}`}
+                          onClick={() => selectNote(note.id)}
+                        >
+                          <div className="note-item-content">
+                            <span className="note-title">{note.title}</span>
+                            <span className="note-date">{formatDate(note.updated_at)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-notes-message">
+                      <span>Немає некатегоризованих нотаток</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

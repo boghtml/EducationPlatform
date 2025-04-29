@@ -21,7 +21,6 @@ import API_URL from '../api';
 import Header from './Header';
 import '../css/NotesManagement.css';
 
-// Компонент управління нотатками для перегляду, створення та редагування нотаток
 function NotesManagement() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -42,8 +41,9 @@ function NotesManagement() {
   const [showDeleteNoteDialog, setShowDeleteNoteDialog] = useState(false);
   const [showDeleteFolderDialog, setShowDeleteFolderDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [isEditingFolder, setIsEditingFolder] = useState(null);
+  const [editFolderName, setEditFolderName] = useState('');
 
-  // Функція для отримання CSRF-токену
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -57,7 +57,6 @@ function NotesManagement() {
     return null;
   };
 
-  // Завантаження даних
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -65,20 +64,14 @@ function NotesManagement() {
       try {
         await getCsrfToken();
 
-        // Завантаження папок
-        const foldersResponse = await axios.get(`${API_URL}/notes/folders/`, {
-          withCredentials: true,
-        });
-
-        // Завантаження нотаток
-        const notesResponse = await axios.get(`${API_URL}/notes/`, {
-          withCredentials: true,
-        });
+        const [foldersResponse, notesResponse] = await Promise.all([
+          axios.get(`${API_URL}/notes/folders/`, { withCredentials: true }),
+          axios.get(`${API_URL}/notes/`, { withCredentials: true }),
+        ]);
 
         setFolders(foldersResponse.data || []);
         setNotes(notesResponse.data || []);
 
-        // Автоматично розгортаємо всі папки
         const expanded = {};
         foldersResponse.data.forEach((folder) => {
           expanded[folder.id] = true;
@@ -96,11 +89,9 @@ function NotesManagement() {
     fetchData();
   }, []);
 
-  // Фільтрація і сортування нотаток
   const filteredAndSortedNotes = React.useMemo(() => {
     let result = [...notes];
 
-    // Фільтрація за текстом
     if (searchTerm) {
       result = result.filter(
         (note) =>
@@ -109,7 +100,6 @@ function NotesManagement() {
       );
     }
 
-    // Фільтрація за папкою
     if (filterFolder !== 'all') {
       if (filterFolder === 'uncategorized') {
         result = result.filter((note) => !note.folder_id);
@@ -118,7 +108,6 @@ function NotesManagement() {
       }
     }
 
-    // Сортування
     result.sort((a, b) => {
       let comparison = 0;
 
@@ -127,7 +116,6 @@ function NotesManagement() {
       } else if (sortBy === 'created') {
         comparison = new Date(a.created_at) - new Date(b.created_at);
       } else {
-        // 'updated'
         comparison = new Date(a.updated_at) - new Date(b.updated_at);
       }
 
@@ -137,7 +125,6 @@ function NotesManagement() {
     return result;
   }, [notes, searchTerm, filterFolder, sortBy, sortDirection]);
 
-  // Перемикання розгорнутого стану папки
   const toggleFolder = (folderId) => {
     setExpandedFolders((prev) => ({
       ...prev,
@@ -145,7 +132,6 @@ function NotesManagement() {
     }));
   };
 
-  // Створення нової папки
   const createNewFolder = async () => {
     if (!newFolderName.trim()) {
       alert('Назва папки не може бути порожньою');
@@ -167,7 +153,6 @@ function NotesManagement() {
       setIsCreatingFolder(false);
       setNewFolderName('');
 
-      // Автоматично розгортаємо нову папку
       setExpandedFolders((prev) => ({
         ...prev,
         [response.data.id]: true,
@@ -178,7 +163,36 @@ function NotesManagement() {
     }
   };
 
-  // Видалення папки
+  const editFolder = async (folderId) => {
+    if (!editFolderName.trim()) {
+      alert('Назва папки не може бути порожньою');
+      return;
+    }
+
+    try {
+      await getCsrfToken();
+
+      const folderData = {
+        name: editFolderName,
+      };
+
+      const response = await axios.put(`${API_URL}/notes/folders/${folderId}/`, folderData, {
+        withCredentials: true,
+      });
+
+      setFolders((prevFolders) =>
+        prevFolders.map((folder) =>
+          folder.id === folderId ? { ...folder, name: editFolderName } : folder
+        )
+      );
+      setIsEditingFolder(null);
+      setEditFolderName('');
+    } catch (error) {
+      console.error('Помилка редагування папки:', error);
+      alert('Не вдалося відредагувати папку. Спробуйте знову.');
+    }
+  };
+
   const deleteFolder = async () => {
     if (!itemToDelete) return;
 
@@ -190,7 +204,6 @@ function NotesManagement() {
 
       setFolders((prevFolders) => prevFolders.filter((folder) => folder.id !== itemToDelete));
 
-      // Переміщення нотаток з цієї папки до загального списку
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
           note.folder_id === itemToDelete ? { ...note, folder_id: null } : note
@@ -208,7 +221,6 @@ function NotesManagement() {
     }
   };
 
-  // Вибір нотатки для перегляду/редагування
   const selectNote = (note) => {
     setSelectedNote(note);
     setEditNoteTitle(note.title);
@@ -217,7 +229,6 @@ function NotesManagement() {
     setIsEditingNote(false);
   };
 
-  // Створення нової нотатки
   const createNewNote = async () => {
     setSelectedNote(null);
     setEditNoteTitle('Нова нотатка');
@@ -228,7 +239,6 @@ function NotesManagement() {
     setIsEditingNote(true);
   };
 
-  // Збереження нотатки
   const saveNote = async () => {
     try {
       await getCsrfToken();
@@ -240,7 +250,6 @@ function NotesManagement() {
       };
 
       if (selectedNote) {
-        // Оновлення існуючої нотатки
         const response = await axios.put(`${API_URL}/notes/${selectedNote.id}/`, noteData, {
           withCredentials: true,
         });
@@ -267,7 +276,6 @@ function NotesManagement() {
           updated_at: new Date().toISOString(),
         });
       } else {
-        // Створення нової нотатки
         const response = await axios.post(`${API_URL}/notes/create/`, noteData, {
           withCredentials: true,
         });
@@ -283,7 +291,6 @@ function NotesManagement() {
     }
   };
 
-  // Видалення нотатки
   const deleteNote = async () => {
     if (!itemToDelete) return;
 
@@ -307,7 +314,6 @@ function NotesManagement() {
     }
   };
 
-  // Форматування дати оновлення
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('uk-UA', {
@@ -319,7 +325,6 @@ function NotesManagement() {
     });
   };
 
-  // Перенесення нотатки до іншої папки
   const moveNoteToFolder = async (noteId, folderId) => {
     try {
       await getCsrfToken();
@@ -332,14 +337,12 @@ function NotesManagement() {
         withCredentials: true,
       });
 
-      // Оновлення локального стану
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
           note.id === noteId ? { ...note, folder_id: folderId } : note
         )
       );
 
-      // Якщо ця нотатка активна, оновлюємо і її теж
       if (selectedNote && selectedNote.id === noteId) {
         setSelectedNote((prev) => ({ ...prev, folder_id: folderId }));
         setActiveFolder(folderId);
