@@ -19,7 +19,8 @@ import {
   FaRegCalendarCheck,
   FaSpinner,
   FaCheckCircle,
-  FaBackward
+  FaBackward,
+  FaBookmark,
 } from 'react-icons/fa';
 
 function Dashboard() {
@@ -319,6 +320,14 @@ function Dashboard() {
                 <p>Завдань виконано</p>
               </div>
             </div>
+
+            <div className="dashboard-nav-item">
+              <Link to="/notes-management" className="dashboard-nav-link">
+                <FaBookmark className="dashboard-nav-icon" />
+                <span>Мої нотатки</span>
+              </Link>
+            </div>
+            
           </div>
           
           {/* Головний контент */}

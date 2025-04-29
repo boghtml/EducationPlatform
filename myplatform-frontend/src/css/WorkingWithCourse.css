@@ -2722,3 +2722,25 @@
     gap: 10px;
   }
 }
+
+/* Додайте ці стилі до файлу WorkingWithCourse.css */
+
+.course-wc-btn-notes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+}
+
+.course-wc-btn-notes:hover {
+  background-color: #388e3c;
+  transform: translateY(-2px);
+}

@@ -24,11 +24,14 @@ import DiscussionsTab from './components/DiscussionsTab';
 import QATab from './components/QATab';
 import ParticipantsTab from './components/ParticipantsTab';
 import GradesTab from './components/GradesTab';
+import NotesManagement from './components/NotesManagement';
 
 import './css/auth.css';
 import './css/courseCatalog.css';
 import './css/header.css';
 import './css/dashboard.css';
+import './css/NotesPanel.css';
+import './css/NotesManagement.css';
 
 function App() {
   return (
@@ -46,6 +49,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/notes-management" element={<NotesManagement />} />
         <Route path="/my-courses/:courseId" element={<WorkingWithCourse />}>
           <Route index element={<LessonsTab />} />
           <Route path="lessons" element={<LessonsTab />} />

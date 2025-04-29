@@ -14,9 +14,15 @@ import {
   File,
   ExternalLink,
   Award,
+  BookOpen,
+  Pencil,
+  Plus
 } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
+import '../css/QuickNote.css';
+import NotesPanel from './NotesPanel';
+import QuickNote from './QuickNote';
 
 function LessonsTab() {
   const { course, courseProgress, getCsrfToken } = useOutletContext();
@@ -25,6 +31,9 @@ function LessonsTab() {
   const [expandedModules, setExpandedModules] = useState({});
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [completingLesson, setCompletingLesson] = useState(false);
+  const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
+  const [isQuickNoteOpen, setIsQuickNoteOpen] = useState(false);
+  const [showQuickNoteButton, setShowQuickNoteButton] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +50,11 @@ function LessonsTab() {
     };
     if (course) fetchData();
   }, [course, getCsrfToken]);
+
+  // Показувати кнопку швидкого створення нотаток тільки тоді, коли урок вибрано
+  useEffect(() => {
+    setShowQuickNoteButton(!!selectedLesson);
+  }, [selectedLesson]);
 
   const fetchLessons = async (moduleId) => {
     if (expandedModules[moduleId]) {
@@ -147,6 +161,28 @@ function LessonsTab() {
       if (lesson && lesson.is_completed) return true;
     }
     return false;
+  };
+
+  // Функція для відкриття панелі нотаток
+  const openNotesPanel = () => {
+    setIsNotesPanelOpen(true);
+    setIsQuickNoteOpen(false);
+  };
+
+  // Функція для закриття панелі нотаток
+  const closeNotesPanel = () => {
+    setIsNotesPanelOpen(false);
+  };
+  
+  // Функція для відкриття швидкої нотатки
+  const toggleQuickNote = () => {
+    setIsQuickNoteOpen(!isQuickNoteOpen);
+  };
+  
+  // Обробка збереження швидкої нотатки
+  const handleQuickNoteSaved = (note) => {
+    // Тут можна додати логіку оновлення списку нотаток або показати сповіщення
+    console.log("Нотатка збережена:", note);
   };
 
   return (
@@ -290,6 +326,15 @@ function LessonsTab() {
             <h2 className="course-wc-lesson-title">{selectedLesson.title}</h2>
 
             <div className="course-wc-lesson-actions">
+              {/* Кнопка відкриття нотаток */}
+              <button 
+                className="course-wc-btn course-wc-btn-notes"
+                onClick={openNotesPanel}
+                title="Мої нотатки"
+              >
+                <BookOpen className="course-wc-button-icon" /> Нотатки
+              </button>
+              
               {selectedLesson.is_completed ? (
                 <button className="course-wc-btn course-wc-btn-completed" disabled>
                   <CheckCircle className="course-wc-button-icon" /> Завершено
@@ -383,6 +428,35 @@ function LessonsTab() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Компонент панелі нотаток */}
+      <NotesPanel 
+        lessonId={selectedLesson?.id} 
+        courseId={course?.id}
+        isOpen={isNotesPanelOpen} 
+        onClose={closeNotesPanel} 
+      />
+      
+      {/* Кнопка для швидкого створення нотатки */}
+      {showQuickNoteButton && (
+        <>
+          {isQuickNoteOpen ? (
+            <QuickNote 
+              lessonId={selectedLesson?.id}
+              onClose={toggleQuickNote}
+              onSaved={handleQuickNoteSaved}
+            />
+          ) : (
+            <button 
+              className="quick-note-button"
+              onClick={toggleQuickNote}
+              title="Швидка нотатка"
+            >
+              <Pencil size={24} />
+            </button>
+          )}
+        </>
       )}
     </div>
   );
