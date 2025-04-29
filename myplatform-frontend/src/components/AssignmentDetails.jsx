@@ -16,7 +16,10 @@ import {
   AlertTriangle,
   RefreshCw,
   ExternalLink,
-  Download
+  Download,
+  User,
+  FileCheck,
+  BookOpen
 } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
@@ -31,7 +34,6 @@ function AssignmentDetails() {
   const [isCancelling, setIsCancelling] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [submissionData, setSubmissionData] = useState(null);
   const { assignmentId } = useParams();
   const navigate = useNavigate();
 
@@ -44,7 +46,7 @@ function AssignmentDetails() {
         return response.data.csrftoken;
       }
     } catch (error) {
-      console.error('Error fetching CSRF token:', error);
+      console.error('Помилка отримання CSRF токену:', error);
     }
     return null;
   };
@@ -55,27 +57,18 @@ function AssignmentDetails() {
       try {
         setLoading(true);
         await getCsrfToken();
-        const response = await axios.get(`${API_URL}/assignments/${assignmentId}/detail/`, { withCredentials: true });
+        
+        // Використовуємо новий ендпоінт для студентів
+        const response = await axios.get(`${API_URL}/assignments/student/${assignmentId}/detail/`, { 
+          withCredentials: true
+        });
+        
         setAssignment(response.data);
-        
-        // Перевіряємо, чи є у завдання надіслані файли (якщо статус 'submitted', 'graded' або 'returned')
-        if (['submitted', 'graded', 'returned'].includes(response.data.status)) {
-          try {
-            // Припустимо, що endpoint для отримання даних подання виглядає так:
-            const submissionResponse = await axios.get(
-              `${API_URL}/assignments/${assignmentId}/cancel_submission/`, 
-              { withCredentials: true }
-            );
-            setSubmissionData(submissionResponse.data);
-          } catch (submissionError) {
-            console.warn("Could not fetch submission data:", submissionError);
-          }
-        }
-        
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching assignment:", error);
-        setError("Не вдалося завантажити завдання. Спробуйте знову.");
+        console.error("Помилка завантаження завдання:", error);
+        const errorMessage = error.response?.data?.error || "Не вдалося завантажити завдання. Спробуйте знову.";
+        setError(errorMessage);
         setLoading(false);
       }
     };
@@ -134,16 +127,19 @@ function AssignmentDetails() {
       // Оновлюємо статус завдання
       setAssignment(prev => ({
         ...prev,
-        status: 'submitted'
+        status: 'submitted',
+        submission: {
+          id: response.data.id || prev.id,
+          comment: submissionComment,
+          submission_date: new Date().toISOString(),
+          files: response.data.files || []
+        }
       }));
-      
-      // Оновлюємо дані подання
-      setSubmissionData(response.data);
       
       // Прокручуємо до повідомлення про успіх
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      console.error("Error submitting assignment:", error);
+      console.error("Помилка відправлення завдання:", error);
       setErrorMessage(error.response?.data?.error || "Помилка при відправці завдання. Спробуйте знову.");
     } finally {
       setIsSubmitting(false);
@@ -174,22 +170,21 @@ function AssignmentDetails() {
       // Оновлюємо статус завдання
       setAssignment(prev => ({
         ...prev,
-        status: 'assigned'
+        status: 'assigned',
+        submission: null
       }));
-      
-      // Скидаємо дані подання
-      setSubmissionData(null);
       
       // Прокручуємо до повідомлення про успіх
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
-      console.error("Error cancelling submission:", error);
+      console.error("Помилка скасування подання:", error);
       setErrorMessage(error.response?.data?.error || "Помилка при скасуванні подання. Спробуйте знову.");
     } finally {
       setIsCancelling(false);
     }
   };
 
+  // Допоміжні функції
   const getFileIcon = (fileType) => {
     if (!fileType) return <FileText className="course-wc-file-icon" />;
     const type = fileType.toLowerCase();
@@ -283,7 +278,20 @@ function AssignmentDetails() {
       year: 'numeric' 
     });
   };
+  
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('uk-UA', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
+  // Стани завантаження та помилки
   if (loading) {
     return (
       <div className="course-wc-interface-container">
@@ -295,13 +303,28 @@ function AssignmentDetails() {
     );
   }
 
-  if (error || !assignment) {
+  if (error) {
     return (
       <div className="course-wc-interface-container">
         <div className="course-wc-error-container">
           <div className="course-wc-error-icon">!</div>
-          <h3>{error ? 'Помилка завантаження' : 'Завдання не знайдено'}</h3>
-          <p>{error || 'Запитане завдання не знайдено. Можливо, його було видалено.'}</p>
+          <h3>Помилка завантаження</h3>
+          <p>{error}</p>
+          <button className="course-wc-btn-primary" onClick={() => navigate(-1)}>
+            Повернутися назад
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!assignment) {
+    return (
+      <div className="course-wc-interface-container">
+        <div className="course-wc-error-container">
+          <div className="course-wc-error-icon">?</div>
+          <h3>Завдання не знайдено</h3>
+          <p>Запитане завдання не знайдено. Можливо, його було видалено.</p>
           <button className="course-wc-btn-primary" onClick={() => navigate(-1)}>
             Повернутися назад
           </button>
@@ -342,13 +365,8 @@ function AssignmentDetails() {
             <h2>{assignment.title}</h2>
             <div className="course-wc-content-meta">
               <span><ClipboardList className="course-wc-meta-icon" /> Завдання</span>
-              <span 
-                className="course-wc-assignment-status" 
-                style={{ backgroundColor: statusInfo.color }}
-              >
-                {statusInfo.icon}
-                <span>{statusInfo.label}</span>
-              </span>
+              <span><User className="course-wc-meta-icon" /> {assignment.teacher.first_name} {assignment.teacher.last_name}</span>
+              <span><BookOpen className="course-wc-meta-icon" /> {assignment.course.title}</span>
             </div>
           </div>
 
@@ -384,10 +402,10 @@ function AssignmentDetails() {
                     <span>{timeRemaining.text}</span>
                   </div>
                 )}
-                {assignment.status === 'graded' && (
+                {assignment.status === 'graded' && assignment.submission && (
                   <div className="course-wc-meta-item course-wc-grade">
                     <Award className="course-wc-meta-icon" />
-                    <span>Оцінка: {assignment.grade}/100</span>
+                    <span>Оцінка: {assignment.submission.grade}/100</span>
                   </div>
                 )}
               </div>
@@ -432,7 +450,7 @@ function AssignmentDetails() {
                       <ExternalLink className="course-wc-file-icon" />
                       <div className="course-wc-file-info">
                         <span className="course-wc-file-name">{link.description || link.link_url}</span>
-                        <span className="course-wc-file-type">External Link</span>
+                        <span className="course-wc-file-type">Зовнішнє посилання</span>
                       </div>
                     </a>
                   ))}
@@ -440,21 +458,21 @@ function AssignmentDetails() {
               </div>
             )}
 
-            {/* Відображення надісланих файлів, якщо завдання було відправлене */}
-            {['submitted', 'graded', 'returned'].includes(assignment.status) && submissionData && (
+            {/* Відображення надісланих файлів */}
+            {['submitted', 'graded', 'returned'].includes(assignment.status) && assignment.submission && (
               <div className="course-wc-assignment-section">
-                <h3>Надіслана робота</h3>
+                <h3>Ваша робота</h3>
                 
-                {submissionData.comment && (
+                {assignment.submission.comment && (
                   <div className="course-wc-submission-comment">
                     <h4>Ваш коментар:</h4>
-                    <p>{submissionData.comment}</p>
+                    <p>{assignment.submission.comment}</p>
                   </div>
                 )}
                 
-                {submissionData.files && submissionData.files.length > 0 ? (
+                {assignment.submission.files && assignment.submission.files.length > 0 ? (
                   <div className="course-wc-files-list">
-                    {submissionData.files.map(file => (
+                    {assignment.submission.files.map(file => (
                       <a 
                         key={file.id}
                         href={file.file_url}
@@ -475,9 +493,9 @@ function AssignmentDetails() {
                   <p>Немає надісланих файлів.</p>
                 )}
                 
-                {submissionData.submission_date && (
+                {assignment.submission.submission_date && (
                   <div className="course-wc-submission-date">
-                    <p>Надіслано: {formatDate(submissionData.submission_date)} о {new Date(submissionData.submission_date).toLocaleTimeString('uk-UA')}</p>
+                    <p>Надіслано: {formatDateTime(assignment.submission.submission_date)}</p>
                   </div>
                 )}
                 
@@ -505,7 +523,7 @@ function AssignmentDetails() {
               </div>
             )}
             
-            {/* Форма надсилання завдання (лише якщо статус 'assigned') */}
+            {/* Форма надсилання завдання */}
             {assignment.status === 'assigned' && (
               <div className="course-wc-assignment-section">
                 <h3>Надіслати роботу</h3>
@@ -586,33 +604,33 @@ function AssignmentDetails() {
               </div>
             )}
 
-            {/* Відображення оцінки і зворотнього зв'язку, якщо завдання оцінено */}
-            {assignment.status === 'graded' && (
+            {/* Відображення оцінки і зворотнього зв'язку */}
+            {assignment.status === 'graded' && assignment.submission && (
               <div className="course-wc-assignment-section course-wc-grade-section">
                 <h3>Оцінка та зворотній зв'язок</h3>
                 <div className="course-wc-grade-container">
                   <div className="course-wc-grade-circle">
-                    <span className="course-wc-grade-value">{assignment.grade}</span>
+                    <span className="course-wc-grade-value">{assignment.submission.grade}</span>
                     <span className="course-wc-grade-total">/100</span>
                   </div>
                   
                   <div className="course-wc-feedback">
                     <h4>Відгук викладача:</h4>
                     <div className="course-wc-feedback-content">
-                      {assignment.feedback || 'Коментарі відсутні.'}
+                      {assignment.submission.feedback || 'Коментарі відсутні.'}
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Відображення зворотнього зв'язку, якщо завдання повернуто */}
-            {assignment.status === 'returned' && (
+            {/* Відображення зворотнього зв'язку для повернутих завдань */}
+            {assignment.status === 'returned' && assignment.submission && (
               <div className="course-wc-assignment-section course-wc-feedback-section">
                 <h3>Зворотній зв'язок від викладача</h3>
                 <div className="course-wc-feedback">
                   <div className="course-wc-feedback-content">
-                    {assignment.feedback || 'Коментарі відсутні.'}
+                    {assignment.submission.feedback || 'Коментарі відсутні.'}
                   </div>
                 </div>
                 
@@ -630,7 +648,7 @@ function AssignmentDetails() {
                     ) : (
                       <>
                         <RefreshCw className="course-wc-button-icon" size={16} />
-                        <span>Скасувати подання і надіслати знову</span>
+                        <span>Скасувати подання і відправити знову</span>
                       </>
                     )}
                   </button>

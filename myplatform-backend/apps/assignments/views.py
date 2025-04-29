@@ -623,3 +623,84 @@ class GradeSubmissionView(APIView):
         submission.save()
 
         return Response({"message": "Submission graded successfully."}, status=status.HTTP_200_OK)
+
+
+class StudentAssignmentDetailView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, assignment_id):
+        """
+        Get detailed information about an assignment for the current student,
+        including submission details if available.
+        """
+        try:
+            student = request.user
+            if student.role != 'student':
+                return Response({"error": "This endpoint is only for students"}, status=status.HTTP_403_FORBIDDEN)
+
+            assignment = get_object_or_404(Assignment, id=assignment_id)
+            
+            if not Enrollment.objects.filter(course=assignment.course, student=student).exists():
+                return Response({"error": "You are not enrolled in this course"}, status=status.HTTP_403_FORBIDDEN)
+            
+            try:
+                submission = Submission.objects.get(student=student, assignment=assignment)
+            except Submission.DoesNotExist:
+                return Response({"error": "Submission not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            assignment_details = {
+                'id': assignment.id,
+                'title': assignment.title,
+                'description': assignment.description,
+                'due_date': assignment.due_date,
+                'created_at': assignment.created_at,
+                'updated_at': assignment.updated_at,
+                'course': {
+                    'id': assignment.course.id,
+                    'title': assignment.course.title
+                },
+                'teacher': {
+                    'id': assignment.teacher.id,
+                    'username': assignment.teacher.username,
+                    'first_name': assignment.teacher.first_name,
+                    'last_name': assignment.teacher.last_name,
+                    'profile_image_url': assignment.teacher.profile_image_url
+                },
+                'files': AssignmentFileSerializer(assignment.files.all(), many=True).data,
+                'links': AssignmentLinkSerializer(assignment.links.all(), many=True).data,
+                'status': submission.status,
+            }
+            
+            if submission.status == 'assigned':
+                pass
+            elif submission.status == 'submitted':
+                assignment_details['submission'] = {
+                    'id': submission.id,
+                    'comment': submission.comment,
+                    'submission_date': submission.submission_date,
+                    'files': SubmissionFileSerializer(submission.files.all(), many=True).data
+                }
+            elif submission.status == 'graded':
+                assignment_details['submission'] = {
+                    'id': submission.id,
+                    'comment': submission.comment,
+                    'submission_date': submission.submission_date,
+                    'files': SubmissionFileSerializer(submission.files.all(), many=True).data,
+                    'grade': submission.grade,
+                    'feedback': submission.feedback
+                }
+            elif submission.status == 'returned':
+                assignment_details['submission'] = {
+                    'id': submission.id,
+                    'comment': submission.comment,
+                    'submission_date': submission.submission_date,
+                    'files': SubmissionFileSerializer(submission.files.all(), many=True).data,
+                    'feedback': submission.feedback,
+                    'returned_at': submission.returned_at
+                }
+            
+            return Response(assignment_details, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
