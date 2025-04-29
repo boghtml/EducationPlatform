@@ -17,28 +17,22 @@ class DashboardStatsView(APIView):
     def get(self, request):
         user = request.user
         
-        # Перевіряємо, що користувач має роль student
         if user.role != 'student':
             return Response({"error": "Цей ендпоінт доступний тільки для студентів"}, status=status.HTTP_403_FORBIDDEN)
         
-        # Отримуємо всі курси, на які записаний користувач
         enrollments = Enrollment.objects.filter(student=user)
         enrolled_courses = [enrollment.course for enrollment in enrollments]
         
-        # Статистика по завданням
-        # 1. Кількість призначених та повернутих завдань
         pending_assignments = Submission.objects.filter(
             student=user, 
             status__in=['assigned', 'returned']
         ).count()
         
-        # 2. Кількість виконаних завдань
         completed_assignments = Submission.objects.filter(
             student=user, 
             status__in=['submitted', 'graded']
         ).count()
         
-        # 3. Список останніх призначених завдань (з дедлайнами)
         upcoming_deadlines = []
         submissions = Submission.objects.filter(
             student=user,
@@ -57,16 +51,13 @@ class DashboardStatsView(APIView):
                     'status': submission.status
                 })
         
-        # Сортування за найближчим дедлайном
         upcoming_deadlines = sorted(upcoming_deadlines, key=lambda x: x['due_date'])
         
-        # Обмеження до 5 найближчих дедлайнів
         upcoming_deadlines = upcoming_deadlines[:5]
         
-        # Дані по курсам
         courses_data = []
         for course in enrolled_courses:
-            # Отримання прогресу для кожного курсу
+            
             from apps.progress_tracking.models import LessonProgress
             from apps.lessons.models import Lesson
             
@@ -76,7 +67,6 @@ class DashboardStatsView(APIView):
                 lesson__module__course=course
             ).exclude(completed_at=None).count()
             
-            # Отримання дати останнього відвідування (припустимо, що це дата останнього завершеного уроку)
             last_progress = LessonProgress.objects.filter(
                 student=user,
                 lesson__module__course=course
@@ -84,7 +74,6 @@ class DashboardStatsView(APIView):
             
             last_access = last_progress.completed_at if last_progress else None
             
-            # Отримання даних про викладача
             teacher_data = None
             if course.teacher:
                 teacher_data = {
@@ -107,20 +96,14 @@ class DashboardStatsView(APIView):
                 'teacher': teacher_data
             })
         
-        # Отримання рекомендованих курсів (наприклад, 3 випадкових курси, на які користувач не записаний)
         enrolled_course_ids = [course.id for course in enrolled_courses]
         recommended_courses = Course.objects.exclude(id__in=enrolled_course_ids).order_by('?')[:3]
         
         recommended_data = []
         for course in recommended_courses:
-            # Отримання рейтингу та кількості студентів (можна реалізувати у вашій системі)
-            # Тут використовуємо заглушки
             
-            # Обчислення приблизного рейтингу та кількості студентів
             students_count = Enrollment.objects.filter(course=course).count()
-            
-            # Рейтинг можна обчислювати на основі відгуків, якщо вони є у вашій системі
-            # Тут використовуємо заглушку
+          
             rating = round((course.id % 5) * 0.8 + 1.5, 1)  # Просто для прикладу
             if rating > 5:
                 rating = 5.0
@@ -144,10 +127,8 @@ class DashboardStatsView(APIView):
                 'teacher': teacher_data
             })
         
-        # Отримання останніх активностей користувача
         recent_activities = []
         
-        # 1. Останні завершені уроки
         recent_lessons = LessonProgress.objects.filter(
             student=user
         ).exclude(completed_at=None).order_by('-completed_at')[:3]
@@ -161,7 +142,6 @@ class DashboardStatsView(APIView):
                 'date': progress.completed_at
             })
         
-        # 2. Останні відправлені завдання
         recent_submissions = Submission.objects.filter(
             student=user,
             status='submitted'
@@ -176,7 +156,6 @@ class DashboardStatsView(APIView):
                 'date': submission.submission_date
             })
         
-        # 3. Останні записи на курси
         recent_enrollments = Enrollment.objects.filter(
             student=user
         ).order_by('-enrollment_date')[:3]
@@ -189,14 +168,12 @@ class DashboardStatsView(APIView):
                 'date': enrollment.enrollment_date
             })
         
-        # Сортування за датою (від найновіших до найстаріших)
         recent_activities = sorted(
             recent_activities, 
             key=lambda x: x['date'] if x['date'] else timezone.now(),
             reverse=True
-        )[:5]  # Обмеження до 5 активностей
+        )[:5]  
         
-        # Формуємо підсумковий результат
         result = {
             'stats': {
                 'total_courses': len(enrolled_courses),
