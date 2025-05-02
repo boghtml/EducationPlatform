@@ -1,41 +1,461 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import Footer from './Footer';
+import '../css/TermsOfService.css';
+import { FaGavel, FaUserShield, FaFileContract, FaMoneyBillWave, 
+  FaLaptopCode, FaInfoCircle, FaExclamationTriangle, FaCopyright, 
+  FaUniversalAccess, FaGlobe, FaBalanceScale, FaHandshake } from 'react-icons/fa';
 
 const TermsOfService = () => {
+  useEffect(() => {
+    document.title = "Умови використання | Освітня платформа";
+    
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <div className="container mt-5">
-      <h1>Terms of Service</h1>
-      <p>Last updated: 05.09.2024</p>
-      <p>
-        Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the [Your App Name] website and services operated by [Your Company Name] ("us", "we", or "our").
-      </p>
-      <h2>1. Terms</h2>
-      <p>
-        By accessing our website and using our services, you agree to be bound by these Terms of Service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws.
-      </p>
-      <h2>2. Use License</h2>
-      <p>
-        Permission is granted to temporarily download one copy of the materials (information or software) on Education Platform's website for personal, non-commercial transitory viewing only.
-      </p>
-      <h2>3. Disclaimer</h2>
-      <p>
-        The materials on Education Platform's website are provided on an 'as is' basis. Education Platform makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
-      </p>
-      <h2>4. Limitations</h2>
-      <p>
-        In no event shall Education Platform or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on [Your App Name]'s website, even if [Your App Name] or a [Your App Name] authorized representative has been notified orally or in writing of the possibility of such damage.
-      </p>
-      <h2>5. Revisions and Errata</h2>
-      <p>
-        The materials appearing on Education Platform's website could include technical, typographical, or photographic errors. Education Platform does not warrant that any of the materials on its website are accurate, complete or current. [Your App Name] may make changes to the materials contained on its website at any time without notice.
-      </p>
-      <h2>6. Governing Law</h2>
-      <p>
-        These Terms shall be governed and construed in accordance with the laws of Ukraine, without regard to its conflict of law provisions.
-      </p>
-      <h2>Contact Us</h2>
-      <p>
-        If you have any questions about these Terms, please contact us at boghtml@gmail.com.
-      </p>
+    <div className="terms-page">
+      
+      <div className="terms-hero">
+        <div className="container">
+          <h1 className="terms-hero-title">
+            <FaGavel className="terms-hero-icon" /> Умови використання
+          </h1>
+          <p className="terms-hero-subtitle">Останнє оновлення: 2 травня 2025 року</p>
+        </div>
+      </div>
+      
+      <div className="container terms-container">
+        <div className="terms-sidebar">
+          <div className="terms-toc">
+            <h3 className="toc-title">Зміст</h3>
+            <ul className="toc-list">
+              <li><a href="#introduction">Вступ та прийняття умов</a></li>
+              <li><a href="#definitions">Визначення термінів</a></li>
+              <li><a href="#account">Реєстрація та обліковий запис</a></li>
+              <li><a href="#content">Контент та інтелектуальна власність</a></li>
+              <li><a href="#payments">Оплата та підписки</a></li>
+              <li><a href="#rules">Правила поведінки</a></li>
+              <li><a href="#moderation">Модерація та блокування</a></li>
+              <li><a href="#termination">Припинення доступу</a></li>
+              <li><a href="#disclaimers">Відмова від відповідальності</a></li>
+              <li><a href="#liability">Обмеження відповідальності</a></li>
+              <li><a href="#disputes">Вирішення спорів</a></li>
+              <li><a href="#changes">Зміни умов використання</a></li>
+              <li><a href="#contact">Контактна інформація</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="terms-content">
+          <section id="introduction" className="terms-section">
+            <h2>Вступ та прийняття умов</h2>
+            <p>
+              Ласкаво просимо до Освітньої платформи. Ці Умови використання ("Умови") регулюють ваш доступ
+              та використання веб-сайту, мобільних додатків та інших онлайн-продуктів і послуг Освітньої платформи
+              (разом "Платформа").
+            </p>
+            <p>
+              Будь ласка, уважно прочитайте ці Умови. Використовуючи нашу Платформу, ви погоджуєтесь дотримуватися
+              цих Умов та нашої Політики конфіденційності. Якщо ви не погоджуєтесь з цими Умовами, будь ласка,
+              не використовуйте Платформу.
+            </p>
+            <div className="terms-alert">
+              <FaExclamationTriangle className="alert-icon" />
+              <p>
+                Використовуючи нашу Платформу, ви підтверджуєте, що вам виповнилося 16 років або ви отримали дозвіл
+                від батьків чи законних опікунів для використання наших послуг.
+              </p>
+            </div>
+          </section>
+          
+          <section id="definitions" className="terms-section">
+            <h2><FaInfoCircle className="section-icon" /> Визначення термінів</h2>
+            
+            <div className="terms-definitions">
+              <div className="term-definition">
+                <h3>"Платформа"</h3>
+                <p>
+                  Означає веб-сайт, мобільні додатки та інші онлайн-сервіси, що надаються Освітньою платформою.
+                </p>
+              </div>
+              
+              <div className="term-definition">
+                <h3>"Користувач", "Ви"</h3>
+                <p>
+                  Будь-яка особа, яка відвідує, переглядає або використовує Платформу будь-яким чином.
+                </p>
+              </div>
+              
+              <div className="term-definition">
+                <h3>"Контент"</h3>
+                <p>
+                  Усі матеріали, що публікуються, завантажуються або розміщуються на Платформі, включаючи текст,
+                  зображення, відео, аудіо, коментарі та інші матеріали.
+                </p>
+              </div>
+              
+              <div className="term-definition">
+                <h3>"Курс"</h3>
+                <p>
+                  Організований навчальний матеріал, що включає відео, текст, завдання, тести та інші освітні ресурси.
+                </p>
+              </div>
+              
+              <div className="term-definition">
+                <h3>"Викладач"</h3>
+                <p>
+                  Користувач, який створює та публікує курси на Платформі.
+                </p>
+              </div>
+              
+              <div className="term-definition">
+                <h3>"Студент"</h3>
+                <p>
+                  Користувач, який реєструється та бере участь у курсах на Платформі.
+                </p>
+              </div>
+            </div>
+          </section>
+          
+          <section id="account" className="terms-section">
+            <h2><FaUserShield className="section-icon" /> Реєстрація та обліковий запис</h2>
+            
+            <div className="terms-card">
+              <h3>Створення облікового запису</h3>
+              <p>
+                Для доступу до більшості функцій нашої Платформи вам потрібно зареєструвати обліковий запис.
+                Під час реєстрації ви погоджуєтесь надати точну та повну інформацію та підтримувати її актуальність.
+              </p>
+            </div>
+            
+            <div className="terms-card">
+              <h3>Безпека облікового запису</h3>
+              <p>
+                Ви несете відповідальність за збереження конфіденційності вашого паролю та за всі дії, 
+                що відбуваються під вашим обліковим записом. Ви зобов'язуєтесь негайно повідомити нас 
+                про будь-яке несанкціоноване використання вашого облікового запису.
+              </p>
+            </div>
+            
+            <div className="terms-card">
+              <h3>Обмеження облікових записів</h3>
+              <p>
+                Ви не можете передавати або продавати доступ до свого облікового запису третім особам.
+                Кожен користувач може мати лише один активний обліковий запис, за винятком випадків, 
+                коли ми надаємо окремий дозвіл.
+              </p>
+            </div>
+            
+            <div className="terms-card">
+              <h3>Вік користувачів</h3>
+              <p>
+                Наші послуги призначені для осіб, яким виповнилося 16 років. Якщо вам менше 16 років, 
+                ви можете використовувати наші послуги лише з дозволу та під наглядом батьків або законних опікунів.
+              </p>
+            </div>
+          </section>
+          
+          <section id="content" className="terms-section">
+            <h2><FaCopyright className="section-icon" /> Контент та інтелектуальна власність</h2>
+            
+            <h3>Права власності</h3>
+            <p>
+              Усі права на Платформу та її контент (крім контенту, наданого користувачами) належать Освітній платформі 
+              та її ліцензіарам. Усі права захищені. Ви не маєте права копіювати, модифікувати, поширювати, продавати 
+              або здавати в оренду будь-яку частину Платформи без нашого письмового дозволу.
+            </p>
+            
+            <h3>Користувацький контент</h3>
+            <p>
+              Публікуючи, завантажуючи або розміщуючи контент на Платформі, ви зберігаєте всі права інтелектуальної 
+              власності на цей контент, але надаєте нам невиключну, безоплатну, глобальну ліцензію на використання,
+              відтворення, модифікацію, адаптацію, публікацію та розповсюдження цього контенту для надання наших послуг.
+            </p>
+            
+            <div className="terms-alert">
+              <FaExclamationTriangle className="alert-icon" />
+              <p>
+                Ви гарантуєте, що маєте всі необхідні права на контент, який ви розміщуєте на Платформі, 
+                і що цей контент не порушує права третіх осіб або закон.
+              </p>
+            </div>
+            
+            <h3>Заборонений контент</h3>
+            <p>
+              Ви не можете публікувати контент, який:
+            </p>
+            <ul className="terms-list">
+              <li>Порушує закон або права третіх осіб</li>
+              <li>Містить образливі, непристойні або дискримінаційні матеріали</li>
+              <li>Пропагує насильство, ненависть або незаконну діяльність</li>
+              <li>Містить шкідливий програмний код</li>
+              <li>Порушує ці Умови або інші правила, встановлені на нашій Платформі</li>
+            </ul>
+            
+            <h3>Авторські права</h3>
+            <p>
+              Ми поважаємо права інтелектуальної власності інших осіб. Якщо ви вважаєте, що ваші авторські 
+              права були порушені на нашій Платформі, будь ласка, повідомте нам про це, надіславши повідомлення 
+              на адресу електронної пошти, вказану в розділі "Контактна інформація".
+            </p>
+          </section>
+          
+          <section id="payments" className="terms-section">
+            <h2><FaMoneyBillWave className="section-icon" /> Оплата та підписки</h2>
+            
+            <h3>Платні курси та підписки</h3>
+            <p>
+              Деякі курси та функції на нашій Платформі можуть бути доступні за оплату. Ціни вказуються 
+              на сторінці відповідного курсу або підписки. Усі ціни вказані в гривнях і включають усі 
+              застосовні податки, якщо не зазначено інше.
+            </p>
+            
+            <h3>Способи оплати</h3>
+            <p>
+              Ми приймаємо різні способи оплати, включаючи кредитні картки та електронні платежі. 
+              Ви підтверджуєте, що надана вами платіжна інформація є точною та що ви маєте право 
+              використовувати вибраний спосіб оплати.
+            </p>
+            
+            <h3>Автоматичне продовження підписки</h3>
+            <p>
+              Якщо ви оформили підписку, вона буде автоматично продовжуватися та з вашого рахунку 
+              буде стягуватися плата до тих пір, поки ви не скасуєте її. Ви можете скасувати підписку 
+              в будь-який час через налаштування свого облікового запису.
+            </p>
+            
+            <h3>Відшкодування</h3>
+            <p>
+              Наша політика відшкодування дозволяє отримати повне відшкодування протягом 14 днів 
+              після оплати курсу, якщо ви не переглянули більше 30% вмісту курсу. Для підписок відшкодування 
+              можливе протягом 7 днів з моменту оплати. Для отримання детальної інформації про відшкодування, 
+              будь ласка, зверніться до нашої Політики відшкодування.
+            </p>
+          </section>
+          
+          <section id="rules" className="terms-section">
+            <h2><FaBalanceScale className="section-icon" /> Правила поведінки</h2>
+            
+            <p>
+              Використовуючи нашу Платформу, ви погоджуєтесь дотримуватися наступних правил поведінки:
+            </p>
+            
+            <div className="terms-dos-donts">
+              <div className="terms-do">
+                <h3>Дозволено</h3>
+                <ul className="terms-list check-list">
+                  <li>Вивчати та взаємодіяти з навчальними матеріалами</li>
+                  <li>Ділитися своїми знаннями та досвідом</li>
+                  <li>Поважати думки та точки зору інших користувачів</li>
+                  <li>Повідомляти про неналежний контент або поведінку</li>
+                  <li>Публікувати конструктивні відгуки та коментарі</li>
+                </ul>
+              </div>
+              
+              <div className="terms-dont">
+                <h3>Заборонено</h3>
+                <ul className="terms-list x-list">
+                  <li>Поширювати спам або рекламу, не пов'язану з освітою</li>
+                  <li>Переслідувати, погрожувати або ображати інших користувачів</li>
+                  <li>Публікувати неправдиву або оманливу інформацію</li>
+                  <li>Намагатися отримати несанкціонований доступ до облікових записів</li>
+                  <li>Порушувати авторські права або інші права інтелектуальної власності</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="terms-alert">
+              <FaExclamationTriangle className="alert-icon" />
+              <p>
+                Порушення правил поведінки може призвести до видалення контенту, тимчасового блокування або 
+                постійного закриття вашого облікового запису без відшкодування коштів.
+              </p>
+            </div>
+          </section>
+          
+          <section id="moderation" className="terms-section">
+            <h2>Модерація та блокування</h2>
+            
+            <p>
+              Ми залишаємо за собою право, але не зобов'язання, модерувати контент та активність 
+              на нашій Платформі для забезпечення дотримання цих Умов та застосовних законів.
+            </p>
+            
+            <h3>Модерація контенту</h3>
+            <p>
+              Ми можемо переглядати, фільтрувати, видаляти або відхиляти будь-який контент, який 
+              порушує ці Умови, завдає шкоди нашій спільноті або не відповідає нашим стандартам якості.
+            </p>
+            
+            <h3>Блокування облікових записів</h3>
+            <p>
+              Ми можемо тимчасово або постійно заблокувати доступ до вашого облікового запису, якщо:
+            </p>
+            <ul className="terms-list">
+              <li>Ви неодноразово порушуєте ці Умови</li>
+              <li>Ви вчиняєте дії, що завдають шкоди іншим користувачам</li>
+              <li>Ви намагаєтеся обійти технічні обмеження Платформи</li>
+              <li>Ваша діяльність становить загрозу безпеці Платформи</li>
+              <li>Ви використовуєте нашу Платформу для незаконної діяльності</li>
+            </ul>
+          </section>
+          
+          <section id="termination" className="terms-section">
+            <h2>Припинення доступу</h2>
+            
+            <h3>Ваше право на припинення</h3>
+            <p>
+              Ви можете в будь-який час припинити використання нашої Платформи, деактивувавши 
+              свій обліковий запис або припинивши використання наших послуг.
+            </p>
+            
+            <h3>Наше право на припинення</h3>
+            <p>
+              Ми можемо призупинити або припинити ваш доступ до Платформи з будь-якої причини, включаючи, 
+              але не обмежуючись, порушенням цих Умов. У разі припинення ви втрачаєте право на використання 
+              Платформи, але ці Умови продовжують діяти відповідно до своїх положень.
+            </p>
+            
+            <h3>Наслідки припинення</h3>
+            <p>
+              У разі припинення:
+            </p>
+            <ul className="terms-list">
+              <li>Ви втрачаєте доступ до свого облікового запису та всіх пов'язаних з ним даних</li>
+              <li>Ви втрачаєте доступ до придбаних курсів та матеріалів</li>
+              <li>Ми можемо видалити ваш контент з Платформи</li>
+              <li>Ми не зобов'язані відшкодовувати кошти за невикористані частини підписки</li>
+            </ul>
+          </section>
+          
+          <section id="disclaimers" className="terms-section">
+            <h2><FaExclamationTriangle className="section-icon" /> Відмова від відповідальності</h2>
+            
+            <div className="terms-disclaimer">
+              <p>
+                НАША ПЛАТФОРМА ТА ПОСЛУГИ НАДАЮТЬСЯ "ЯК Є" ТА "ЯК ДОСТУПНО", БЕЗ БУДЬ-ЯКИХ ГАРАНТІЙ БУДЬ-ЯКОГО ВИДУ, 
+                ЯВНИХ АБО НЕПРЯМИХ. МИ НЕ ГАРАНТУЄМО, ЩО НАША ПЛАТФОРМА БУДЕ БЕЗПЕРЕРВНОЮ, СВОЄЧАСНОЮ, БЕЗПЕЧНОЮ АБО 
+                БЕЗПОМИЛКОВОЮ, АБО ЩО БУДЬ-ЯКІ ДЕФЕКТИ БУДУТЬ ВИПРАВЛЕНІ.
+              </p>
+              <p>
+                МИ НЕ ГАРАНТУЄМО ТОЧНІСТЬ, ПОВНОТУ АБО КОРИСНІСТЬ БУДЬ-ЯКОГО КОНТЕНТУ, ДОСТУПНОГО ЧЕРЕЗ НАШУ ПЛАТФОРМУ. 
+                ВИ ВИКОРИСТОВУЄТЕ БУДЬ-ЯКИЙ КОНТЕНТ НА СВІЙ ВЛАСНИЙ РИЗИК.
+              </p>
+              <p>
+                МИ НЕ ГАРАНТУЄМО, ЩО КОНТЕНТ АБО КУРСИ, ДОСТУПНІ ЧЕРЕЗ ПЛАТФОРМУ, ВІДПОВІДАТИМУТЬ ВАШИМ ВИМОГАМ АБО 
+                ОЧІКУВАННЯМ, АБО ЩО ПЛАТФОРМА БУДЕ БЕЗПЕРЕРВНО ДОСТУПНОЮ.
+              </p>
+            </div>
+          </section>
+          
+          <section id="liability" className="terms-section">
+            <h2>Обмеження відповідальності</h2>
+            
+            <div className="terms-disclaimer">
+              <p>
+                У МАКСИМАЛЬНО ДОЗВОЛЕНІЙ ЗАКОНОМ МІРІ, МИ НЕ НЕСЕМО ВІДПОВІДАЛЬНОСТІ ЗА БУДЬ-ЯКІ ПРЯМІ, НЕПРЯМІ, 
+                ВИПАДКОВІ, СПЕЦІАЛЬНІ, НАСЛІДКОВІ АБО ШТРАФНІ ЗБИТКИ, ВКЛЮЧАЮЧИ ВТРАТУ ПРИБУТКУ, ДАНИХ, ВИКОРИСТАННЯ 
+                ЧИ ІНШОЇ НЕМАТЕРІАЛЬНОЇ ВТРАТИ, ЩО ВИНИКАЮТЬ У ЗВ'ЯЗКУ З:
+              </p>
+              <ul className="terms-list">
+                <li>ВАШИМ ВИКОРИСТАННЯМ АБО НЕМОЖЛИВІСТЮ ВИКОРИСТАННЯ НАШОЇ ПЛАТФОРМИ</li>
+                <li>БУДЬ-ЯКИМ КОНТЕНТОМ, ДОСТУПНИМ ЧЕРЕЗ НАШУ ПЛАТФОРМУ</li>
+                <li>БУДЬ-ЯКИМИ ДІЯМИ АБО КОНТЕНТОМ ТРЕТІХ ОСІБ</li>
+                <li>НЕСАНКЦІОНОВАНИМ ДОСТУПОМ ДО ВАШОГО ОБЛІКОВОГО ЗАПИСУ АБО ДАНИХ</li>
+              </ul>
+              <p>
+                У БУДЬ-ЯКОМУ ВИПАДКУ, НАША ЗАГАЛЬНА ВІДПОВІДАЛЬНІСТЬ ЗА БУДЬ-ЯКІ ПРЕТЕНЗІЇ, ПОВ'ЯЗАНІ З ЦИМИ УМОВАМИ 
+                АБО НАШОЮ ПЛАТФОРМОЮ, НЕ ПЕРЕВИЩУВАТИМЕ СУМУ, СПЛАЧЕНУ ВАМИ ЗА ДОСТУП ДО ПЛАТФОРМИ ПРОТЯГОМ 
+                ПОПЕРЕДНІХ 12 МІСЯЦІВ.
+              </p>
+            </div>
+          </section>
+          
+          <section id="disputes" className="terms-section">
+            <h2><FaHandshake className="section-icon" /> Вирішення спорів</h2>
+            
+            <h3>Застосовне право</h3>
+            <p>
+              Ці Умови регулюються та тлумачаться відповідно до законів України, без урахування норм 
+              колізійного права.
+            </p>
+            
+            <h3>Врегулювання спорів</h3>
+            <p>
+              У разі виникнення будь-якого спору, пов'язаного з використанням нашої Платформи або цими Умовами, 
+              ви погоджуєтеся спочатку спробувати вирішити спір неформально, зв'язавшись з нами. Якщо спір 
+              не вдається вирішити неформально, ви погоджуєтеся вирішувати будь-які спори виключно в судах України.
+            </p>
+            
+            <h3>Строк давності</h3>
+            <p>
+              Ви погоджуєтеся, що будь-які претензії, пов'язані з цими Умовами або нашою Платформою, повинні 
+              бути подані протягом одного (1) року після виникнення підстави для позову, інакше така претензія 
+              буде безповоротно втрачена.
+            </p>
+          </section>
+          
+          <section id="changes" className="terms-section">
+            <h2><FaFileContract className="section-icon" /> Зміни умов використання</h2>
+            
+            <p>
+              Ми можемо змінювати ці Умови час від часу. Зміни набувають чинності після публікації 
+              оновлених умов на цій сторінці.
+            </p>
+            <p>
+              Ми повідомлятимемо вас про суттєві зміни до цих Умов шляхом:
+            </p>
+            <ul className="terms-list">
+              <li>Надсилання повідомлення на адресу електронної пошти, пов'язану з вашим обліковим записом</li>
+              <li>Розміщення помітного повідомлення на нашій Платформі</li>
+              <li>Оновлення дати "Останнє оновлення" у верхній частині цих Умов</li>
+            </ul>
+            <p>
+              Продовження використання нашої Платформи після внесення змін до цих Умов означає ваше 
+              прийняття цих змін. Якщо ви не погоджуєтеся з новими умовами, ви повинні припинити 
+              використання нашої Платформи.
+            </p>
+          </section>
+          
+          <section id="contact" className="terms-section">
+            <h2><FaGlobe className="section-icon" /> Контактна інформація</h2>
+            
+            <p>
+              Якщо у вас є питання, коментарі або повідомлення про порушення цих Умов, будь ласка, 
+              зв'яжіться з нами:
+            </p>
+            
+            <div className="contact-info">
+              <div className="contact-item">
+                <strong>Електронна пошта:</strong> <a href="mailto:info@educationplatform.com">info@educationplatform.com</a>
+              </div>
+              
+              <div className="contact-item">
+                <strong>Телефон:</strong> <a href="tel:+380441234567">+380 44 123 45 67</a>
+              </div>
+              
+              <div className="contact-item">
+                <strong>Адреса:</strong><br />
+                Освітня платформа<br />
+                вул. Степана Бандери, 1/1<br />
+                Хмельницький, 29000<br />
+                Україна
+              </div>
+            </div>
+          </section>
+          
+          <div className="terms-footer">
+            <p>Ці Умови використання були останній раз оновлені 2 травня 2025 року.</p>
+            <p>
+              <Link to="/privacy-policy">Політика конфіденційності</Link> • 
+              <Link to="/"> Головна сторінка</Link>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <Footer />
     </div>
   );
 };

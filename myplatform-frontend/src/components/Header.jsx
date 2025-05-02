@@ -124,6 +124,9 @@ const Header = () => {
               <li className={`nav-item ${isActive('/about') ? 'active' : ''}`}>
                 <Link to="/about" className="nav-link">Про нас</Link>
               </li>
+              <li className={`nav-item ${isActive('/site-map') ? 'active' : ''}`}>
+                <Link to="/site-map" className="nav-link">Картка</Link>
+              </li>
             </ul>
           </nav>
           

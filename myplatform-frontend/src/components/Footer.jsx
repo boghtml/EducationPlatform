@@ -60,11 +60,11 @@ const Footer = () => {
                   <FaTwitter />
                   <span className="social-tooltip">Twitter</span>
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-link">
+                <a href="https://www.instagram.com/andrii_rybak1/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="social-link">
                   <FaInstagram />
                   <span className="social-tooltip">Instagram</span>
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="social-link">
+                <a href="https://www.linkedin.com/in/andrii-rybak-1440m7h365d/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="social-link">
                   <FaLinkedinIn />
                   <span className="social-tooltip">LinkedIn</span>
                 </a>
@@ -104,7 +104,7 @@ const Footer = () => {
               <ul className="footer-contact-info">
                 <li>
                   <FaMapMarkerAlt />
-                  <span>вул. Освіти, 10, Київ, 03150, Україна</span>
+                  <span>вул. Степана Бандери 1/1, Хмельницький, 29000, Україна</span>
                 </li>
                 <li>
                   <FaPhone />
@@ -112,7 +112,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <FaEnvelope />
-                  <a href="mailto:info@platforma.com">info@platforma.com</a>
+                  <a href="mailto:info@platforma.com">myeduplatform@platforma.com</a>
                 </li>
               </ul>
               <div className="footer-newsletter">

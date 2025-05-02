@@ -25,6 +25,9 @@ import QATab from './components/QATab';
 import ParticipantsTab from './components/ParticipantsTab';
 import GradesTab from './components/GradesTab';
 import NotesManagement from './components/NotesManagement';
+import SiteMap from './components/SiteMap';
+import Contact  from './components/Contact';
+import FAQ from './components/FAQ';
 
 import './css/auth.css';
 import './css/courseCatalog.css';
@@ -48,7 +51,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/site-map" element={< SiteMap/>} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/contact" element={<Contact  />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/notes-management" element={<NotesManagement />} />
         <Route path="/my-courses/:courseId" element={<WorkingWithCourse />}>
           <Route index element={<LessonsTab />} />

@@ -1,0 +1,587 @@
+/* Contact.css */
+
+.contact-page {
+    color: #333;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+  }
+  
+  /* Секція заголовка */
+  .contact-hero {
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    padding: 80px 0 60px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .contact-hero:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='100%' height='100%' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 60c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zM50 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.1;
+  }
+  
+  .contact-hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .contact-hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+  }
+  
+  /* Контейнер контактів */
+  .contact-container {
+    padding-bottom: 60px;
+  }
+  
+  /* Інформаційні картки */
+  .contact-info-section {
+    margin-bottom: 60px;
+  }
+  
+  .contact-info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .contact-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .contact-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contact-card:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #4a6baf 0%, #2c3e50 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: center;
+    z-index: -1;
+  }
+  
+  .contact-card:hover:after {
+    transform: scaleX(1);
+  }
+  
+  .contact-card-icon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    font-size: 1.8rem;
+  }
+  
+  .contact-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  
+  .contact-card p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  .contact-link, .contact-link-text {
+    display: block;
+    color: #4a6baf;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 1.05rem;
+    transition: color 0.2s;
+  }
+  
+  .contact-link:hover {
+    color: #2c3e50;
+  }
+  
+  /* Секція форми */
+  .contact-form-section {
+    margin-bottom: 60px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .form-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  @media (max-width: 992px) {
+    .form-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .form-content {
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .form-content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  
+  .form-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    opacity: 0.9;
+  }
+  
+  .contact-social-media {
+    display: flex;
+    gap: 15px;
+    margin-top: auto;
+  }
+  
+  .social-media-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    position: relative;
+  }
+  
+  .social-media-link:hover {
+    background-color: white;
+    color: #4a6baf;
+    transform: translateY(-3px);
+  }
+  
+  .social-media-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+    margin-bottom: 5px;
+  }
+  
+  .social-media-tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+  
+  .social-media-link:hover .social-media-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .form-wrapper {
+    padding: 50px;
+    background-color: white;
+  }
+  
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #555;
+  }
+  
+  .input-icon {
+    margin-right: 8px;
+    color: #4a6baf;
+    font-size: 0.9rem;
+  }
+  
+  input, textarea {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #4a6baf;
+    box-shadow: 0 0 0 2px rgba(74, 107, 175, 0.2);
+  }
+  
+  input.has-error, textarea.has-error {
+    border-color: #e74c3c;
+  }
+  
+  .error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
+  
+  .submit-button {
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+  
+  .submit-button:hover {
+    background: linear-gradient(135deg, #3b5998 0%, #1e2c3a 100%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .submit-error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .form-success {
+    text-align: center;
+    padding: 30px;
+  }
+  
+  .success-icon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    font-size: 1.8rem;
+  }
+  
+  .form-success h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  
+  .form-success p {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  /* Секція відділів */
+  .contact-departments-section {
+    margin-bottom: 60px;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+  
+  .departments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .department-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .department-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .department-card h3 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  
+  .department-card p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  .department-email {
+    display: flex;
+    align-items: center;
+    color: #4a6baf;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  
+  .department-email:hover {
+    color: #2c3e50;
+  }
+  
+  .email-icon {
+    margin-right: 8px;
+  }
+  
+  /* Секція офісів */
+  .contact-offices-section {
+    margin-bottom: 60px;
+  }
+  
+  .offices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .office-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .office-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .office-city {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+  }
+  
+  .office-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .office-info-item {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .office-icon {
+    color: #4a6baf;
+    margin-right: 10px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  
+  .office-info-item a {
+    color: #4a6baf;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .office-info-item a:hover {
+    color: #2c3e50;
+    text-decoration: underline;
+  }
+  
+  /* Секція карти */
+  .contact-map-section {
+    margin-bottom: 60px;
+  }
+  
+  .map-container {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Секція FAQ */
+  .contact-faq-section {
+    text-align: center;
+    padding: 50px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 40px;
+  }
+  
+  .faq-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+  
+  .faq-button:hover {
+    background: linear-gradient(135deg, #3b5998 0%, #1e2c3a 100%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+  }
+  
+  /* Адаптивність */
+  @media (max-width: 1200px) {
+    .contact-info-cards,
+    .departments-grid,
+    .offices-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .form-content,
+    .form-wrapper {
+      padding: 30px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .contact-hero {
+      padding: 60px 0 40px;
+    }
+    
+    .contact-hero-title {
+      font-size: 2rem;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+    }
+    
+    .contact-info-cards,
+    .departments-grid,
+    .offices-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .contact-faq-section {
+      padding: 30px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .contact-hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .contact-hero-subtitle,
+    .section-subtitle {
+      font-size: 1rem;
+    }
+    
+    .form-content,
+    .form-wrapper {
+      padding: 20px;
+    }
+    
+    .form-content h2 {
+      font-size: 1.6rem;
+    }
+    
+    .contact-card,
+    .department-card,
+    .office-card {
+      padding: 20px;
+    }
+  }
