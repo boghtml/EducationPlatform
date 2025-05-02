@@ -18,7 +18,6 @@ function CourseDetail() {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const navigate = useNavigate();
   
-  // Create a ref for the payment form section
   const paymentFormRef = useRef(null);
 
   useEffect(() => {
@@ -29,8 +28,8 @@ function CourseDetail() {
         setCourse(response.data);
         setIsLoading(false);
       } catch (error) {
-        console.error('There was an error fetching the course details!', error);
-        setError('Failed to load course details. Please try again later.');
+        console.error('Помилка завантаження деталей курсу!', error);
+        setError('Не вдалося завантажити деталі курсу. Спробуйте ще раз пізніше.');
         setIsLoading(false);
       }
     };
@@ -38,7 +37,6 @@ function CourseDetail() {
     fetchCourseDetails();
   }, [id]);
 
-  // Function to render rating stars
   const renderRatingStars = (rating) => {
     const totalStars = 5;
     const fullStars = Math.floor(rating || 4.5);
@@ -57,7 +55,6 @@ function CourseDetail() {
     );
   };
 
-  // Handle enrollment for free courses
   const handleEnrollFree = async () => {
     const userId = sessionStorage.getItem('userId');
     
@@ -84,37 +81,31 @@ function CourseDetail() {
       setEnrollmentSuccess(true);
       setEnrollmentLoading(false);
       
-      // Redirect to dashboard after successful enrollment
       setTimeout(() => {
         navigate('/dashboard');
       }, 2000);
       
     } catch (error) {
       setEnrollmentLoading(false);
-      console.error('Error enrolling in course:', error);
+      console.error('Помилка запису на курс:', error);
       
       if (error.response && error.response.data && error.response.data.error) {
         setEnrollmentError(error.response.data.error);
       } else {
-        setEnrollmentError('Failed to enroll in the course. Please try again later.');
+        setEnrollmentError('Не вдалося записатися на курс. Спробуйте ще раз пізніше.');
       }
     }
   };
 
-  // Handle premium course signup - show payment form
   const handlePremiumSignup = () => {
     setShowPaymentForm(true);
-    // Scroll to payment form
     if (paymentFormRef.current) {
       paymentFormRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  // Handle payment form submission
   const handlePaymentSubmit = (e) => {
     e.preventDefault();
-    // Payment processing logic would go here...
-    // For now, just redirect to dashboard
     navigate('/dashboard');
   };
 
@@ -126,9 +117,9 @@ function CourseDetail() {
         {isLoading ? (
           <div className="loading-spinner">
             <div className="spinner-border text-primary" role="status">
-              <span className="sr-only">Loading...</span>
+              <span className="sr-only">Завантаження...</span>
             </div>
-            <p>Loading course details...</p>
+            <p>Завантаження деталей курсу...</p>
           </div>
         ) : error ? (
           <div className="alert alert-danger" role="alert">
@@ -136,13 +127,13 @@ function CourseDetail() {
           </div>
         ) : !course ? (
           <div className="alert alert-warning" role="alert">
-            Course not found
+            Курс не знайдено
           </div>
         ) : (
           <>
             {enrollmentSuccess && (
               <div className="alert alert-success" role="alert">
-                Successfully enrolled in the course! Redirecting to your dashboard...
+                Успішно записано на курс! Перенаправлення на вашу панель керування...
               </div>
             )}
             
@@ -156,7 +147,7 @@ function CourseDetail() {
               <div className="container">
                 <div className="course-detail-hero-content">
                   <div className={`course-badge ${course.status}`}>
-                    {course.status === 'free' ? 'Free' : 'Premium'}
+                    {course.status === 'free' ? 'Безкоштовно' : 'Преміум'}
                   </div>
                   <h1>{course.title}</h1>
                   <p className="course-short-description">{course.description.slice(0, 150)}...</p>
@@ -166,10 +157,10 @@ function CourseDetail() {
                       {renderRatingStars(course.rating || 4.5)}
                     </div>
                     <div className="course-meta-item">
-                      <FaUsers /> <span>{course.students_count || 0} students enrolled</span>
+                      <FaUsers /> <span>{course.students_count || 0} студентів записано</span>
                     </div>
                     <div className="course-meta-item">
-                      <FaCalendarAlt /> <span>Last updated {new Date(course.updated_at).toLocaleDateString()}</span>
+                      <FaCalendarAlt /> <span>Останнє оновлення {new Date(course.updated_at).toLocaleDateString('uk-UA')}</span>
                     </div>
                   </div>
                   
@@ -178,8 +169,8 @@ function CourseDetail() {
                       <img src={course.teacher?.profile_image_url || 'https://via.placeholder.com/40'} alt={course.teacher?.full_name} />
                     </div>
                     <div className="author-info">
-                      <span>Created by</span>
-                      <h4>{course.teacher ? course.teacher.full_name || `${course.teacher.first_name} ${course.teacher.last_name}` : 'Unknown Teacher'}</h4>
+                      <span>Створено</span>
+                      <h4>{course.teacher ? course.teacher.full_name || `${course.teacher.first_name} ${course.teacher.last_name}` : 'Невідомий викладач'}</h4>
                     </div>
                   </div>
                 </div>
@@ -195,36 +186,36 @@ function CourseDetail() {
                         className={`tab-button ${activeTab === 'description' ? 'active' : ''}`}
                         onClick={() => setActiveTab('description')}
                       >
-                        Description
+                        Опис
                       </button>
                       <button 
                         className={`tab-button ${activeTab === 'curriculum' ? 'active' : ''}`}
                         onClick={() => setActiveTab('curriculum')}
                       >
-                        Curriculum
+                        Навчальна програма
                       </button>
                       <button 
                         className={`tab-button ${activeTab === 'instructor' ? 'active' : ''}`}
                         onClick={() => setActiveTab('instructor')}
                       >
-                        Instructor
+                        Викладач
                       </button>
                       <button 
                         className={`tab-button ${activeTab === 'reviews' ? 'active' : ''}`}
                         onClick={() => setActiveTab('reviews')}
                       >
-                        Reviews
+                        Відгуки
                       </button>
                     </div>
                     
                     <div className="course-tabs-content">
                       {activeTab === 'description' && (
                         <div className="tab-pane description-pane">
-                          <h3>About This Course</h3>
+                          <h3>Про цей курс</h3>
                           <p>{course.description}</p>
                           
                           <div className="course-categories-section">
-                            <h4>Categories</h4>
+                            <h4>Категорії</h4>
                             <div className="course-categories">
                               {course.categories && course.categories.map(category => (
                                 <span className="course-category" key={category.id}>
@@ -235,12 +226,12 @@ function CourseDetail() {
                           </div>
                           
                           <div className="what-you-learn">
-                            <h4>What You'll Learn</h4>
+                            <h4>Чого ви навчитеся</h4>
                             <ul className="learn-list">
-                              <li><FaCheckCircle /> Understand the fundamental concepts of the subject</li>
-                              <li><FaCheckCircle /> Apply theoretical knowledge to real-world problems</li>
-                              <li><FaCheckCircle /> Develop practical skills through hands-on exercises</li>
-                              <li><FaCheckCircle /> Build your own projects from scratch</li>
+                              <li><FaCheckCircle /> Розуміння основних концепцій предмета</li>
+                              <li><FaCheckCircle /> Застосування теоретичних знань до реальних проблем</li>
+                              <li><FaCheckCircle /> Розвиток практичних навичок через практичні вправи</li>
+                              <li><FaCheckCircle /> Створення власних проєктів з нуля</li>
                             </ul>
                           </div>
                         </div>
@@ -248,40 +239,40 @@ function CourseDetail() {
                       
                       {activeTab === 'curriculum' && (
                         <div className="tab-pane curriculum-pane">
-                          <h3>Course Curriculum</h3>
-                          <p>This course contains {course.total_lessons || 0} lessons organized into several modules. The curriculum is designed to take you from beginner to advanced level.</p>
+                          <h3>Навчальна програма курсу</h3>
+                          <p>Цей курс містить {course.total_lessons || 0} уроків, організованих у кілька модулів. Програма розроблена для переходу від початкового до просунутого рівня.</p>
                           
                           <div className="curriculum-modules">
                             <div className="curriculum-module">
                               <div className="module-header">
-                                <h4>Module 1: Introduction</h4>
-                                <span className="module-duration">2 weeks</span>
+                                <h4>Модуль 1: Вступ</h4>
+                                <span className="module-duration">2 тижні</span>
                               </div>
                               <ul className="module-lessons">
                                 <li className="lesson-item">
-                                  <span className="lesson-title">Lesson 1: Getting Started</span>
-                                  <span className="lesson-duration"><FaClock /> 45 min</span>
+                                  <span className="lesson-title">Урок 1: Початок роботи</span>
+                                  <span className="lesson-duration"><FaClock /> 45 хв</span>
                                 </li>
                                 <li className="lesson-item">
-                                  <span className="lesson-title">Lesson 2: Basic Concepts</span>
-                                  <span className="lesson-duration"><FaClock /> 60 min</span>
+                                  <span className="lesson-title">Урок 2: Основні концепції</span>
+                                  <span className="lesson-duration"><FaClock /> 60 хв</span>
                                 </li>
                               </ul>
                             </div>
                             
                             <div className="curriculum-module">
                               <div className="module-header">
-                                <h4>Module 2: Intermediate Level</h4>
-                                <span className="module-duration">3 weeks</span>
+                                <h4>Модуль 2: Середній рівень</h4>
+                                <span className="module-duration">3 тижні</span>
                               </div>
                               <ul className="module-lessons">
                                 <li className="lesson-item">
-                                  <span className="lesson-title">Lesson 3: Advanced Concepts</span>
-                                  <span className="lesson-duration"><FaClock /> 75 min</span>
+                                  <span className="lesson-title">Урок 3: Просунуті концепції</span>
+                                  <span className="lesson-duration"><FaClock /> 75 хв</span>
                                 </li>
                                 <li className="lesson-item">
-                                  <span className="lesson-title">Lesson 4: Practical Applications</span>
-                                  <span className="lesson-duration"><FaClock /> 90 min</span>
+                                  <span className="lesson-title">Урок 4: Практичні застосування</span>
+                                  <span className="lesson-duration"><FaClock /> 90 хв</span>
                                 </li>
                               </ul>
                             </div>
@@ -291,30 +282,30 @@ function CourseDetail() {
                       
                       {activeTab === 'instructor' && (
                         <div className="tab-pane instructor-pane">
-                          <h3>About the Instructor</h3>
+                          <h3>Про викладача</h3>
                           
                           <div className="instructor-profile">
                             <div className="instructor-image">
                               <img 
                                 src={course.teacher?.profile_image_url || 'https://via.placeholder.com/150'} 
-                                alt={course.teacher?.full_name || 'Instructor'} 
+                                alt={course.teacher?.full_name || 'Викладач'} 
                               />
                             </div>
                             <div className="instructor-info">
-                              <h4>{course.teacher ? course.teacher.full_name || `${course.teacher.first_name} ${course.teacher.last_name}` : 'Unknown Teacher'}</h4>
-                              <p className="instructor-title">Course Instructor</p>
+                              <h4>{course.teacher ? course.teacher.full_name || `${course.teacher.first_name} ${course.teacher.last_name}` : 'Невідомий викладач'}</h4>
+                              <p className="instructor-title">Викладач курсу</p>
                               <div className="instructor-stats">
                                 <div className="stat-item">
                                   <span className="stat-value">4.8</span>
-                                  <span className="stat-label">Instructor Rating</span>
+                                  <span className="stat-label">Рейтинг викладача</span>
                                 </div>
                                 <div className="stat-item">
                                   <span className="stat-value">24,357</span>
-                                  <span className="stat-label">Students</span>
+                                  <span className="stat-label">Студентів</span>
                                 </div>
                                 <div className="stat-item">
                                   <span className="stat-value">12</span>
-                                  <span className="stat-label">Courses</span>
+                                  <span className="stat-label">Курсів</span>
                                 </div>
                               </div>
                             </div>
@@ -322,9 +313,9 @@ function CourseDetail() {
                           
                           <div className="instructor-bio">
                             <p>
-                              Our instructor has extensive experience in the field and has been teaching for over 5 years. 
-                              They are passionate about helping students achieve their goals and have a track record of 
-                              successful alumni who have gone on to work in top companies.
+                              Наш викладач має великий досвід у цій галузі та викладає понад 5 років. 
+                              Вони захоплені допомогою студентам у досягненні їхніх цілей і мають історію 
+                              успішних випускників, які працюють у провідних компаніях.
                             </p>
                           </div>
                         </div>
@@ -332,46 +323,46 @@ function CourseDetail() {
                       
                       {activeTab === 'reviews' && (
                         <div className="tab-pane reviews-pane">
-                          <h3>Student Reviews</h3>
+                          <h3>Відгуки студентів</h3>
                           
                           <div className="reviews-summary">
                             <div className="overall-rating">
                               <div className="big-rating">{course.rating || 4.5}</div>
                               <div className="big-stars">{renderRatingStars(course.rating || 4.5)}</div>
-                              <div className="rating-count">Course Rating • {course.students_count || 0} students</div>
+                              <div className="rating-count">Рейтинг курсу • {course.students_count || 0} студентів</div>
                             </div>
                             
                             <div className="rating-breakdown">
                               <div className="rating-bar">
-                                <span className="rating-label">5 stars</span>
+                                <span className="rating-label">5 зірок</span>
                                 <div className="progress">
                                   <div className="progress-bar" style={{width: '80%'}}></div>
                                 </div>
                                 <span className="rating-percent">80%</span>
                               </div>
                               <div className="rating-bar">
-                                <span className="rating-label">4 stars</span>
+                                <span className="rating-label">4 зірки</span>
                                 <div className="progress">
                                   <div className="progress-bar" style={{width: '15%'}}></div>
                                 </div>
                                 <span className="rating-percent">15%</span>
                               </div>
                               <div className="rating-bar">
-                                <span className="rating-label">3 stars</span>
+                                <span className="rating-label">3 зірки</span>
                                 <div className="progress">
                                   <div className="progress-bar" style={{width: '3%'}}></div>
                                 </div>
                                 <span className="rating-percent">3%</span>
                               </div>
                               <div className="rating-bar">
-                                <span className="rating-label">2 stars</span>
+                                <span className="rating-label">2 зірки</span>
                                 <div className="progress">
                                   <div className="progress-bar" style={{width: '1%'}}></div>
                                 </div>
                                 <span className="rating-percent">1%</span>
                               </div>
                               <div className="rating-bar">
-                                <span className="rating-label">1 star</span>
+                                <span className="rating-label">1 зірка</span>
                                 <div className="progress">
                                   <div className="progress-bar" style={{width: '1%'}}></div>
                                 </div>
@@ -383,30 +374,30 @@ function CourseDetail() {
                           <div className="review-list">
                             <div className="review-item">
                               <div className="reviewer-avatar">
-                                <img src="https://via.placeholder.com/50" alt="Student" />
+                                <img src="https://via.placeholder.com/50" alt="Студент" />
                               </div>
                               <div className="review-content">
-                                <div className="reviewer-name">John Doe</div>
-                                <div className="review-date">3 months ago</div>
+                                <div className="reviewer-name">Джон Доу</div>
+                                <div className="review-date">3 місяці тому</div>
                                 <div className="review-rating">{renderRatingStars(5)}</div>
                                 <p className="review-text">
-                                  This course exceeded my expectations. The instructor explains complex topics in a simple manner, 
-                                  and the practical exercises helped me apply what I learned immediately.
+                                  Цей курс перевершив мої очікування. Викладач пояснює складні теми простою мовою, 
+                                  а практичні вправи допомогли мені одразу застосувати отримані знання.
                                 </p>
                               </div>
                             </div>
                             
                             <div className="review-item">
                               <div className="reviewer-avatar">
-                                <img src="https://via.placeholder.com/50" alt="Student" />
+                                <img src="https://via.placeholder.com/50" alt="Студент" />
                               </div>
                               <div className="review-content">
-                                <div className="reviewer-name">Jane Smith</div>
-                                <div className="review-date">1 month ago</div>
+                                <div className="reviewer-name">Джейн Сміт</div>
+                                <div className="review-date">1 місяць тому</div>
                                 <div className="review-rating">{renderRatingStars(4)}</div>
                                 <p className="review-text">
-                                  Great course with lots of practical information. I would have given 5 stars if there 
-                                  were more examples, but overall I'm very satisfied with what I learned.
+                                  Чудовий курс із великою кількістю практичної інформації. Я б поставила 5 зірок, якби 
+                                  було більше прикладів, але загалом я дуже задоволена тим, що вивчила.
                                 </p>
                               </div>
                             </div>
@@ -423,7 +414,7 @@ function CourseDetail() {
                       <div className="course-video">
                         <iframe 
                           src={course.intro_video_url} 
-                          title="Course Introduction" 
+                          title="Вступ до курсу" 
                           frameBorder="0" 
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                           allowFullScreen
@@ -438,38 +429,38 @@ function CourseDetail() {
                     <div className="course-sidebar-content">
                       <div className="course-price">
                         {course.status === 'free' ? (
-                          <span className="price free">Free</span>
+                          <span className="price free">Безкоштовно</span>
                         ) : (
-                          <span className="price premium">{course.price} UAH</span>
+                          <span className="price premium">{course.price} грн</span>
                         )}
                       </div>
                       
                       <div className="course-includes">
-                        <h4>This course includes:</h4>
+                        <h4>Цей курс включає:</h4>
                         <ul>
-                          <li><FaClock /> <span>{course.duration} weeks of access</span></li>
-                          <li><FaChalkboardTeacher /> <span>{course.total_lessons || 10} lessons</span></li>
-                          <li><FaUsers /> <span>Access to community</span></li>
-                          <li><FaCheckCircle /> <span>Certificate of completion</span></li>
+                          <li><FaClock /> <span>{course.duration} тижнів доступу</span></li>
+                          <li><FaChalkboardTeacher /> <span>{course.total_lessons || 10} уроків</span></li>
+                          <li><FaUsers /> <span>Доступ до спільноти</span></li>
+                          <li><FaCheckCircle /> <span>Сертифікат про завершення</span></li>
                         </ul>
                       </div>
                       
                       {enrollmentLoading ? (
                         <button className="btn-enroll" disabled>
                           <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                          Enrolling...
+                          Запис...
                         </button>
                       ) : course.status === 'free' ? (
                         <button className="btn-enroll" onClick={handleEnrollFree}>
-                          Enroll Now - Free
+                          Записатися зараз - Безкоштовно
                         </button>
                       ) : (
                         <button className="btn-enroll" onClick={handlePremiumSignup}>
-                          Buy Now
+                          Купити зараз
                         </button>
                       )}
                       
-                      <p className="money-back">30-Day Money-Back Guarantee</p>
+                      <p className="money-back">30-денна гарантія повернення коштів</p>
                     </div>
                   </div>
                 </div>
@@ -480,10 +471,10 @@ function CourseDetail() {
               <div className="payment-section" ref={paymentFormRef}>
                 <div className="container">
                   <div className="course__payment-details">
-                    <h3 className="course__payment-title">Payment Details</h3>
+                    <h3 className="course__payment-title">Деталі оплати</h3>
                     <form onSubmit={handlePaymentSubmit} className="course__payment-form">
                       <div className="form-group">
-                        <label htmlFor="firstName">First Name</label>
+                        <label htmlFor="firstName">Ім'я</label>
                         <input
                           type="text"
                           id="firstName"
@@ -493,7 +484,7 @@ function CourseDetail() {
                         />
                       </div>
                       <div className="form-group">
-                        <label htmlFor="lastName">Last Name</label>
+                        <label htmlFor="lastName">Прізвище</label>
                         <input
                           type="text"
                           id="lastName"
@@ -503,7 +494,7 @@ function CourseDetail() {
                         />
                       </div>
                       <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                        <label htmlFor="email">Електронна пошта</label>
                         <input
                           type="email"
                           id="email"
@@ -513,7 +504,7 @@ function CourseDetail() {
                         />
                       </div>
                       <div className="form-group">
-                        <label htmlFor="cardNumber">Card Number</label>
+                        <label htmlFor="cardNumber">Номер картки</label>
                         <input
                           type="text"
                           id="cardNumber"
@@ -526,13 +517,13 @@ function CourseDetail() {
                       <div className="row">
                         <div className="col-md-6">
                           <div className="form-group">
-                            <label htmlFor="expiryDate">Expiry Date</label>
+                            <label htmlFor="expiryDate">Термін дії</label>
                             <input
                               type="text"
                               id="expiryDate"
                               name="expiryDate"
                               className="form-control"
-                              placeholder="MM/YY"
+                              placeholder="ММ/РР"
                               required
                             />
                           </div>
@@ -552,7 +543,7 @@ function CourseDetail() {
                         </div>
                       </div>
                       <button type="submit" className="course__submit-btn btn btn-primary">
-                        Complete Payment - {course.price} UAH
+                        Завершити оплату - {course.price} грн
                       </button>
                     </form>
                   </div>
