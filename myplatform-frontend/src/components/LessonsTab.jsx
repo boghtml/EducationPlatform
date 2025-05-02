@@ -17,11 +17,16 @@ import {
   BookOpen,
   Pencil,
   Download,
-  FileType
+  FileType,
+  Video,
+  Newspaper,
+  Info,
+  List
 } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
 import '../css/QuickNote.css';
+import '../css/MaterialsDisplay.css'; // Додаємо новий файл стилів
 import NotesPanel from './NotesPanel';
 import QuickNote from './QuickNote';
 import VideoPlayer from './VideoPlayer';
@@ -37,11 +42,15 @@ function LessonsTab() {
   const [isQuickNoteOpen, setIsQuickNoteOpen] = useState(false);
   const [showQuickNoteButton, setShowQuickNoteButton] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedMaterial, setExpandedMaterial] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         await getCsrfToken();
         const [materialsResponse, modulesResponse] = await Promise.all([
           axios.get(`${API_URL}/materials/?course=${course.id}`, { withCredentials: true }),
@@ -49,8 +58,11 @@ function LessonsTab() {
         ]);
         setMaterials(materialsResponse.data || []);
         setModules(modulesResponse.data || []);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching lessons tab data:", error);
+        setError("Не вдалося завантажити дані курсу. Будь ласка, спробуйте пізніше.");
+        setLoading(false);
       }
     };
     if (course) fetchData();
@@ -112,7 +124,9 @@ function LessonsTab() {
     setCompletingLesson(true);
     try {
       await getCsrfToken();
-      await axios.post(`${API_URL}/progress/lessons/${selectedLesson.id}/complete/`, {}, { withCredentials: true });
+      await axios.post(`${API_URL}/progress/lessons/${selectedLesson.id}/complete/`, {}, {
+        withCredentials: true
+      });
       setSelectedLesson((prev) => ({ ...prev, is_completed: true }));
       setModules((prevModules) =>
         prevModules.map((module) => {
@@ -160,8 +174,8 @@ function LessonsTab() {
     if (!fileType) return <File className="course-wc-file-icon" />;
     const type = fileType.toLowerCase();
     if (type.includes('pdf')) return <FileText className="course-wc-file-icon" />;
-    if (type.includes('doc')) return <FileText className="course-wc-file-icon" />;
-    if (type.includes('vid') || type.includes('mp4')) return <PlayCircle className="course-wc-file-icon" />;
+    if (type.includes('doc')) return <Newspaper className="course-wc-file-icon" />;
+    if (type.includes('vid') || type.includes('mp4')) return <Video className="course-wc-file-icon" />;
     if (type.includes('xls') || type.includes('sheet')) return <FileType className="course-wc-file-icon" />;
     return <Paperclip className="course-wc-file-icon" />;
   };
@@ -209,6 +223,14 @@ function LessonsTab() {
     setSelectedFile(file);
   };
 
+  const toggleMaterialExpand = (materialId) => {
+    if (expandedMaterial === materialId) {
+      setExpandedMaterial(null);
+    } else {
+      setExpandedMaterial(materialId);
+    }
+  };
+
   const openNotesPanel = () => {
     setIsNotesPanelOpen(true);
     setIsQuickNoteOpen(false);
@@ -225,6 +247,35 @@ function LessonsTab() {
   const handleQuickNoteSaved = (note) => {
     console.log("Нотатка збережена:", note);
   };
+
+  const formatFileSize = (bytes) => {
+    if (!bytes) return "0 B";
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
+  };
+
+  if (loading) {
+    return (
+      <div className="course-wc-loading-spinner">
+        <div className="course-wc-spinner"></div>
+        <p>Завантаження матеріалів курсу...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="course-wc-error-container">
+        <div className="course-wc-error-icon">!</div>
+        <h3>Помилка завантаження</h3>
+        <p>{error}</p>
+        <button className="course-wc-btn-primary" onClick={() => window.location.reload()}>
+          Спробувати знову
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="course-wc-lessons-tab">
@@ -243,63 +294,96 @@ function LessonsTab() {
             <div className="course-wc-materials-section">
               <h3 className="course-wc-section-title">
                 <Paperclip className="course-wc-section-icon" />
-                Матеріали курсу
+                Загальні матеріали курсу
               </h3>
-              <div className="course-wc-materials-list">
+              <div className="materials-grid">
                 {materials.map((material) => (
-                  <div key={material.id} className="course-wc-material-card">
-                    <div className="course-wc-material-header">
-                      <h4>{material.title}</h4>
+                  <div 
+                    key={material.id} 
+                    className={`material-card ${expandedMaterial === material.id ? 'expanded' : ''}`}
+                  >
+                    <div 
+                      className="material-header" 
+                      onClick={() => toggleMaterialExpand(material.id)}
+                    >
+                      <div className="material-title-container">
+                        <Info className="material-icon" />
+                        <h4 className="material-title">{material.title}</h4>
+                      </div>
+                      <button className="material-expand-button">
+                        {expandedMaterial === material.id ? 
+                          <ChevronUp className="material-expand-icon" /> : 
+                          <ChevronDown className="material-expand-icon" />
+                        }
+                      </button>
                     </div>
-                    <p className="course-wc-material-description">{material.description}</p>
-                    <div className="course-wc-material-files">
-                      {material.files?.map((file) => {
-                        const fileName = file.file_name || getFilenameFromUrl(file.file_url);
-                        const isVideo = isVideoFile(file.file_type, file.file_url);
-                        const isPdf = isPdfFile(file.file_type, file.file_url);
-                        return (
-                          <div
-                            key={file.id}
-                            className={`course-wc-file-item ${isVideo ? 'video-file' : ''} ${isPdf ? 'pdf-file' : ''}`}
-                            onClick={isVideo || isPdf ? () => handleFileClick(file) : undefined}
-                          >
-                            {getFileIcon(file.file_type)}
-                            <div className="course-wc-file-info">
-                              <span className="course-wc-file-name" title={fileName}>
-                                {fileName}
-                              </span>
-                              <span className="course-wc-file-type">
-                                {file.file_type?.toUpperCase() || 'FILE'} •{' '}
-                                {((file.file_size || 0) / 1024 / 1024).toFixed(2)} MB
-                              </span>
-                            </div>
-                            {(isVideo || isPdf) ? (
-                              <button className="course-wc-view-btn">
-                                <Play size={16} /> Переглянути
-                              </button>
-                            ) : (
-                              <a
-                                href={file.file_url}
-                                download
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="course-wc-download-btn"
-                              >
-                                <Download size={16} />
-                              </a>
-                            )}
+                    
+                    {expandedMaterial === material.id && (
+                      <div className="material-content">
+                        {material.description && (
+                          <div className="material-description">
+                            <h5 className="material-section-title">Опис</h5>
+                            <p>{material.description}</p>
                           </div>
-                        );
-                      })}
-                    </div>
+                        )}
+                        
+                        {material.files?.length > 0 && (
+                          <div className="material-files">
+                            <h5 className="material-section-title">
+                              <List className="material-section-icon" /> 
+                              Файли ({material.files.length})
+                            </h5>
+                            <div className="material-files-list">
+                              {material.files.map((file) => {
+                                const fileName = file.file_name || getFilenameFromUrl(file.file_url);
+                                const isVideo = isVideoFile(file.file_type, file.file_url);
+                                const isPdf = isPdfFile(file.file_type, file.file_url);
+                                
+                                return (
+                                  <div 
+                                    key={file.id} 
+                                    className={`material-file-item ${isVideo ? 'video-file' : ''} ${isPdf ? 'pdf-file' : ''}`}
+                                  >
+                                    <div className="material-file-info">
+                                      {getFileIcon(file.file_type)}
+                                      <div className="material-file-details">
+                                        <span className="material-file-name" title={fileName}>
+                                          {fileName}
+                                        </span>
+                                        <span className="material-file-meta">
+                                          {file.file_type?.toUpperCase() || 'ФАЙЛ'} • {formatFileSize(file.file_size)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div className="material-file-actions">
+                                        <a
+                                        href={file.file_url}
+                                        download
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="material-download-button"
+                                        title="Завантажити файл"
+                                      >
+                                        <Download size={16} />
+                                        <span>Завантажити</span>
+                                      </a>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="course-wc-modules-section">
+<div className="course-wc-modules-section">
             <h3 className="course-wc-section-title">
               <Book className="course-wc-section-icon" />
               Модулі та уроки

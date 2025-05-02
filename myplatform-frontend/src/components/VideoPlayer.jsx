@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import '../css/VideoPlayer.css';
 
 const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const videoRef = useRef(null);
   
   // Функція для отримання ID відео з URL YouTube
   const getYouTubeVideoId = (url) => {
+    if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url?.match(regExp);
+    const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
   
@@ -29,6 +32,26 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     }
     return name;
   };
+
+  // Визначення типу контенту
+  const determineContentType = (url, type) => {
+    if (isYoutubeUrl(url)) return 'youtube';
+    
+    if (type) {
+      const lowerType = type.toLowerCase();
+      if (lowerType.includes('video') || lowerType.includes('mp4')) return 'video';
+      if (lowerType.includes('pdf')) return 'pdf';
+    }
+    
+    if (url) {
+      const lowerUrl = url.toLowerCase();
+      if (lowerUrl.endsWith('.mp4')) return 'video';
+      if (lowerUrl.endsWith('.webm')) return 'video';
+      if (lowerUrl.endsWith('.pdf')) return 'pdf';
+    }
+    
+    return 'unknown';
+  };
   
   useEffect(() => {
     if (fileUrl) {
@@ -39,6 +62,20 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
       return () => clearTimeout(timer);
     }
   }, [fileUrl]);
+
+  // Обробка помилок відтворення відео
+  const handleVideoError = (e) => {
+    console.error("Помилка відтворення відео:", e);
+    setError("Не вдалося відтворити відео. Формат може не підтримуватися в браузері або файл недоступний.");
+  };
+
+  // Спроба повторно завантажити відео при помилці
+  const retryVideoLoad = () => {
+    if (videoRef.current) {
+      setError(null);
+      videoRef.current.load();
+    }
+  };
   
   if (loading) {
     return (
@@ -53,25 +90,31 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     return (
       <div className="video-player-error">
         <p>Помилка відтворення: {error}</p>
-        <a 
-          href={fileUrl} 
-          download 
-          className="file-download-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Спробуйте завантажити файл
-        </a>
+        <div className="video-error-actions">
+          <button onClick={retryVideoLoad} className="video-retry-button">
+            Спробувати ще раз
+          </button>
+          <a 
+            href={fileUrl} 
+            download 
+            className="file-download-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Завантажити файл
+          </a>
+        </div>
       </div>
     );
   }
   
-  // Обробляємо відео з YouTube
-  if (isYoutubeUrl(fileUrl)) {
+  const contentType = determineContentType(fileUrl, fileType);
+  const formattedTitle = formatFileName(fileName);
+  
+  // Обробка YouTube відео
+  if (contentType === 'youtube') {
     const videoId = getYouTubeVideoId(fileUrl);
     if (videoId) {
-      const formattedTitle = formatFileName(fileName);
-      
       return (
         <div className="video-player youtube-player">
           <h4 className="video-title">{formattedTitle}</h4>
@@ -86,47 +129,58 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
               allowFullScreen
             ></iframe>
           </div>
+          <div className="video-player-footer">
+            <p className="video-note">Відтворюється відео з YouTube</p>
+          </div>
         </div>
       );
     }
   }
   
-  // Обробляємо власні відеофайли (MP4, WebM тощо)
-  if (fileType?.toLowerCase().includes('video') || fileUrl?.toLowerCase().endsWith('.mp4') || fileUrl?.toLowerCase().endsWith('.webm')) {
-    const formattedTitle = formatFileName(fileName);
-    const corsProxyUrl = isS3Url(fileUrl) ? fileUrl : fileUrl; // якщо потрібно, можна додати проксі
+  // Обробка власних відеофайлів
+  if (contentType === 'video') {
+    const corsProxyUrl = fileUrl; // якщо потрібно, можна додати проксі для CORS
+
+    // Визначаємо MIME тип відео
+    let mimeType = 'video/mp4'; // за замовчуванням
+    if (fileType?.toLowerCase().includes('webm')) {
+      mimeType = 'video/webm';
+    } else if (fileUrl?.toLowerCase().endsWith('.webm')) {
+      mimeType = 'video/webm';
+    }
     
     return (
       <div className="video-player native-player">
         <h4 className="video-title">{formattedTitle}</h4>
         <div className="video-container">
           <video 
+            ref={videoRef}
             controls 
             width="100%" 
             height="auto"
             preload="metadata"
             className="lesson-video"
-            controlsList="nodownload" // обмеження завантаження, хоча не 100% надійне
-            onError={(e) => {
-              console.error("Помилка відтворення відео:", e);
-              setError("Не вдалося відтворити відео. Формат може не підтримуватися в браузері або файл недоступний.");
-            }}
+            controlsList="nodownload" 
+            onError={handleVideoError}
+            autoPlay
+            playsInline
           >
-            <source src={corsProxyUrl} type={fileType || "video/mp4"} />
+            <source src={corsProxyUrl} type={mimeType} />
             Ваш браузер не підтримує відтворення відео.
           </video>
         </div>
         <div className="video-player-footer">
-          <p className="video-note">Якщо відео не відтворюється, ви можете <a href={fileUrl} download target="_blank" rel="noopener noreferrer">завантажити його</a>.</p>
+          <p className="video-note">
+            Якщо відео не відтворюється, ви можете 
+            <a href={fileUrl} download target="_blank" rel="noopener noreferrer"> завантажити його</a>.
+          </p>
         </div>
       </div>
     );
   }
   
-  // Обробляємо PDF файли
-  if (fileType?.toLowerCase().includes('pdf') || fileUrl?.toLowerCase().endsWith('.pdf')) {
-    const formattedTitle = formatFileName(fileName);
-    
+  // Обробка PDF файлів
+  if (contentType === 'pdf') {
     // Для PDF з S3 та інших джерел можемо використати Viewer API від Google
     const pdfViewerUrl = isS3Url(fileUrl) 
       ? `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true` 
@@ -145,18 +199,19 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
           ></iframe>
         </div>
         <div className="pdf-viewer-footer">
-          <p className="pdf-note">Якщо документ не відображається, ви можете <a href={fileUrl} download target="_blank" rel="noopener noreferrer">завантажити його</a>.</p>
+          <p className="pdf-note">
+            Якщо документ не відображається, ви можете 
+            <a href={fileUrl} download target="_blank" rel="noopener noreferrer"> завантажити його</a>.
+          </p>
         </div>
       </div>
     );
   }
   
   // Для інших типів файлів показуємо посилання для завантаження
-  const formattedTitle = formatFileName(fileName);
-  
   return (
     <div className="file-download">
-      <p>Цей тип файлу не може бути відтворений безпосередньо. Будь ласка, завантажте його.</p>
+      <p>Цей тип файлу ({fileType || 'невідомий'}) не може бути відтворений безпосередньо. Будь ласка, завантажте його.</p>
       <a 
         href={fileUrl} 
         download 
