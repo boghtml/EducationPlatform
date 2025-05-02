@@ -5,7 +5,6 @@ import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 import { 
-  FaGoogle, 
   FaEnvelope, 
   FaLock, 
   FaEye, 
@@ -38,18 +37,18 @@ function Register() {
   const [step, setStep] = useState(1); 
   const navigate = useNavigate();
 
+  // Fetch CSRF token on component mount
   useEffect(() => {
     getCSRFToken();
   }, []);
 
-  const getCSRFToken = () => {
-    axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true })
-      .then(response => {
-        console.log('CSRF token set', response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching CSRF token', error);
-      });
+  const getCSRFToken = async () => {
+    try {
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      console.log('CSRF token fetched successfully');
+    } catch (error) {
+      console.error('Error fetching CSRF token', error);
+    }
   };
 
   const handleChange = (e) => {
@@ -71,15 +70,15 @@ function Register() {
     const newErrors = {};
     
     if (!formData.username.trim()) {
-      newErrors.username = 'Ім\'я користувача обов\'язкове';
+      newErrors.username = 'Username is required';
     } else if (formData.username.length < 3) {
-      newErrors.username = 'Ім\'я користувача повинно містити мінімум 3 символи';
+      newErrors.username = 'Username must be at least 3 characters';
     }
     
     if (!formData.email.trim()) {
-      newErrors.email = 'Email обов\'язковий';
+      newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Введіть коректний email';
+      newErrors.email = 'Please enter a valid email';
     }
     
     setErrors(newErrors);
@@ -90,15 +89,15 @@ function Register() {
     const newErrors = {};
     
     if (!formData.password1) {
-      newErrors.password1 = 'Пароль обов\'язковий';
+      newErrors.password1 = 'Password is required';
     } else if (formData.password1.length < 8) {
-      newErrors.password1 = 'Пароль повинен містити мінімум 8 символів';
+      newErrors.password1 = 'Password must be at least 8 characters';
     }
     
     if (!formData.password2) {
-      newErrors.password2 = 'Підтвердження паролю обов\'язкове';
+      newErrors.password2 = 'Password confirmation is required';
     } else if (formData.password1 !== formData.password2) {
-      newErrors.password2 = 'Паролі не співпадають';
+      newErrors.password2 = 'Passwords do not match';
     }
     
     setErrors(newErrors);
@@ -143,23 +142,22 @@ function Register() {
       
       setRegistrationMessage({ 
         type: 'success', 
-        message: 'Реєстрація успішна! Перенаправлення на сторінку входу...' 
+        message: 'Registration successful! Redirecting to login page...' 
       });
       
-      // Затримка перед перенаправленням для відображення повідомлення
       setTimeout(() => {
         navigate('/login');
       }, 2000);
       
     } catch (error) {
-      console.error('There was an error registering the user!', error);
+      console.error('Registration error:', error);
       
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
       } else {
         setRegistrationMessage({ 
           type: 'error', 
-          message: 'Помилка реєстрації. Будь ласка, перевірте ваші дані.' 
+          message: 'Registration failed. Please check your information.' 
         });
       }
       
@@ -168,36 +166,35 @@ function Register() {
     }
   };
 
-  const handleGoogleRegister = (credentialResponse) => {
+  const handleGoogleRegister = async (credentialResponse) => {
     setIsLoading(true);
     setRegistrationMessage({ type: '', message: '' });
     
-    axios.post(`${API_URL}/users/register/`, {
-      token: credentialResponse.credential
-    })
-    .then(response => {
+    try {
+      const response = await axios.post(`${API_URL}/users/register/`, {
+        token: credentialResponse.credential
+      }, { withCredentials: true });
+      
       console.log('User registered via Google successfully', response.data);
       
       setRegistrationMessage({ 
         type: 'success', 
-        message: 'Реєстрація через Google успішна! Перенаправлення на сторінку входу...' 
+        message: 'Google registration successful! Redirecting to login page...' 
       });
       
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-    })
-    .catch(error => {
-      console.error('There was an error registering via Google!', error);
+    } catch (error) {
+      console.error('Google registration error:', error);
       
       setRegistrationMessage({ 
         type: 'error', 
-        message: 'Помилка реєстрації через Google.' 
+        message: 'Google registration failed: ' + (error.response?.data?.errors || error.message)
       });
-    })
-    .finally(() => {
+    } finally {
       setIsLoading(false);
-    });
+    }
   };
 
   const togglePassword1Visibility = () => {
@@ -208,13 +205,15 @@ function Register() {
     setShowPassword2(!showPassword2);
   };
 
-  // Рендеринг першого кроку (особиста інформація)
+  const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
+  // Render first step (personal information)
   const renderStep1 = () => (
     <>
       <div className="form-group position-relative">
         <label htmlFor="username">
           <FaUserTag className="input-icon" />
-          <span>Ім'я користувача*</span>
+          <span>Username*</span>
         </label>
         <input 
           type="text" 
@@ -223,7 +222,7 @@ function Register() {
           name="username" 
           value={formData.username} 
           onChange={handleChange} 
-          placeholder="Введіть ім'я користувача"
+          placeholder="Enter username"
           disabled={isLoading} 
         />
         {errors.username && <div className="invalid-feedback">{errors.username}</div>}
@@ -241,7 +240,7 @@ function Register() {
           name="email" 
           value={formData.email} 
           onChange={handleChange} 
-          placeholder="Введіть email"
+          placeholder="Enter email"
           disabled={isLoading} 
         />
         {errors.email && <div className="invalid-feedback">{errors.email}</div>}
@@ -250,7 +249,7 @@ function Register() {
       <div className="form-group position-relative">
         <label htmlFor="first_name">
           <FaUser className="input-icon" />
-          <span>Ім'я</span>
+          <span>First Name</span>
         </label>
         <input 
           type="text" 
@@ -259,7 +258,7 @@ function Register() {
           name="first_name" 
           value={formData.first_name} 
           onChange={handleChange} 
-          placeholder="Введіть ваше ім'я"
+          placeholder="Enter your first name"
           disabled={isLoading} 
         />
       </div>
@@ -267,7 +266,7 @@ function Register() {
       <div className="form-group position-relative">
         <label htmlFor="last_name">
           <FaUser className="input-icon" />
-          <span>Прізвище</span>
+          <span>Last Name</span>
         </label>
         <input 
           type="text" 
@@ -276,7 +275,7 @@ function Register() {
           name="last_name" 
           value={formData.last_name} 
           onChange={handleChange} 
-          placeholder="Введіть ваше прізвище"
+          placeholder="Enter your last name"
           disabled={isLoading} 
         />
       </div>
@@ -284,7 +283,7 @@ function Register() {
       <div className="form-group position-relative">
         <label htmlFor="phone_number">
           <FaPhone className="input-icon" />
-          <span>Номер телефону</span>
+          <span>Phone Number</span>
         </label>
         <input 
           type="text" 
@@ -293,7 +292,7 @@ function Register() {
           name="phone_number" 
           value={formData.phone_number} 
           onChange={handleChange} 
-          placeholder="Введіть номер телефону"
+          placeholder="Enter phone number"
           disabled={isLoading} 
         />
       </div>
@@ -301,7 +300,7 @@ function Register() {
       <div className="form-group position-relative">
         <label htmlFor="profile_image_url">
           <FaImage className="input-icon" />
-          <span>URL зображення профілю</span>
+          <span>Profile Image URL</span>
         </label>
         <input 
           type="text" 
@@ -310,13 +309,13 @@ function Register() {
           name="profile_image_url" 
           value={formData.profile_image_url} 
           onChange={handleChange} 
-          placeholder="Введіть URL зображення"
+          placeholder="Enter image URL"
           disabled={isLoading} 
         />
       </div>
       
       <div className="form-group">
-        <label>Роль</label>
+        <label>Role</label>
         <div className="role-selection">
           <div className="form-check form-check-inline">
             <input
@@ -330,7 +329,7 @@ function Register() {
               disabled={isLoading}
             />
             <label className="form-check-label" htmlFor="role-student">
-              Студент
+              Student
             </label>
           </div>
           <div className="form-check form-check-inline">
@@ -345,7 +344,7 @@ function Register() {
               disabled={isLoading}
             />
             <label className="form-check-label" htmlFor="role-teacher">
-              Викладач
+              Teacher
             </label>
           </div>
         </div>
@@ -357,17 +356,18 @@ function Register() {
         onClick={nextStep}
         disabled={isLoading}
       >
-        Продовжити
+        Continue
       </button>
     </>
   );
 
+  // Render second step (password and security)
   const renderStep2 = () => (
     <>
       <div className="form-group position-relative">
         <label htmlFor="password1">
           <FaLock className="input-icon" />
-          <span>Пароль*</span>
+          <span>Password*</span>
         </label>
         <div className="password-input-container">
           <input 
@@ -377,7 +377,7 @@ function Register() {
             name="password1" 
             value={formData.password1} 
             onChange={handleChange} 
-            placeholder="Введіть пароль"
+            placeholder="Enter password"
             disabled={isLoading} 
           />
           <button 
@@ -394,7 +394,7 @@ function Register() {
       <div className="form-group position-relative">
         <label htmlFor="password2">
           <FaLock className="input-icon" />
-          <span>Підтвердження паролю*</span>
+          <span>Confirm Password*</span>
         </label>
         <div className="password-input-container">
           <input 
@@ -404,7 +404,7 @@ function Register() {
             name="password2" 
             value={formData.password2} 
             onChange={handleChange} 
-            placeholder="Підтвердіть пароль"
+            placeholder="Confirm password"
             disabled={isLoading} 
           />
           <button 
@@ -425,14 +425,14 @@ function Register() {
           onClick={prevStep}
           disabled={isLoading}
         >
-          <FaArrowLeft className="mr-2" /> Назад
+          <FaArrowLeft className="mr-2" /> Back
         </button>
         <button 
           type="submit" 
           className="btn btn-primary ml-2"
           disabled={isLoading}
         >
-          {isLoading ? 'Реєстрація...' : 'Зареєструватися'}
+          {isLoading ? 'Registering...' : 'Register'}
         </button>
       </div>
     </>
@@ -442,17 +442,17 @@ function Register() {
     <div className="auth-container container mt-5">
       <div className="auth-form-container">
         <div className="auth-header">
-          <h2>Реєстрація</h2>
-          <p>Створіть свій обліковий запис</p>
+          <h2>Register</h2>
+          <p>Create your account</p>
           <div className="step-indicator">
             <div className={`step ${step === 1 ? 'active' : ''}`}>
               <span className="step-number">1</span>
-              <span className="step-text">Особиста інформація</span>
+              <span className="step-text">Personal Information</span>
             </div>
             <div className="step-divider"></div>
             <div className={`step ${step === 2 ? 'active' : ''}`}>
               <span className="step-number">2</span>
-              <span className="step-text">Безпека</span>
+              <span className="step-text">Security</span>
             </div>
           </div>
         </div>
@@ -470,45 +470,52 @@ function Register() {
         {step === 1 && (
           <>
             <div className="divider">
-              <span>або</span>
+              <span>or</span>
             </div>
             
             <div className="social-login">
-              <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-                <div className="google-btn-container">
-                  <GoogleLogin
-                    onSuccess={handleGoogleRegister}
-                    onError={() => {
-                      console.log('Registration Failed');
-                      setRegistrationMessage({ 
-                        type: 'error', 
-                        message: 'Не вдалося зареєструватися через Google' 
-                      });
-                    }}
-                    type="standard"
-                    theme="filled_blue"
-                    size="large"
-                    text="signup_with"
-                    shape="rectangular"
-                    logo_alignment="left"
-                    width="100%"
-                  />
+              {GOOGLE_CLIENT_ID ? (
+                <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                  <div className="google-btn-container">
+                    <GoogleLogin
+                      onSuccess={handleGoogleRegister}
+                      onError={(error) => {
+                        console.error('Google registration failed:', error);
+                        setRegistrationMessage({ 
+                          type: 'error', 
+                          message: 'Google registration failed. Please try again.' 
+                        });
+                      }}
+                      useOneTap
+                      type="standard"
+                      theme="filled_blue"
+                      size="large"
+                      text="signup_with"
+                      shape="rectangular"
+                      logo_alignment="left"
+                      width="100%"
+                    />
+                  </div>
+                </GoogleOAuthProvider>
+              ) : (
+                <div className="alert alert-warning">
+                  Google registration is not available. Please contact the administrator.
                 </div>
-              </GoogleOAuthProvider>
+              )}
             </div>
           </>
         )}
         
         <div className="auth-footer">
           <p>
-            Вже маєте обліковий запис? <Link to="/login">Увійти</Link>
+            Already have an account? <Link to="/login">Login</Link>
           </p>
           <p className="mt-2">
             <small>
-              Реєструючись, ви погоджуєтесь з 
-              <Link to="/terms-of-service" className="mx-1">Умовами використання</Link>
-              та
-              <Link to="/privacy-policy" className="mx-1">Політикою конфіденційності</Link>
+              By registering, you agree to our 
+              <Link to="/terms-of-service" className="mx-1">Terms of Service</Link>
+              and
+              <Link to="/privacy-policy" className="mx-1">Privacy Policy</Link>
             </small>
           </p>
         </div>
@@ -517,6 +524,7 @@ function Register() {
   );
 }
 
+// Helper function to get CSRF token from cookies
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {

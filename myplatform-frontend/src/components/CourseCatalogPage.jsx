@@ -6,7 +6,6 @@ import Header from './Header';
 import Footer from './Footer';
 import RangeSlider from './RangeSlider';
 import { FaSearch, FaFilter, FaSort, FaStar, FaUsers, FaClock, FaCalendarAlt, FaTag, FaChalkboardTeacher } from 'react-icons/fa';
-import { TiArrowSortedUp, TiArrowSortedDown } from 'react-icons/ti';
 import 'nouislider/dist/nouislider.css';
 import '../css/courseCatalog.css';
 

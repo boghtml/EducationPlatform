@@ -4,8 +4,8 @@ import axios from 'axios';
 import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-// Іконки
-import { FaGoogle, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+// Icons
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -18,18 +18,18 @@ function Login() {
   const [loginMessage, setLoginMessage] = useState({ type: '', message: '' });
   const navigate = useNavigate();
 
+  // Fetch CSRF token on component mount
   useEffect(() => {
     getCSRFToken();
   }, []);
 
-  const getCSRFToken = () => {
-    axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true })
-      .then(response => {
-        console.log('CSRF token set', response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching CSRF token', error);
-      });
+  const getCSRFToken = async () => {
+    try {
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      console.log('CSRF token fetched successfully');
+    } catch (error) {
+      console.error('Error fetching CSRF token', error);
+    }
   };
 
   const handleChange = (e) => {
@@ -38,7 +38,7 @@ function Login() {
       [e.target.name]: e.target.value,
     });
     
-    // Очищення помилок при зміні поля
+    // Clear errors when field changes
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -51,11 +51,11 @@ function Login() {
     const newErrors = {};
     
     if (!formData.username) {
-      newErrors.username = 'Будь ласка, введіть email або ім\'я користувача';
+      newErrors.username = 'Please enter email or username';
     }
     
     if (!formData.password) {
-      newErrors.password = 'Будь ласка, введіть пароль';
+      newErrors.password = 'Please enter password';
     }
     
     setErrors(newErrors);
@@ -83,7 +83,7 @@ function Login() {
       
       console.log('User logged in successfully', response.data);
       
-      // Зберігання даних користувача
+      // Store user data
       sessionStorage.setItem('userName', response.data.userName);
       sessionStorage.setItem('userId', response.data.id);
       sessionStorage.setItem('userEmail', response.data.userEmail);
@@ -92,20 +92,20 @@ function Login() {
       
       setLoginMessage({ 
         type: 'success', 
-        message: 'Успішна авторизація. Перенаправлення...' 
+        message: 'Login successful. Redirecting...' 
       });
       
-      // Затримка перед перенаправленням для відображення повідомлення
+      // Delay redirect to show message
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
       
     } catch (error) {
-      console.error('There was an error logging in the user!', error);
+      console.error('Login error:', error);
       
       setLoginMessage({ 
         type: 'error', 
-        message: error.response?.data?.errors || 'Помилка авторизації. Перевірте ім\'я користувача та пароль.' 
+        message: error.response?.data?.errors || 'Login failed. Check your username and password.' 
       });
       
     } finally {
@@ -113,16 +113,18 @@ function Login() {
     }
   };
 
-  const handleGoogleLogin = (credentialResponse) => {
+  const handleGoogleLogin = async (credentialResponse) => {
     setIsLoading(true);
     setLoginMessage({ type: '', message: '' });
     
-    axios.post(`${API_URL}/users/login/`, {
-      token: credentialResponse.credential
-    })
-    .then(response => {
+    try {
+      const response = await axios.post(`${API_URL}/users/login/`, {
+        token: credentialResponse.credential
+      }, { withCredentials: true });
+      
       console.log('User logged in via Google successfully', response.data);
       
+      // Store user data
       sessionStorage.setItem('userName', response.data.userName);
       sessionStorage.setItem('userId', response.data.id);
       sessionStorage.setItem('userEmail', response.data.userEmail);
@@ -131,36 +133,37 @@ function Login() {
       
       setLoginMessage({ 
         type: 'success', 
-        message: 'Успішна авторизація через Google. Перенаправлення...' 
+        message: 'Google login successful. Redirecting...' 
       });
       
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
-    })
-    .catch(error => {
-      console.error('There was an error logging in via Google!', error);
+    } catch (error) {
+      console.error('Google login error:', error);
       
       setLoginMessage({ 
         type: 'error', 
-        message: 'Помилка авторизації через Google.' 
+        message: 'Google login failed: ' + (error.response?.data?.errors || error.message)
       });
-    })
-    .finally(() => {
+    } finally {
       setIsLoading(false);
-    });
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  console.log('Google Client ID:', GOOGLE_CLIENT_ID);
+  
   return (
     <div className="auth-container container mt-5">
       <div className="auth-form-container">
         <div className="auth-header">
-          <h2>Авторизація</h2>
-          <p>Увійдіть у свій обліковий запис, щоб продовжити</p>
+          <h2>Login</h2>
+          <p>Log in to your account to continue</p>
         </div>
         
         {loginMessage.message && (
@@ -173,7 +176,7 @@ function Login() {
           <div className="form-group position-relative">
             <label htmlFor="username">
               <FaEnvelope className="input-icon" />
-              <span>Email або ім'я користувача</span>
+              <span>Email or Username</span>
             </label>
             <input 
               type="text" 
@@ -182,7 +185,7 @@ function Login() {
               name="username" 
               value={formData.username} 
               onChange={handleChange} 
-              placeholder="Введіть свій email або ім'я користувача"
+              placeholder="Enter your email or username"
               disabled={isLoading}
             />
             {errors.username && <div className="invalid-feedback">{errors.username}</div>}
@@ -191,7 +194,7 @@ function Login() {
           <div className="form-group position-relative">
             <label htmlFor="password">
               <FaLock className="input-icon" />
-              <span>Пароль</span>
+              <span>Password</span>
             </label>
             <div className="password-input-container position-relative">
               <input 
@@ -201,7 +204,7 @@ function Login() {
                 name="password" 
                 value={formData.password} 
                 onChange={handleChange} 
-                placeholder="Введіть свій пароль"
+                placeholder="Enter your password"
                 autoComplete="current-password"
                 disabled={isLoading} 
               />
@@ -217,7 +220,7 @@ function Login() {
           </div>
           
           <div className="forgot-password text-end mb-3">
-            <Link to="/forgot-password">Забули пароль?</Link>
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
           
           <button 
@@ -225,40 +228,47 @@ function Login() {
             className="btn btn-primary btn-block"
             disabled={isLoading}
           >
-            {isLoading ? 'Авторизація...' : 'Увійти'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
           
           <div className="divider">
-            <span>або</span>
+            <span>or</span>
           </div>
           
           <div className="social-login">
-            <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-              <div className="google-btn-container">
-                <GoogleLogin
-                  onSuccess={handleGoogleLogin}
-                  onError={() => {
-                    console.log('Login Failed');
-                    setLoginMessage({ 
-                      type: 'error', 
-                      message: 'Не вдалося авторизуватися через Google' 
-                    });
-                  }}
-                  type="standard"
-                  theme="filled_blue"
-                  size="large"
-                  text="continue_with"
-                  shape="rectangular"
-                  logo_alignment="left"
-                  width="100%"
-                />
+            {GOOGLE_CLIENT_ID ? (
+              <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                <div className="google-btn-container">
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={(error) => {
+                      console.error('Google login failed:', error);
+                      setLoginMessage({ 
+                        type: 'error', 
+                        message: 'Google login failed. Please try again.' 
+                      });
+                    }}
+                    useOneTap
+                    type="standard"
+                    theme="filled_blue"
+                    size="large"
+                    text="continue_with"
+                    shape="rectangular"
+                    logo_alignment="left"
+                    width="100%"
+                  />
+                </div>
+              </GoogleOAuthProvider>
+            ) : (
+              <div className="alert alert-warning">
+                Google login is not available. Please contact the administrator.
               </div>
-            </GoogleOAuthProvider>
+            )}
           </div>
           
           <div className="auth-footer">
             <p>
-              Ще не маєте облікового запису? <Link to="/register">Зареєструватися</Link>
+              Don't have an account yet? <Link to="/register">Register</Link>
             </p>
           </div>
         </form>
@@ -267,6 +277,7 @@ function Login() {
   );
 }
 
+// Helper function to get CSRF token from cookies
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
