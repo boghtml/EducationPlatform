@@ -43,10 +43,10 @@ const Contact = () => {
       hours: 'Пн-Пт: 9:00 - 18:00'
     },
     {
-      city: 'Одеса',
-      address: 'вул. Приморська, 15, Одеса, 65000',
+      city: 'Хмельницький',
+      address: 'вул. Степана Бандери, 1/1, Хмельницький, 29000',
       phone: '+380 48 765 43 21',
-      email: 'odesa@educationplatform.com',
+      email: 'khmelnytskyi@educationplatform.com',
       hours: 'Пн-Пт: 10:00 - 19:00'
     }
   ];

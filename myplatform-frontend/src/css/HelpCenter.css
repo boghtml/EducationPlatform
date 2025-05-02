@@ -1,0 +1,909 @@
+/* HelpCenter.css */
+
+.help-center-page {
+    color: #333;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+  }
+  
+  /* Секція заголовка */
+  .help-hero {
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    padding: 80px 0 60px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .help-hero:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='100%' height='100%' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 60c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zM50 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.1;
+  }
+  
+  .help-hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .help-hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    text-align: center;
+    position: relative;
+  }
+  
+  /* Пошук */
+  .help-search {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    color: #4a6baf;
+    font-size: 1.1rem;
+    z-index: 1;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 15px 40px 15px 45px;
+    border: none;
+    border-radius: 30px 0 0 30px;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .clear-search {
+    position: absolute;
+    right: 120px;
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  
+  .clear-search:hover {
+    color: #666;
+  }
+  
+  .search-button {
+    padding: 15px 25px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 0 30px 30px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .search-button:hover {
+    background: #1e2b38;
+  }
+  
+  /* Основний контейнер */
+  .help-container {
+    padding-bottom: 60px;
+  }
+  
+  /* Заголовки секцій */
+  .section-header {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .section-header h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin: 0;
+    position: relative;
+    padding-bottom: 10px;
+  }
+  
+  .section-header h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #4a6baf 0%, #2c3e50 100%);
+  }
+  
+  .section-header p {
+    color: #666;
+    margin: 10px 0 0;
+    font-size: 1.05rem;
+  }
+  
+  .view-all-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4a6baf;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+  
+  .view-all-link:hover {
+    color: #2c3e50;
+    text-decoration: underline;
+  }
+  
+  /* Результати пошуку */
+  .search-results-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+  
+  .close-results-button {
+    padding: 8px 15px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 5px;
+    color: #666;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .close-results-button:hover {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  
+  .search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .search-result-item {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  
+  .search-result-item:hover {
+    background-color: #f3f3f3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .result-category {
+    display: flex;
+    align-items: center;
+    color: #4a6baf;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  
+  .result-category svg {
+    margin-right: 8px;
+  }
+  
+  .result-title {
+    font-size: 1.2rem;
+    margin: 0 0 10px;
+  }
+  
+  .result-title a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .result-title a:hover {
+    color: #4a6baf;
+  }
+  
+  .result-excerpt {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+  
+  .read-more-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4a6baf;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  
+  .read-more-link:hover {
+    color: #2c3e50;
+  }
+  
+  .arrow-icon {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+  }
+  
+  .read-more-link:hover .arrow-icon {
+    transform: translateX(3px);
+  }
+  
+  /* Відсутність результатів */
+  .no-results {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .no-results-icon {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 20px;
+  }
+  
+  .no-results h3 {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+  }
+  
+  .no-results p {
+    color: #666;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  /* Категорії допомоги */
+  .help-categories-section {
+    margin-bottom: 50px;
+  }
+  
+  .help-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .category-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    color: #333;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .category-card:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #4a6baf 0%, #2c3e50 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .category-card:hover:before {
+    transform: scaleX(1);
+  }
+  
+  .category-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+  
+  .category-card h3 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin: 0 0 10px;
+  }
+  
+  .category-card p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 20px;
+    flex-grow: 1;
+  }
+  
+  .explore-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4a6baf;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    margin-top: auto;
+  }
+  
+  .category-card:hover .explore-link {
+    color: #2c3e50;
+  }
+  
+  .category-card:hover .arrow-icon {
+    transform: translateX(3px);
+  }
+  
+  /* Популярні статті */
+  .popular-articles-section {
+    margin-bottom: 50px;
+  }
+  
+  .articles-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .article-item {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    transition: all 0.3s;
+    height: 100%;
+  }
+  
+  .article-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .article-category {
+    display: flex;
+    align-items: center;
+    color: #4a6baf;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  
+  .article-category svg {
+    margin-right: 8px;
+  }
+  
+  .article-title {
+    font-size: 1.2rem;
+    margin: 0 0 15px;
+    line-height: 1.4;
+  }
+  
+  .article-title a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .article-title a:hover {
+    color: #4a6baf;
+  }
+  
+  .article-meta {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .meta-icon {
+    margin-right: 5px;
+  }
+  
+  .read-article-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4a6baf;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  
+  .read-article-link:hover {
+    color: #2c3e50;
+  }
+  
+  .article-item:hover .arrow-icon {
+    transform: translateX(3px);
+  }
+  
+  /* Відеоінструкції */
+  .video-tutorials-section {
+    margin-bottom: 50px;
+  }
+  
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+  }
+  
+  .video-card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s;
+  }
+  
+  .video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .video-thumbnail {
+    position: relative;
+    overflow: hidden;
+    padding-top: 56.25%; /* 16:9 */
+  }
+  
+  .video-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  
+  .video-card:hover .video-thumbnail img {
+    transform: scale(1.05);
+  }
+  
+  .video-duration {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .play-overlay svg {
+    font-size: 3rem;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+  
+  .video-card:hover .play-overlay {
+    opacity: 1;
+  }
+  
+  .video-title {
+    padding: 15px;
+    font-size: 1.1rem;
+    margin: 0;
+    color: #2c3e50;
+  }
+  
+  /* Швидкі відповіді на FAQ */
+  .quick-faqs-section {
+    margin-bottom: 50px;
+  }
+  
+  .faqs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .faq-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    transition: all 0.3s;
+    height: 100%;
+  }
+  
+  .faq-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .faq-question {
+    display: flex;
+    align-items: flex-start;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin: 0 0 15px;
+    line-height: 1.4;
+  }
+  
+  .question-icon {
+    color: #4a6baf;
+    margin-right: 10px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  
+  .faq-answer {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0 0 15px;
+  }
+  
+  .faq-details-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4a6baf;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  
+  .faq-details-link:hover {
+    color: #2c3e50;
+  }
+  
+  .faq-card:hover .arrow-icon {
+    transform: translateX(3px);
+  }
+  
+  /* Контактна секція */
+  .help-contact-section {
+    margin-bottom: 50px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 992px) {
+    .contact-content {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .contact-text {
+    padding: 40px;
+  }
+  
+  .contact-text h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin: 0 0 15px;
+  }
+  
+  .contact-text p {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 25px;
+  }
+  
+  .contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .contact-option {
+    display: flex;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+  }
+  
+  .contact-option:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contact-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .contact-details {
+    flex: 1;
+  }
+  
+  .contact-details h3 {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin: 0 0 5px;
+  }
+  
+  .contact-details p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0 0 10px;
+  }
+  
+  .start-chat-button {
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .start-chat-button:hover {
+    background: linear-gradient(135deg, #3b5998 0%, #1e2c3a 100%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .contact-email, .contact-phone {
+    color: #4a6baf;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    display: inline-block;
+  }
+  
+  .contact-email:hover, .contact-phone:hover {
+    color: #2c3e50;
+    text-decoration: underline;
+  }
+  
+  .contact-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .contact-image img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  /* Додаткові ресурси */
+  .additional-resources-section {
+    margin-bottom: 30px;
+  }
+  
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+  }
+  
+  .resource-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  .resource-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #4a6baf 0%, #2c3e50 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .resource-card h3 {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin: 0 0 10px;
+  }
+  
+  .resource-card p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  /* Адаптивність */
+  @media (max-width: 992px) {
+    .search-input {
+      border-radius: 30px 0 0 30px;
+    }
+    
+    .help-categories-grid,
+    .articles-list,
+    .video-grid,
+    .faqs-grid,
+    .resources-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .help-hero {
+      padding: 60px 0 40px;
+    }
+    
+    .help-hero-title {
+      font-size: 2rem;
+    }
+    
+    .search-input-wrapper {
+      flex-direction: column;
+    }
+    
+    .search-input {
+      width: 100%;
+      border-radius: 30px;
+      margin-bottom: 10px;
+    }
+    
+    .search-button {
+      width: 100%;
+      border-radius: 30px;
+    }
+    
+    .clear-search {
+      right: 15px;
+    }
+    
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .view-all-link {
+      margin-top: 10px;
+    }
+    
+    .help-categories-grid,
+    .articles-list,
+    .video-grid,
+    .faqs-grid,
+    .resources-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .help-hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .help-hero-subtitle {
+      font-size: 1rem;
+    }
+    
+    .section-header h2 {
+      font-size: 1.5rem;
+    }
+    
+    .category-icon,
+    .resource-icon {
+      width: 50px;
+      height: 50px;
+      font-size: 1.3rem;
+    }
+    
+    .category-card h3,
+    .article-title,
+    .video-title,
+    .resource-card h3 {
+      font-size: 1.1rem;
+    }
+    
+    .contact-option {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .contact-icon {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+  }
