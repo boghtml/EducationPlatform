@@ -34,12 +34,11 @@ function QADetails() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [currentUser, setCurrentUser] = useState({});
-  const [isEditing, setIsEditing] = useState(null); // Відстежує, яка відповідь редагується
-  const [editContent, setEditContent] = useState(''); // Вміст для редагування
+  const [isEditing, setIsEditing] = useState(null); 
+  const [editContent, setEditContent] = useState(''); 
   const { questionId } = useParams();
   const navigate = useNavigate();
 
-  // Отримання CSRF-токену
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -53,14 +52,12 @@ function QADetails() {
     return null;
   };
 
-  // Отримання деталей питання
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
         setLoading(true);
         await getCsrfToken();
 
-        // Отримання інформації про поточного користувача із sessionStorage
         const userInfo = {
           id: sessionStorage.getItem('userId'),
           username: sessionStorage.getItem('userName'),
@@ -68,7 +65,6 @@ function QADetails() {
         };
         setCurrentUser(userInfo);
 
-        // Запит деталей питання
         const response = await axios.get(`${API_URL}/questions/${questionId}/`, {
           withCredentials: true,
         });
@@ -85,8 +81,7 @@ function QADetails() {
 
     fetchQuestion();
   }, [questionId]);
-
-  // Надсилання нової відповіді
+  
   const handleSubmitAnswer = async (e) => {
     e.preventDefault();
 
@@ -108,22 +103,19 @@ function QADetails() {
         { withCredentials: true },
       );
 
-      // Створення об'єкта нової відповіді з інформацією про користувача
       const newAnswerObject = {
         ...response.data,
         user: currentUser.username,
         profile_image_url: currentUser.profileImageUrl,
         created_at: new Date().toISOString(),
-        // Додавання id, якщо API не надає
+       
         id: response.data.id || Date.now().toString(),
       };
 
-      // Додавання нової відповіді до списку
       setAnswers((prev) => [...prev, newAnswerObject]);
       setNewAnswer('');
       setSuccessMessage('Відповідь успішно додано!');
 
-      // Прокрутка до нової відповіді
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } catch (error) {
       console.error('Помилка надсилання відповіді:', error);
@@ -133,7 +125,6 @@ function QADetails() {
     }
   };
 
-  // Редагування відповіді
   const handleEditAnswer = async (answerId) => {
     if (!editContent.trim()) {
       setErrorMessage('Відповідь не може бути порожньою');
@@ -149,7 +140,6 @@ function QADetails() {
         { withCredentials: true },
       );
 
-      // Оновлення списку відповідей з відредагованою відповіддю
       setAnswers((prev) =>
         prev.map((answer) =>
           answer.id === answerId
@@ -167,7 +157,6 @@ function QADetails() {
     }
   };
 
-  // Видалення відповіді
   const handleDeleteAnswer = async (answerId) => {
     if (!window.confirm('Ви впевнені, що хочете видалити цю відповідь?')) {
       return;
@@ -180,7 +169,6 @@ function QADetails() {
         withCredentials: true,
       });
 
-      // Видалення відповіді зі списку
       setAnswers((prev) => prev.filter((answer) => answer.id !== answerId));
       setSuccessMessage('Відповідь успішно видалено!');
     } catch (error) {
@@ -189,19 +177,16 @@ function QADetails() {
     }
   };
 
-  // Початок редагування відповіді
   const startEditing = (answer) => {
     setIsEditing(answer.id);
     setEditContent(answer.content);
   };
-
-  // Скасування редагування
+  
   const cancelEditing = () => {
     setIsEditing(null);
     setEditContent('');
   };
 
-  // Форматування дати
   const formatDate = (dateString) => {
     if (!dateString) return '';
 
@@ -215,7 +200,6 @@ function QADetails() {
     });
   };
 
-  // Отримання формату "скільки часу тому"
   const getTimeAgo = (dateString) => {
     if (!dateString) return '';
 

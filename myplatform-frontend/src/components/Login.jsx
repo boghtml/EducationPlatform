@@ -4,7 +4,6 @@ import axios from 'axios';
 import API_URL from '../api';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-// Icons
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Login() {
@@ -18,7 +17,6 @@ function Login() {
   const [loginMessage, setLoginMessage] = useState({ type: '', message: '' });
   const navigate = useNavigate();
 
-  // Fetch CSRF token on component mount
   useEffect(() => {
     getCSRFToken();
   }, []);
@@ -38,7 +36,6 @@ function Login() {
       [e.target.name]: e.target.value,
     });
     
-    // Clear errors when field changes
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -83,7 +80,6 @@ function Login() {
       
       console.log('User logged in successfully', response.data);
       
-      // Store user data
       sessionStorage.setItem('userName', response.data.userName);
       sessionStorage.setItem('userId', response.data.id);
       sessionStorage.setItem('userEmail', response.data.userEmail);
@@ -95,7 +91,6 @@ function Login() {
         message: 'Login successful. Redirecting...' 
       });
       
-      // Delay redirect to show message
       setTimeout(() => {
         navigate('/dashboard');
       }, 1000);
@@ -124,7 +119,6 @@ function Login() {
       
       console.log('User logged in via Google successfully', response.data);
       
-      // Store user data
       sessionStorage.setItem('userName', response.data.userName);
       sessionStorage.setItem('userId', response.data.id);
       sessionStorage.setItem('userEmail', response.data.userEmail);
@@ -157,7 +151,7 @@ function Login() {
 
   const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
   console.log('Google Client ID:', GOOGLE_CLIENT_ID);
-  
+
   return (
     <div className="auth-container container mt-5">
       <div className="auth-form-container">
@@ -277,7 +271,6 @@ function Login() {
   );
 }
 
-// Helper function to get CSRF token from cookies
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {

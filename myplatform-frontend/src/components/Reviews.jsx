@@ -20,7 +20,6 @@ const Reviews = () => {
   useEffect(() => {
     document.title = "Відгуки | Освітня платформа";
     
-    // Симуляція отримання даних з API
     const mockReviews = [
       {
         id: 1,
@@ -156,7 +155,6 @@ const Reviews = () => {
     setReviews([newReview, ...reviews]);
     setFilteredReviews([newReview, ...filteredReviews]);
     
-    // Скидання форми
     setName('');
     setReviewText('');
     setRating(0);
@@ -191,7 +189,6 @@ const Reviews = () => {
     return stars;
   };
   
-  // Пагінація
   const indexOfLastReview = currentPage * reviewsPerPage;
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = filteredReviews.slice(indexOfFirstReview, indexOfLastReview);
@@ -199,10 +196,8 @@ const Reviews = () => {
   
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   
-  // Унікальні курси для фільтра
   const uniqueCourses = [...new Set(reviews.map(review => review.course))];
   
-  // Статистика рейтингів
   const ratingStats = {
     average: reviews.length ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1) : 0,
     count: reviews.length,

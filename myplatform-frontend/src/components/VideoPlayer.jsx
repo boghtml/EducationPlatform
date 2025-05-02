@@ -6,7 +6,6 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
   const [error, setError] = useState(null);
   const videoRef = useRef(null);
   
-  // Функція для отримання ID відео з URL YouTube
   const getYouTubeVideoId = (url) => {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -14,17 +13,14 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
   
-  // Перевірка, чи є URL посиланням на YouTube
   const isYoutubeUrl = (url) => {
     return url?.includes('youtube.com') || url?.includes('youtu.be');
   };
   
-  // Перевірка, чи є файл з S3
   const isS3Url = (url) => {
     return url?.includes('amazonaws.com') || url?.includes('s3.');
   };
   
-  // Форматування довгої назви файлу
   const formatFileName = (name) => {
     if (!name) return "Файл";
     if (name.length > 40) {
@@ -33,7 +29,6 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     return name;
   };
 
-  // Визначення типу контенту
   const determineContentType = (url, type) => {
     if (isYoutubeUrl(url)) return 'youtube';
     
@@ -55,7 +50,7 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
   
   useEffect(() => {
     if (fileUrl) {
-      // Затримка для відображення завантаження
+      
       const timer = setTimeout(() => {
         setLoading(false);
       }, 500);
@@ -63,13 +58,11 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     }
   }, [fileUrl]);
 
-  // Обробка помилок відтворення відео
   const handleVideoError = (e) => {
     console.error("Помилка відтворення відео:", e);
     setError("Не вдалося відтворити відео. Формат може не підтримуватися в браузері або файл недоступний.");
   };
 
-  // Спроба повторно завантажити відео при помилці
   const retryVideoLoad = () => {
     if (videoRef.current) {
       setError(null);
@@ -111,7 +104,6 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
   const contentType = determineContentType(fileUrl, fileType);
   const formattedTitle = formatFileName(fileName);
   
-  // Обробка YouTube відео
   if (contentType === 'youtube') {
     const videoId = getYouTubeVideoId(fileUrl);
     if (videoId) {
@@ -137,12 +129,10 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     }
   }
   
-  // Обробка власних відеофайлів
   if (contentType === 'video') {
-    const corsProxyUrl = fileUrl; // якщо потрібно, можна додати проксі для CORS
+    const corsProxyUrl = fileUrl; 
 
-    // Визначаємо MIME тип відео
-    let mimeType = 'video/mp4'; // за замовчуванням
+    let mimeType = 'video/mp4'; 
     if (fileType?.toLowerCase().includes('webm')) {
       mimeType = 'video/webm';
     } else if (fileUrl?.toLowerCase().endsWith('.webm')) {
@@ -179,9 +169,8 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     );
   }
   
-  // Обробка PDF файлів
   if (contentType === 'pdf') {
-    // Для PDF з S3 та інших джерел можемо використати Viewer API від Google
+    
     const pdfViewerUrl = isS3Url(fileUrl) 
       ? `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true` 
       : `${fileUrl}#toolbar=1&view=FitH`;
@@ -208,7 +197,6 @@ const VideoPlayer = ({ fileUrl, fileType, fileName }) => {
     );
   }
   
-  // Для інших типів файлів показуємо посилання для завантаження
   return (
     <div className="file-download">
       <p>Цей тип файлу ({fileType || 'невідомий'}) не може бути відтворений безпосередньо. Будь ласка, завантажте його.</p>

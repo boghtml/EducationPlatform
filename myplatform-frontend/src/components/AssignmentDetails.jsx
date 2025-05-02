@@ -37,7 +37,6 @@ function AssignmentDetails() {
   const { assignmentId } = useParams();
   const navigate = useNavigate();
 
-  // Отримання CSRF-токену
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -51,14 +50,12 @@ function AssignmentDetails() {
     return null;
   };
 
-  // Завантаження деталей завдання
   useEffect(() => {
     const fetchAssignment = async () => {
       try {
         setLoading(true);
         await getCsrfToken();
         
-        // Використовуємо новий ендпоінт для студентів
         const response = await axios.get(`${API_URL}/assignments/student/${assignmentId}/detail/`, { 
           withCredentials: true
         });
@@ -76,18 +73,15 @@ function AssignmentDetails() {
     fetchAssignment();
   }, [assignmentId]);
 
-  // Обробник додавання файлів
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setSubmissionFiles(prev => [...prev, ...selectedFiles]);
   };
 
-  // Видалення файлу з списку перед надсиланням
   const removeFile = (index) => {
     setSubmissionFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Відправка завдання
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -124,7 +118,6 @@ function AssignmentDetails() {
       setSubmissionComment('');
       setSubmissionFiles([]);
       
-      // Оновлюємо статус завдання
       setAssignment(prev => ({
         ...prev,
         status: 'submitted',
@@ -136,7 +129,6 @@ function AssignmentDetails() {
         }
       }));
       
-      // Прокручуємо до повідомлення про успіх
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Помилка відправлення завдання:", error);
@@ -146,7 +138,6 @@ function AssignmentDetails() {
     }
   };
 
-  // Скасування подання
   const handleCancelSubmission = async () => {
     if (!window.confirm("Ви впевнені, що хочете скасувати подання? Усі файли будуть видалені.")) {
       return;
@@ -167,14 +158,12 @@ function AssignmentDetails() {
       
       setSuccessMessage("Подання успішно скасовано!");
       
-      // Оновлюємо статус завдання
       setAssignment(prev => ({
         ...prev,
         status: 'assigned',
         submission: null
       }));
       
-      // Прокручуємо до повідомлення про успіх
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Помилка скасування подання:", error);
@@ -184,7 +173,6 @@ function AssignmentDetails() {
     }
   };
 
-  // Допоміжні функції
   const getFileIcon = (fileType) => {
     if (!fileType) return <FileText className="course-wc-file-icon" />;
     const type = fileType.toLowerCase();
@@ -291,7 +279,6 @@ function AssignmentDetails() {
     });
   };
 
-  // Стани завантаження та помилки
   if (loading) {
     return (
       <div className="course-wc-interface-container">

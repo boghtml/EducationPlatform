@@ -48,7 +48,6 @@ function AssignmentsTab() {
           setAssignments(assignmentsData);
           setFilteredAssignments(assignmentsData);
           
-          // Calculate stats
           const stats = {
             total: assignmentsData.length,
             assigned: assignmentsData.filter(a => a.status === 'assigned').length,
@@ -79,12 +78,10 @@ function AssignmentsTab() {
     
     let filtered = [...assignments];
     
-    // Apply filter
     if (assignmentFilter !== 'all') {
       filtered = filtered.filter((a) => a.status === assignmentFilter);
     }
     
-    // Apply search
     if (assignmentSearch) {
       const searchTerm = assignmentSearch.toLowerCase();
       filtered = filtered.filter(
@@ -94,13 +91,12 @@ function AssignmentsTab() {
       );
     }
     
-    // Apply sorting
     filtered.sort((a, b) => {
       let comparison = 0;
       
       switch (sortBy) {
         case 'dueDate':
-          // Handle null values for due_date
+          
           if (!a.due_date && !b.due_date) comparison = 0;
           else if (!a.due_date) comparison = 1;
           else if (!b.due_date) comparison = -1;
@@ -112,13 +108,13 @@ function AssignmentsTab() {
           break;
           
         case 'status':
-          // Define order for statuses
+          
           const statusOrder = { assigned: 1, submitted: 2, graded: 3, returned: 4 };
           comparison = statusOrder[a.status] - statusOrder[b.status];
           break;
           
         case 'grade':
-          // Handle null values for grade
+          
           if (!a.grade && !b.grade) comparison = 0;
           else if (!a.grade) comparison = 1;
           else if (!b.grade) comparison = -1;

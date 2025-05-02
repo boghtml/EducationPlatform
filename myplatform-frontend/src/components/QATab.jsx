@@ -35,7 +35,6 @@ function QATab() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Завантаження питань
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -63,13 +62,11 @@ function QATab() {
     if (course && course.id) fetchQuestions();
   }, [course, getCsrfToken]);
 
-  // Фільтрація та сортування питань
   useEffect(() => {
     if (!questions.length) return;
     
     let filtered = [...questions];
     
-    // Пошук за текстом
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(question => 
@@ -78,7 +75,6 @@ function QATab() {
       );
     }
     
-    // Фільтрація за відповіддю
     if (filter === 'answered') {
       filtered = filtered.filter(question => 
         question.answers && question.answers.length > 0
@@ -89,7 +85,6 @@ function QATab() {
       );
     }
     
-    // Сортування
     switch (sortBy) {
       case 'recent':
         filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -114,7 +109,6 @@ function QATab() {
     setFilteredQuestions(filtered);
   }, [questions, searchQuery, filter, sortBy]);
 
-  // Створення нового питання
   const handleCreateQuestion = async (e) => {
     e.preventDefault();
     
@@ -139,15 +133,12 @@ function QATab() {
         { withCredentials: true }
       );
       
-      // Додаємо нове питання до списку
       setQuestions(prev => [response.data, ...prev]);
       
-      // Скидаємо форму
       setNewQuestion({ title: '', description: '' });
       setShowCreateForm(false);
       setSuccessMessage("Питання успішно створено!");
       
-      // Прокручуємо до повідомлення про успіх
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Error creating question:", error);
@@ -157,7 +148,6 @@ function QATab() {
     }
   };
 
-  // Обробник розгортання/згортання питання
   const toggleQuestionExpand = (questionId) => {
     if (expandedQuestion === questionId) {
       setExpandedQuestion(null);
@@ -166,17 +156,15 @@ function QATab() {
     }
   };
 
-  // Форматування дати
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     
-    // Отримуємо різницю у часі
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) {
-      // Якщо сьогодні, показуємо час
+      
       return `Сьогодні, ${date.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}`;
     } else if (diffDays === 1) {
       return "Вчора";

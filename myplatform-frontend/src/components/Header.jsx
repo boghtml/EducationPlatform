@@ -28,7 +28,6 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Перевірка авторизації користувача при завантаженні компонента
   useEffect(() => {
     const userName = sessionStorage.getItem('userName');
     const userEmail = sessionStorage.getItem('userEmail');
@@ -46,7 +45,6 @@ const Header = () => {
     }
   }, []);
 
-  // Закриття випадаючого меню при кліку поза ним
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
@@ -61,7 +59,7 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
-    // Видалення даних сесії
+    
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('userEmail');
@@ -76,11 +74,9 @@ const Header = () => {
       userRole: ''
     });
     
-    // Перенаправлення на головну сторінку
     navigate('/');
   };
 
-  // Функція для перевірки активного посилання
   const isActive = (path) => {
     if (path === '/' && location.pathname === '/') {
       return true;

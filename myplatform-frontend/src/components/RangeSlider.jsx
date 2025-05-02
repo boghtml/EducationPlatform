@@ -47,7 +47,6 @@ const RangeSlider = ({
     };
   }, [min, max, step, onChange]);
 
-  // Update slider when inputs change
   const handleInputChange = (index, event) => {
     const newValue = parseInt(event.target.value);
     
@@ -56,7 +55,6 @@ const RangeSlider = ({
     const newValues = [...values];
     newValues[index] = newValue;
     
-    // Ensure min <= max
     if (index === 0 && newValue > values[1]) {
       newValues[index] = values[1];
     } else if (index === 1 && newValue < values[0]) {

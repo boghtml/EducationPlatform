@@ -37,7 +37,6 @@ function Register() {
   const [step, setStep] = useState(1); 
   const navigate = useNavigate();
 
-  // Fetch CSRF token on component mount
   useEffect(() => {
     getCSRFToken();
   }, []);
@@ -207,7 +206,6 @@ function Register() {
 
   const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-  // Render first step (personal information)
   const renderStep1 = () => (
     <>
       <div className="form-group position-relative">
@@ -361,7 +359,6 @@ function Register() {
     </>
   );
 
-  // Render second step (password and security)
   const renderStep2 = () => (
     <>
       <div className="form-group position-relative">
@@ -524,7 +521,6 @@ function Register() {
   );
 }
 
-// Helper function to get CSRF token from cookies
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {

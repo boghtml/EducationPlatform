@@ -8,10 +8,9 @@ const QuickNote = ({ lessonId, onClose, onSaved }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [status, setStatus] = useState(null); // 'success', 'error'
+  const [status, setStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Функція для отримання CSRF-токену
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -25,7 +24,6 @@ const QuickNote = ({ lessonId, onClose, onSaved }) => {
     return null;
   };
 
-  // Зберегти нотатку
   const saveNote = async () => {
     if (!title.trim()) {
       setStatus('error');
@@ -51,7 +49,6 @@ const QuickNote = ({ lessonId, onClose, onSaved }) => {
       setIsSaving(false);
       setStatus('success');
       
-      // Чекаємо 1 секунду перед закриттям і сповіщенням батьківського компонента
       setTimeout(() => {
         if (onSaved) onSaved(response.data);
         onClose();

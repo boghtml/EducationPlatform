@@ -6,7 +6,7 @@ import Footer from './Footer';
 
 const AboutPage = () => {
   useEffect(() => {
-    // Анімація при завантаженні сторінки
+    
     const cards = document.querySelectorAll('.about__card');
     cards.forEach((card, index) => {
       setTimeout(() => {

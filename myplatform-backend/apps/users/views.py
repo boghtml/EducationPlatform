@@ -326,70 +326,61 @@ def handle_google_login(request, token):
     try:
         print(f"Attempting to verify Google token: {token[:20]}...")
         logger.info(f"Attempting to verify Google token: {token[:20]}...")
-        # Verify the token
+
         idinfo = id_token.verify_oauth2_token(
             token, 
             google_requests.Request(), 
-            '236864019519-293u6gsp5j8ajm85t7h8gf2rr9uj93f1.apps.googleusercontent.com'  # Your OAuth client ID
+            '236864019519-293u6gsp5j8ajm85t7h8gf2rr9uj93f1.apps.googleusercontent.com'
         )
         print(f"Token verification successful. User email: {idinfo.get('email')}")
         logger.info(f"Token verification successful. User email: {idinfo.get('email')}")
         
-        # Check if the token is valid and get the user info
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             return JsonResponse({'errors': 'Invalid issuer'}, status=400)
         
-        # Get user data from token
         email = idinfo['email']
         
-        # Try to find a user with this email
         try:
             user = UserModel.objects.get(email=email)
-            # User exists, log them in
+           
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return create_success_response(request, user)
         except UserModel.DoesNotExist:
-            # User doesn't exist, create a new one
+            
             name = idinfo.get('name', '')
             given_name = idinfo.get('given_name', '')
             family_name = idinfo.get('family_name', '')
             picture = idinfo.get('picture', '')
-            
-            # Create username from email or name
+        
             username = email.split('@')[0]
             
-            # Ensure username is unique
             base_username = username
             counter = 1
             while UserModel.objects.filter(username=username).exists():
                 username = f"{base_username}{counter}"
                 counter += 1
             
-            # Create the user
             user = UserModel.objects.create(
                 username=username,
                 email=email,
                 first_name=given_name or name,
                 last_name=family_name,
                 profile_image_url=picture,
-                role='student'  # Default role
+                role='student' 
             )
             
-            # Set unusable password for security
             user.set_unusable_password()
             user.save()
             
-            # Log in the new user
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return create_success_response(request, user)
             
     except ValueError as ve:
-        # Detailed error for invalid tokens
         print(f"Invalid token error: {str(ve)}")
         logger.error(f"Invalid token error: {str(ve)}")
         return JsonResponse({'errors': f'Invalid token: {str(ve)}'}, status=400)
+    
     except Exception as e:
-        # Log other errors
         print(f"Google login error: {str(e)}")
         logger.error(f"Google login error: {str(e)}")
         return JsonResponse({'errors': str(e)}, status=500)
@@ -443,55 +434,47 @@ def register(request):
 
 def handle_google_register(request, token):
     try:
-        # Verify the token
+        
         idinfo = id_token.verify_oauth2_token(
             token, 
             google_requests.Request(), 
-            '961028426280-6o6re3hfrp7lnr3nennusu902171sapj.apps.googleusercontent.com'  # Your OAuth client ID
+            '961028426280-6o6re3hfrp7lnr3nennusu902171sapj.apps.googleusercontent.com'
         )
         
-        # Check token validity
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             return JsonResponse({'errors': 'Invalid issuer'}, status=400)
         
-        # Get user data
         email = idinfo['email']
         name = idinfo.get('name', '')
         given_name = idinfo.get('given_name', '')
         family_name = idinfo.get('family_name', '')
         picture = idinfo.get('picture', '')
         
-        # Check if user already exists
         user_exists = UserModel.objects.filter(email=email).exists()
         
         if user_exists:
             return JsonResponse({'message': 'User already exists. Please login instead'}, status=400)
         
-        # Create username from email
         username = email.split('@')[0]
         
-        # Ensure username is unique
         base_username = username
         counter = 1
         while UserModel.objects.filter(username=username).exists():
             username = f"{base_username}{counter}"
             counter += 1
         
-        # Create the user
         user = UserModel.objects.create(
             username=username,
             email=email,
             first_name=given_name or name,
             last_name=family_name,
             profile_image_url=picture,
-            role='student'  # Default role
+            role='student'
         )
         
-        # Set unusable password
         user.set_unusable_password()
         user.save()
         
-        # Return success response
         return JsonResponse({
             'message': 'User registered successfully via Google',
             'user_id': user.id

@@ -24,15 +24,13 @@ function CourseCatalogPage() {
   const [selectedRating, setSelectedRating] = useState(0);
   const [error, setError] = useState(null);
 
-  // Refs for sliders
   const priceSliderRef = useRef(null);
   const durationSliderRef = useRef(null);
 
-  // Additional state for UI
   const [hoveredCourse, setHoveredCourse] = useState(null);
 
   useEffect(() => {
-    // Loading courses
+    
     const fetchCourses = async () => {
       try {
         setIsLoading(true);
@@ -47,7 +45,6 @@ function CourseCatalogPage() {
       }
     };
 
-    // Loading categories
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${API_URL}/categories/`);
@@ -61,7 +58,6 @@ function CourseCatalogPage() {
     fetchCategories();
   }, []);
 
-  // Filter and sort courses when parameters change
   useEffect(() => {
     filterAndSortCourses();
   }, [
@@ -80,7 +76,6 @@ function CourseCatalogPage() {
     
     let filtered = [...courses];
 
-    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(course => 
@@ -89,23 +84,19 @@ function CourseCatalogPage() {
       );
     }
 
-    // Filter by status
     if (statusFilter) {
       filtered = filtered.filter(course => course.status === statusFilter);
     }
 
-    // Filter by price
     filtered = filtered.filter(course => {
       const price = course.status === 'premium' ? parseFloat(course.price) : 0;
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
-    // Filter by duration
     filtered = filtered.filter(course => 
       course.duration >= durationRange[0] && course.duration <= durationRange[1]
     );
 
-    // Filter by categories
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(course => {
         if (!course.categories) return false;
@@ -115,14 +106,12 @@ function CourseCatalogPage() {
       });
     }
 
-    // Filter by rating (placeholder since we don't have this in the API yet)
     if (selectedRating > 0) {
       filtered = filtered.filter(course => 
         (course.rating || 4.5) >= selectedRating
       );
     }
 
-    // Sorting
     switch (sortOption) {
       case 'newest':
         filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -193,7 +182,6 @@ function CourseCatalogPage() {
     setSelectedRating(0);
   };
 
-  // Function to render rating stars
   const renderRatingStars = (rating) => {
     const totalStars = 5;
     const fullStars = Math.floor(rating || 4.5);
@@ -211,7 +199,6 @@ function CourseCatalogPage() {
     );
   };
 
-  // Function to display formatted price
   const formatPrice = (price, status) => {
     if (status === 'free') return 'Free';
     return `${price} UAH`;

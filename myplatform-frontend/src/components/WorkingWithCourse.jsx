@@ -18,7 +18,6 @@ function WorkingWithCourse() {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
-  // Get CSRF token
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -32,7 +31,6 @@ function WorkingWithCourse() {
     return null;
   };
 
-  // Initial data fetching
   useEffect(() => {
     axios.defaults.withCredentials = true;
 

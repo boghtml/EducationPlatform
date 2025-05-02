@@ -2,7 +2,6 @@ import React from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 import '../css/ConfirmationDialog.css';
 
-// Компонент діалогового вікна для підтвердження дій
 const ConfirmationDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
   if (!isOpen) return null;
 
