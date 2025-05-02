@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import { Card, CardContent } from './ui/Card';
 import '../css/Reviews.css';
+import Footer from './Footer';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -384,6 +385,7 @@ const Reviews = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

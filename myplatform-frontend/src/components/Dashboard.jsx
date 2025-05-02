@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../api';
 import Header from './Header';
+import Footer from './Footer';
 import '../css/dashboard.css';
 import { 
   FaGraduationCap, 
@@ -589,6 +590,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

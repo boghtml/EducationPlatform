@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Header from './Header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/Card';
 import '../css/About.css';
+import Footer from './Footer';
 
 const AboutPage = () => {
   useEffect(() => {
@@ -169,6 +170,7 @@ const AboutPage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

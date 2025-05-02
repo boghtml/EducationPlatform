@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './Header';
+import Footer from './Footer';
 
 
 function Events() {
@@ -10,6 +11,7 @@ function Events() {
       <h1>Найближчі заходи</h1>
       <p>Контент для найближчих заходів...</p>
     </div>
+      <Footer/>
     </div>
   );
 }

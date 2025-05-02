@@ -1,0 +1,134 @@
+/* Стилі для Range Slider */
+.slider-filter {
+    width: 100%;
+    padding: 10px 0;
+    margin-bottom: 15px;
+  }
+  
+  .slider-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .slider-filter-label {
+    font-weight: 500;
+    color: #333;
+    font-size: 15px;
+  }
+  
+  .slider-filter-values {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .slider-filter-inputs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .slider-filter-input {
+    width: 80px;
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .slider-filter-input:focus {
+    outline: none;
+    border-color: #ff6600;
+  }
+  
+  .slider-filter-input-separator {
+    margin: 0 10px;
+    color: #666;
+  }
+  
+  .slider-filter-container {
+    position: relative;
+    height: 6px;
+    margin: 10px 0;
+    padding: 10px 0;
+    touch-action: none;
+    cursor: pointer;
+  }
+  
+  .slider-filter-track {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+  }
+  
+  .slider-filter-progress {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background-color: #ff6600;
+    border-radius: 3px;
+  }
+  
+  .slider-filter-thumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    border: 2px solid #ff6600;
+    border-radius: 50%;
+    cursor: grab;
+    transition: transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  
+  .slider-filter-thumb:hover, .slider-filter-thumb:active {
+    transform: translate(-50%, -50%) scale(1.1);
+    background-color: #fff9f5;
+  }
+  
+  .slider-filter-thumb:active {
+    cursor: grabbing;
+  }
+  
+  .slider-filter-thumb.left {
+    z-index: 3;
+  }
+  
+  .slider-filter-thumb-handle {
+    width: 6px;
+    height: 6px;
+    background-color: #ff6600;
+    border-radius: 50%;
+  }
+  
+  /* Відповідальний дизайн */
+  @media (max-width: 576px) {
+    .slider-filter-input {
+      width: 60px;
+      padding: 4px 6px;
+      font-size: 13px;
+    }
+    
+    .slider-filter-thumb {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .slider-filter-thumb-handle {
+      width: 4px;
+      height: 4px;
+    }
+  }
