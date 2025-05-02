@@ -16,13 +16,15 @@ import {
   Award,
   BookOpen,
   Pencil,
-  Plus
+  Download,
+  FileType
 } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
 import '../css/QuickNote.css';
 import NotesPanel from './NotesPanel';
 import QuickNote from './QuickNote';
+import VideoPlayer from './VideoPlayer';
 
 function LessonsTab() {
   const { course, courseProgress, getCsrfToken } = useOutletContext();
@@ -34,15 +36,18 @@ function LessonsTab() {
   const [isNotesPanelOpen, setIsNotesPanelOpen] = useState(false);
   const [isQuickNoteOpen, setIsQuickNoteOpen] = useState(false);
   const [showQuickNoteButton, setShowQuickNoteButton] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         await getCsrfToken();
-        const materialsResponse = await axios.get(`${API_URL}/materials/?course=${course.id}`);
+        const [materialsResponse, modulesResponse] = await Promise.all([
+          axios.get(`${API_URL}/materials/?course=${course.id}`, { withCredentials: true }),
+          axios.get(`${API_URL}/modules/get_modules/${course.id}/`, { withCredentials: true })
+        ]);
         setMaterials(materialsResponse.data || []);
-        const modulesResponse = await axios.get(`${API_URL}/modules/get_modules/${course.id}/`, { withCredentials: true });
         setModules(modulesResponse.data || []);
       } catch (error) {
         console.error("Error fetching lessons tab data:", error);
@@ -51,7 +56,6 @@ function LessonsTab() {
     if (course) fetchData();
   }, [course, getCsrfToken]);
 
-  // Показувати кнопку швидкого створення нотаток тільки тоді, коли урок вибрано
   useEffect(() => {
     setShowQuickNoteButton(!!selectedLesson);
   }, [selectedLesson]);
@@ -84,11 +88,14 @@ function LessonsTab() {
 
   const handleLessonClick = async (moduleId, lesson) => {
     setSelectedLesson(null);
+    setSelectedFile(null);
     try {
       await getCsrfToken();
-      const detailsResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/`, { withCredentials: true });
-      const filesResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/files/`, { withCredentials: true });
-      const linksResponse = await axios.get(`${API_URL}/lessons/${lesson.id}/links/`, { withCredentials: true });
+      const [detailsResponse, filesResponse, linksResponse] = await Promise.all([
+        axios.get(`${API_URL}/lessons/${lesson.id}/`, { withCredentials: true }),
+        axios.get(`${API_URL}/lessons/${lesson.id}/files/`, { withCredentials: true }),
+        axios.get(`${API_URL}/lessons/${lesson.id}/links/`, { withCredentials: true })
+      ]);
       setSelectedLesson({
         ...detailsResponse.data,
         files: filesResponse.data || [],
@@ -118,9 +125,9 @@ function LessonsTab() {
           };
         })
       );
-      setCompletingLesson(false);
     } catch (error) {
       console.error("Error marking lesson as completed:", error);
+    } finally {
       setCompletingLesson(false);
     }
   };
@@ -143,14 +150,49 @@ function LessonsTab() {
     }
   };
 
+  const truncateUrl = (url, maxLength = 40) => {
+    if (!url) return "Посилання";
+    if (url.length <= maxLength) return url;
+    return url.substring(0, maxLength - 3) + '...';
+  };
+
   const getFileIcon = (fileType) => {
     if (!fileType) return <File className="course-wc-file-icon" />;
     const type = fileType.toLowerCase();
     if (type.includes('pdf')) return <FileText className="course-wc-file-icon" />;
     if (type.includes('doc')) return <FileText className="course-wc-file-icon" />;
     if (type.includes('vid') || type.includes('mp4')) return <PlayCircle className="course-wc-file-icon" />;
-    if (type.includes('xls') || type.includes('sheet')) return <FileText className="course-wc-file-icon" />;
+    if (type.includes('xls') || type.includes('sheet')) return <FileType className="course-wc-file-icon" />;
     return <Paperclip className="course-wc-file-icon" />;
+  };
+
+  const isVideoFile = (fileType, fileUrl) => {
+    if (!fileType && !fileUrl) return false;
+    if (fileType) {
+      const type = fileType.toLowerCase();
+      if (type.includes('video') || type.includes('mp4') || type.includes('webm')) return true;
+    }
+    if (fileUrl) {
+      const url = fileUrl.toLowerCase();
+      if (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.avi') || url.endsWith('.mov') ||
+          url.includes('youtube.com') || url.includes('youtu.be')) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const isPdfFile = (fileType, fileUrl) => {
+    if (!fileType && !fileUrl) return false;
+    if (fileType) {
+      const type = fileType.toLowerCase();
+      if (type.includes('pdf')) return true;
+    }
+    if (fileUrl) {
+      const url = fileUrl.toLowerCase();
+      if (url.endsWith('.pdf')) return true;
+    }
+    return false;
   };
 
   const isLessonCompleted = (lessonId) => {
@@ -163,25 +205,24 @@ function LessonsTab() {
     return false;
   };
 
-  // Функція для відкриття панелі нотаток
+  const handleFileClick = (file) => {
+    setSelectedFile(file);
+  };
+
   const openNotesPanel = () => {
     setIsNotesPanelOpen(true);
     setIsQuickNoteOpen(false);
   };
 
-  // Функція для закриття панелі нотаток
   const closeNotesPanel = () => {
     setIsNotesPanelOpen(false);
   };
-  
-  // Функція для відкриття швидкої нотатки
+
   const toggleQuickNote = () => {
     setIsQuickNoteOpen(!isQuickNoteOpen);
   };
-  
-  // Обробка збереження швидкої нотатки
+
   const handleQuickNoteSaved = (note) => {
-    // Тут можна додати логіку оновлення списку нотаток або показати сповіщення
     console.log("Нотатка збережена:", note);
   };
 
@@ -198,7 +239,7 @@ function LessonsTab() {
 
       {!selectedLesson ? (
         <div className="course-wc-lessons-content">
-          {materials && materials.length > 0 && (
+          {materials.length > 0 && (
             <div className="course-wc-materials-section">
               <h3 className="course-wc-section-title">
                 <Paperclip className="course-wc-section-icon" />
@@ -212,27 +253,45 @@ function LessonsTab() {
                     </div>
                     <p className="course-wc-material-description">{material.description}</p>
                     <div className="course-wc-material-files">
-                      {material.files &&
-                        material.files.map((file) => (
-                          <a
+                      {material.files?.map((file) => {
+                        const fileName = file.file_name || getFilenameFromUrl(file.file_url);
+                        const isVideo = isVideoFile(file.file_type, file.file_url);
+                        const isPdf = isPdfFile(file.file_type, file.file_url);
+                        return (
+                          <div
                             key={file.id}
-                            href={file.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="course-wc-file-item"
+                            className={`course-wc-file-item ${isVideo ? 'video-file' : ''} ${isPdf ? 'pdf-file' : ''}`}
+                            onClick={isVideo || isPdf ? () => handleFileClick(file) : undefined}
                           >
                             {getFileIcon(file.file_type)}
                             <div className="course-wc-file-info">
-                              <span className="course-wc-file-name">
-                                {file.file_name || getFilenameFromUrl(file.file_url)}
+                              <span className="course-wc-file-name" title={fileName}>
+                                {fileName}
                               </span>
                               <span className="course-wc-file-type">
                                 {file.file_type?.toUpperCase() || 'FILE'} •{' '}
                                 {((file.file_size || 0) / 1024 / 1024).toFixed(2)} MB
                               </span>
                             </div>
-                          </a>
-                        ))}
+                            {(isVideo || isPdf) ? (
+                              <button className="course-wc-view-btn">
+                                <Play size={16} /> Переглянути
+                              </button>
+                            ) : (
+                              <a
+                                href={file.file_url}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="course-wc-download-btn"
+                              >
+                                <Download size={16} />
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -319,22 +378,24 @@ function LessonsTab() {
           <div className="course-wc-lesson-header">
             <button
               className="course-wc-back-button"
-              onClick={() => setSelectedLesson(null)}
+              onClick={() => {
+                setSelectedLesson(null);
+                setSelectedFile(null);
+              }}
             >
               <ChevronDown className="course-wc-back-icon" /> Назад до модулів
             </button>
             <h2 className="course-wc-lesson-title">{selectedLesson.title}</h2>
 
             <div className="course-wc-lesson-actions">
-              {/* Кнопка відкриття нотаток */}
-              <button 
+              <button
                 className="course-wc-btn course-wc-btn-notes"
                 onClick={openNotesPanel}
                 title="Мої нотатки"
               >
                 <BookOpen className="course-wc-button-icon" /> Нотатки
               </button>
-              
+
               {selectedLesson.is_completed ? (
                 <button className="course-wc-btn course-wc-btn-completed" disabled>
                   <CheckCircle className="course-wc-button-icon" /> Завершено
@@ -373,55 +434,119 @@ function LessonsTab() {
                 </div>
               )}
 
-              {selectedLesson.files && selectedLesson.files.length > 0 && (
+              {selectedFile && (
+                <div className="course-wc-selected-file-container">
+                  <div className="course-wc-selected-file-header">
+                    <button
+                      className="course-wc-back-button"
+                      onClick={() => setSelectedFile(null)}
+                    >
+                      <ChevronDown className="course-wc-back-icon" /> Назад до файлів
+                    </button>
+                  </div>
+                  <VideoPlayer
+                    fileUrl={selectedFile.file_url}
+                    fileType={selectedFile.file_type}
+                    fileName={selectedFile.file_name || getFilenameFromUrl(selectedFile.file_url)}
+                  />
+                </div>
+              )}
+
+              {!selectedFile && selectedLesson.files?.length > 0 && (
                 <div className="course-wc-lesson-resources">
                   <h3>Матеріали заняття</h3>
                   <div className="course-wc-files-list">
-                    {selectedLesson.files.map((file) => (
-                      <a
-                        key={file.id}
-                        href={file.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="course-wc-file-item"
-                      >
-                        {getFileIcon(file.file_type)}
-                        <div className="course-wc-file-info">
-                          <span className="course-wc-file-name">
-                            {file.file_name || getFilenameFromUrl(file.file_url)}
-                          </span>
-                          <span className="course-wc-file-type">
-                            {file.file_type?.toUpperCase() || 'FILE'} •{' '}
-                            {((file.file_size || 0) / 1024 / 1024).toFixed(2)} MB
-                          </span>
+                    {selectedLesson.files.map((file) => {
+                      const fileName = file.file_name || getFilenameFromUrl(file.file_url);
+                      const isVideo = isVideoFile(file.file_type, file.file_url);
+                      const isPdf = isPdfFile(file.file_type, file.file_url);
+                      return (
+                        <div
+                          key={file.id}
+                          className={`course-wc-file-item ${isVideo ? 'video-file' : ''} ${isPdf ? 'pdf-file' : ''}`}
+                          onClick={isVideo || isPdf ? () => handleFileClick(file) : undefined}
+                        >
+                          {getFileIcon(file.file_type)}
+                          <div className="course-wc-file-info">
+                            <span className="course-wc-file-name" title={fileName}>
+                              {fileName}
+                            </span>
+                            <span className="course-wc-file-type">
+                              {file.file_type?.toUpperCase() || 'FILE'} •{' '}
+                              {((file.file_size || 0) / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                          </div>
+                          {(isVideo || isPdf) ? (
+                            <button className="course-wc-view-btn">
+                              <Play size={16} /> Переглянути
+                            </button>
+                          ) : (
+                            <a
+                              href={file.file_url}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="course-wc-download-btn"
+                            >
+                              <Download size={16} />
+                            </a>
+                          )}
                         </div>
-                      </a>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {selectedLesson.links && selectedLesson.links.length > 0 && (
+              {!selectedFile && selectedLesson.links?.length > 0 && (
                 <div className="course-wc-lesson-links">
                   <h3>Додаткові ресурси</h3>
                   <div className="course-wc-links-list">
-                    {selectedLesson.links.map((link) => (
-                      <a
-                        key={link.id}
-                        href={link.link_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="course-wc-link-item"
-                      >
-                        <ExternalLink className="course-wc-link-icon" />
-                        <div className="course-wc-link-info">
-                          <span className="course-wc-link-title">
-                            {link.description || 'Додатковий ресурс'}
-                          </span>
-                          <span className="course-wc-link-url">{link.link_url}</span>
+                    {selectedLesson.links.map((link) => {
+                      const isYoutubeLink = link.link_url?.includes('youtube.com') || link.link_url?.includes('youtu.be');
+                      const displayUrl = truncateUrl(link.link_url);
+                      return (
+                        <div
+                          key={link.id}
+                          className={`course-wc-link-item ${isYoutubeLink ? 'youtube-link' : ''}`}
+                          onClick={isYoutubeLink ? () => handleFileClick({
+                            file_url: link.link_url,
+                            file_type: 'video/youtube',
+                            file_name: link.description || 'Відео з YouTube'
+                          }) : undefined}
+                        >
+                          {isYoutubeLink ? (
+                            <PlayCircle className="course-wc-link-icon" />
+                          ) : (
+                            <ExternalLink className="course-wc-link-icon" />
+                          )}
+                          <div className="course-wc-link-info">
+                            <span className="course-wc-link-title">
+                              {link.description || 'Додатковий ресурс'}
+                            </span>
+                            <span className="course-wc-link-url" title={link.link_url}>
+                              {displayUrl}
+                            </span>
+                          </div>
+                          {isYoutubeLink ? (
+                            <button className="course-wc-view-btn">
+                              <Play size={16} /> Переглянути
+                            </button>
+                          ) : (
+                            <a
+                              href={link.link_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="course-wc-external-link-btn"
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
                         </div>
-                      </a>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -429,26 +554,24 @@ function LessonsTab() {
           </div>
         </div>
       )}
-      
-      {/* Компонент панелі нотаток */}
-      <NotesPanel 
-        lessonId={selectedLesson?.id} 
+
+      <NotesPanel
+        lessonId={selectedLesson?.id}
         courseId={course?.id}
-        isOpen={isNotesPanelOpen} 
-        onClose={closeNotesPanel} 
+        isOpen={isNotesPanelOpen}
+        onClose={closeNotesPanel}
       />
-      
-      {/* Кнопка для швидкого створення нотатки */}
+
       {showQuickNoteButton && (
         <>
           {isQuickNoteOpen ? (
-            <QuickNote 
+            <QuickNote
               lessonId={selectedLesson?.id}
               onClose={toggleQuickNote}
               onSaved={handleQuickNoteSaved}
             />
           ) : (
-            <button 
+            <button
               className="quick-note-button"
               onClick={toggleQuickNote}
               title="Швидка нотатка"
