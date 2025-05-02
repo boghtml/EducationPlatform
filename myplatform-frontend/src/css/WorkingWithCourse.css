@@ -2010,11 +2010,11 @@
 }
 
 .course-wc-btn-qa-create::after,
-.course-wc-btn-forum:hover::after,
-.course-wc-btn-assignment:hover::after,
-.course-wc-btn-view-profile:hover::after,
-.course-wc-btn-complete:hover::after,
-.course-wc-btn-qa:hover::after {
+.course-wc-btn-forum::after,
+.course-wc-btn-assignment::after,
+.course-wc-btn-view-profile::after,
+.course-wc-btn-complete::after,
+.course-wc-btn-qa::after {
   content: '';
   position: absolute;
   width: 100%;

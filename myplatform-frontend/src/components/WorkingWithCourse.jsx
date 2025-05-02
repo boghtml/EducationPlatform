@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, Outlet } from 'react-router-dom';
+import { useParams, useNavigate, Link, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import { Book, ClipboardList, Edit3, Star, MessageCircle, Users, HelpCircle } from 'lucide-react';
 import API_URL from '../api';
@@ -16,6 +16,7 @@ function WorkingWithCourse() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { courseId } = useParams();
+  const navigate = useNavigate();
 
   // Get CSRF token
   const getCsrfToken = async () => {
