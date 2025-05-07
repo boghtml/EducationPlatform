@@ -5,8 +5,7 @@ from .views import (
     register, login_view, update_profile, delete_user,
     list_teachers, list_students, reset_password_request,
     reset_password_confirm, change_password, test_email, get_student_details, get_teacher_details, change_password_by_id,
-    upload_profile_image, create_teacher, edit_teacher, delete_teacher
-  #  google_login
+    upload_profile_image, create_teacher, edit_teacher, delete_teacher, UserCoursesView
 )
 
 from .dashboard_views import DashboardStatsView
@@ -34,5 +33,6 @@ urlpatterns = [
     path('delete-teacher/<int:teacher_id>/', delete_teacher, name='delete_teacher'),
 
     path('dashboard-stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
+    path('<int:user_id>/courses/', UserCoursesView.as_view(), name='user_courses'),
 
 ]

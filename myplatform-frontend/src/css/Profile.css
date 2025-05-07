@@ -1,0 +1,305 @@
+/* Enhanced Profile Styles */
+
+/* Profile Stats */
+.course-wc-profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 20px 0 30px;
+  }
+  
+  .course-wc-profile-stat-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .course-wc-profile-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .course-wc-stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 24px;
+    color: white;
+  }
+  
+  .course-wc-stat-icon.courses {
+    background-color: #4CAF50;
+  }
+  
+  .course-wc-stat-icon.active {
+    background-color: #2196F3;
+  }
+  
+  .course-wc-stat-icon.completed {
+    background-color: #9C27B0;
+  }
+  
+  .course-wc-stat-content h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .course-wc-stat-content p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+  }
+  
+  /* Profile Content Sections */
+  .course-wc-profile-content {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .course-wc-profile-section {
+    padding: 25px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .course-wc-profile-section:last-child {
+    border-bottom: none;
+  }
+  
+  .course-wc-profile-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Profile Courses Grid */
+  .course-wc-profile-courses {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+  
+  .course-wc-profile-course-card {
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .course-wc-profile-course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .course-wc-profile-course-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  
+  .course-wc-profile-course-info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .course-wc-profile-course-info h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    line-height: 1.3;
+  }
+  
+  .course-wc-profile-course-info p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    flex: 1;
+  }
+  
+  .course-wc-profile-course-progress {
+    margin-bottom: 15px;
+  }
+  
+  .profile-progress-bar {
+    height: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+  
+  .profile-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6600, #ff9966);
+    border-radius: 4px;
+  }
+  
+  .profile-progress-text {
+    font-size: 13px;
+    color: #666;
+    text-align: right;
+    display: block;
+  }
+  
+  .course-wc-profile-course-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+  }
+  
+  .course-wc-profile-course-status {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+  }
+  
+  .course-wc-profile-course-status.free {
+    background-color: #4caf50;
+  }
+  
+  .course-wc-profile-course-status.premium {
+    background-color: #ff6600;
+  }
+  
+  /* Achievements */
+  .course-wc-profile-achievements {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .course-wc-profile-achievement {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+  }
+  
+  .course-wc-profile-achievement:hover {
+    transform: translateY(-3px);
+    background-color: #f0f0f0;
+  }
+  
+  .course-wc-achievement-icon {
+    color: #FFC107;
+    font-size: 22px;
+  }
+  
+  .course-wc-achievement-icon.gold {
+    color: #ffd700;
+  }
+  
+  .course-wc-achievement-icon.silver {
+    color: #c0c0c0;
+  }
+  
+  .course-wc-achievement-icon.bronze {
+    color: #cd7f32;
+  }
+  
+  /* Specializations */
+  .course-wc-specialization-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+  }
+  
+  .course-wc-specialization-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .course-wc-specialization-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* No Courses Display */
+  .course-wc-no-courses {
+    text-align: center;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .course-wc-no-courses-icon {
+    font-size: 40px;
+    color: #ddd;
+    margin-bottom: 15px;
+  }
+  
+  /* Media Queries for Responsiveness */
+  @media (max-width: 992px) {
+    .course-wc-profile-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .course-wc-profile-courses {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .course-wc-profile-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 15px;
+    }
+  
+    .course-wc-profile-meta {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .course-wc-profile-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .course-wc-profile-courses,
+    .course-wc-specialization-list,
+    .course-wc-profile-achievements {
+      grid-template-columns: 1fr;
+    }
+  }

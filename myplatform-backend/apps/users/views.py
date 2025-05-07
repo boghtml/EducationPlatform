@@ -28,6 +28,12 @@ from rest_framework import status
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.backends import ModelBackend
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from apps.enrollments.models import Enrollment
+from apps.courses.models import Course
+from apps.courses.serializers import CourseSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -594,3 +600,20 @@ def delete_teacher(request, teacher_id):
         return JsonResponse({'message': 'Teacher deleted successfully.'})
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+class UserCoursesView(APIView):
+    def get(self, request, user_id):
+        try:
+            
+            enrolled_courses = Course.objects.filter(
+                id__in=Enrollment.objects.filter(student_id=user_id).values_list('course_id', flat=True)
+            )
+            
+            taught_courses = Course.objects.filter(teacher_id=user_id)
+            
+            courses = list(enrolled_courses) + list(taught_courses.exclude(id__in=enrolled_courses.values_list('id', flat=True)))
+            
+            serializer = CourseSerializer(courses, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

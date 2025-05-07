@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, Outlet } from 'react-router-dom';
 import axios from 'axios';
-import { Book, ClipboardList, Edit3, Star, MessageCircle, Users, HelpCircle } from 'lucide-react';
+import { Book, ClipboardList, Edit3, Star, MessageCircle, Users, HelpCircle, Info } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
+import TeacherInfo from './TeacherInfo';
 
 function WorkingWithCourse() {
   const [course, setCourse] = useState(null);
@@ -15,6 +16,7 @@ function WorkingWithCourse() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showTeacherInfo, setShowTeacherInfo] = useState(false);
   const { courseId } = useParams();
   const navigate = useNavigate();
 
@@ -63,6 +65,14 @@ function WorkingWithCourse() {
   const calculateProgress = () => {
     if (!courseProgress.total_lessons || courseProgress.total_lessons === 0) return 0;
     return Math.round((courseProgress.completed_lessons / courseProgress.total_lessons) * 100);
+  };
+
+  const handleTeacherClick = () => {
+    setShowTeacherInfo(true);
+  };
+
+  const closeTeacherInfo = () => {
+    setShowTeacherInfo(false);
   };
 
   if (loading) {
@@ -197,7 +207,7 @@ function WorkingWithCourse() {
         </nav>
 
         <div className="course-wc-course-teacher">
-          <div className="course-wc-teacher-info">
+          <div className="course-wc-teacher-info" onClick={handleTeacherClick}>
             <img
               src={course.teacher?.profile_image_url || 'https://via.placeholder.com/40'}
               alt={course.teacher?.full_name || 'Викладач'}
@@ -213,6 +223,9 @@ function WorkingWithCourse() {
                   : 'Невідомий викладач'}
               </span>
             </div>
+            <div className="course-wc-teacher-info-badge">
+              <Info size={12} />
+            </div>
           </div>
         </div>
       </aside>
@@ -220,6 +233,11 @@ function WorkingWithCourse() {
       <main className="course-wc-content">
         <Outlet context={{ course, courseProgress, getCsrfToken }} />
       </main>
+
+      {/* Teacher Info Popup */}
+      {showTeacherInfo && course.teacher && (
+        <TeacherInfo teacher={course.teacher} onClose={closeTeacherInfo} />
+      )}
     </div>
   );
 }
