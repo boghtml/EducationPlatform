@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Users } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
+import { getDefaultAvatar } from '../utils/userUtils';
 
 function ParticipantsTab() {
   const { course, getCsrfToken } = useOutletContext();
@@ -31,6 +32,21 @@ function ParticipantsTab() {
     if (course) fetchParticipants();
   }, [course, getCsrfToken]);
 
+  const getUserDisplayName = (user) => {
+    return user.first_name && user.last_name
+      ? `${user.first_name} ${user.last_name}`
+      : user.username;
+  };
+
+  const getUserAvatar = (user) => {
+    if (user.profile_image_url) {
+      return user.profile_image_url;
+    }
+    
+    const displayName = getUserDisplayName(user);
+    return getDefaultAvatar(displayName, user.role || 'student');
+  };
+
   return (
     <div className="course-wc-participants-tab">
       <div className="course-wc-content-header">
@@ -49,21 +65,19 @@ function ParticipantsTab() {
               participants.teachers.map((teacher) => (
                 <div key={teacher.id} className="course-wc-participant-card">
                   <img
-                    src={teacher.profile_image_url || 'https://via.placeholder.com/60'}
-                    alt={teacher.username}
+                    src={getUserAvatar({...teacher, role: 'teacher'})}
+                    alt={getUserDisplayName(teacher)}
                     className="course-wc-participant-avatar"
                   />
                   <div className="course-wc-participant-info">
                     <h4 className="course-wc-participant-name">
-                      {teacher.first_name && teacher.last_name
-                        ? `${teacher.first_name} ${teacher.last_name}`
-                        : teacher.username}
+                      {getUserDisplayName(teacher)}
                     </h4>
                     <span className="course-wc-participant-role">Викладач</span>
                     <span className="course-wc-participant-email">{teacher.email}</span>
                     <button
                       className="course-wc-btn-view-profile"
-                      onClick={() => navigate(`/profile/${teacher.id}`)}
+                      onClick={() => navigate(`/profile/${teacher.id}?role=teacher`)}
                     >
                       Переглянути профіль
                     </button>
@@ -85,21 +99,19 @@ function ParticipantsTab() {
               participants.students.map((student) => (
                 <div key={student.id} className="course-wc-participant-card">
                   <img
-                    src={student.profile_image_url || 'https://via.placeholder.com/60'}
-                    alt={student.username}
+                    src={getUserAvatar({...student, role: 'student'})}
+                    alt={getUserDisplayName(student)}
                     className="course-wc-participant-avatar"
                   />
                   <div className="course-wc-participant-info">
                     <h4 className="course-wc-participant-name">
-                      {student.first_name && student.last_name
-                        ? `${student.first_name} ${student.last_name}`
-                        : student.username}
+                      {getUserDisplayName(student)}
                     </h4>
                     <span className="course-wc-participant-role">Студент</span>
                     <span className="course-wc-participant-email">{student.email}</span>
                     <button
                       className="course-wc-btn-view-profile"
-                      onClick={() => navigate(`/profile/${student.id}`)}
+                      onClick={() => navigate(`/profile/${student.id}?role=student`)}
                     >
                       Переглянути профіль
                     </button>
@@ -119,21 +131,19 @@ function ParticipantsTab() {
               {participants.admins.map((admin) => (
                 <div key={admin.id} className="course-wc-participant-card">
                   <img
-                    src={admin.profile_image_url || 'https://via.placeholder.com/60'}
-                    alt={admin.username}
+                    src={getUserAvatar({...admin, role: 'admin'})}
+                    alt={getUserDisplayName(admin)}
                     className="course-wc-participant-avatar"
                   />
                   <div className="course-wc-participant-info">
                     <h4 className="course-wc-participant-name">
-                      {admin.first_name && admin.last_name
-                        ? `${admin.first_name} ${admin.last_name}`
-                        : admin.username}
+                      {getUserDisplayName(admin)}
                     </h4>
                     <span className="course-wc-participant-role">Адміністратор</span>
                     <span className="course-wc-participant-email">{admin.email}</span>
                     <button
                       className="course-wc-btn-view-profile"
-                      onClick={() => navigate(`/profile/${admin.id}`)}
+                      onClick={() => navigate(`/profile/${admin.id}?role=admin`)}
                     >
                       Переглянути профіль
                     </button>

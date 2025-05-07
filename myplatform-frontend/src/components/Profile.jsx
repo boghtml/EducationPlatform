@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { User, Mail, Book, Clock, Award, ChevronDown } from 'lucide-react';
 import API_URL from '../api';
 import '../css/WorkingWithCourse.css';
+import { getDefaultAvatar } from '../utils/userUtils';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -12,15 +13,36 @@ function Profile() {
   const [error, setError] = useState(null);
   const { userId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const searchParams = new URLSearchParams(location.search);
+  const userRole = searchParams.get('role') || 'student';
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const userResponse = await axios.get(`${API_URL}/users/student/${userId}/`, { withCredentials: true });
+        
+        let userEndpoint;
+        switch(userRole) {
+          case 'teacher':
+            userEndpoint = `${API_URL}/users/teacher/${userId}/`;
+            break;
+          case 'admin':
+            userEndpoint = `${API_URL}/users/admin/${userId}/`;
+            break;
+          case 'student':
+          default:
+            userEndpoint = `${API_URL}/users/student/${userId}/`;
+            break;
+        }
+        
+        const userResponse = await axios.get(userEndpoint, { withCredentials: true });
         setUser(userResponse.data);
+        
         const coursesResponse = await axios.get(`${API_URL}/users/${userId}/courses/`, { withCredentials: true });
         setCourses(coursesResponse.data || []);
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -28,8 +50,26 @@ function Profile() {
         setLoading(false);
       }
     };
+    
     fetchProfile();
-  }, [userId]);
+  }, [userId, userRole]);
+
+  const getUserDisplayName = (user) => {
+    if (!user) return '';
+    return user.first_name && user.last_name 
+      ? `${user.first_name} ${user.last_name}` 
+      : user.username;
+  };
+
+  const getUserAvatar = (user) => {
+    if (!user) return '';
+    if (user.profile_image_url) {
+      return user.profile_image_url;
+    }
+    
+    const displayName = getUserDisplayName(user);
+    return getDefaultAvatar(displayName, user.role || userRole);
+  };
 
   if (loading) {
     return (
@@ -70,15 +110,15 @@ function Profile() {
           
           <div className="course-wc-profile-header">
             <img
-              src={user.profile_image_url || 'https://via.placeholder.com/150'}
-              alt={user.username}
+              src={getUserAvatar(user)}
+              alt={getUserDisplayName(user)}
               className="course-wc-profile-avatar"
             />
             <div className="course-wc-profile-info">
               <h2 className="course-wc-profile-name">
-                {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}
+                {getUserDisplayName(user)}
               </h2>
-              <span className="course-wc-profile-role">{user.role || 'Користувач'}</span>
+              <span className="course-wc-profile-role">{user.role || userRole}</span>
               <div className="course-wc-profile-meta">
                 <span><Mail className="course-wc-meta-icon" /> {user.email}</span>
                 <span><Clock className="course-wc-meta-icon" /> Зареєстровано: {new Date(user.date_joined).toLocaleDateString('uk-UA')}</span>
@@ -101,7 +141,7 @@ function Profile() {
                   {courses.map(course => (
                     <div key={course.id} className="course-wc-profile-course-card">
                       <img
-                        src={course.image_url || 'https://via.placeholder.com/100'}
+                        src={course.image_url || getDefaultAvatar(course.title, 'course')}
                         alt={course.title}
                         className="course-wc-profile-course-image"
                       />

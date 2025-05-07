@@ -48,7 +48,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         return response.data.csrftoken;
       }
     } catch (error) {
-      console.error('Помилка отримання CSRF-токену:', error);
+      console.error('Error getting CSRF token:', error);
     }
     return null;
   };
@@ -65,17 +65,18 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
     try {
       await getCsrfToken();
 
+      console.log("Fetching notes and folders...");
       const [foldersResponse, notesResponse] = await Promise.all([
         axios.get(`${API_URL}/notes/folders/`, { withCredentials: true }),
         axios.get(`${API_URL}/notes/`, { withCredentials: true }),
       ]);
 
-      const filteredNotes = lessonId
-        ? notesResponse.data.filter((note) => note.lesson_id === parseInt(lessonId))
-        : notesResponse.data;
+      console.log("Folders response:", foldersResponse.data);
+      console.log("Notes response:", notesResponse.data);
 
       setFolders(foldersResponse.data || []);
-      setNotes(filteredNotes || []);
+
+      setNotes(notesResponse.data || []);
 
       const expanded = {};
       foldersResponse.data.forEach((folder) => {
@@ -85,8 +86,8 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
 
       setLoading(false);
     } catch (error) {
-      console.error('Помилка завантаження нотаток:', error);
-      setError('Не вдалося завантажити нотатки. Спробуйте знову.');
+      console.error('Error loading notes:', error);
+      setError('Could not load notes. Please try again.');
       setLoading(false);
     }
   };
@@ -95,7 +96,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
     if (!isCreatingNote) {
       setIsCreatingNote(true);
       setActiveNote(null);
-      setEditTitle('Нова нотатка');
+      setEditTitle('New Note');
       setEditContent('');
       setIsEditing(true);
       return;
@@ -118,9 +119,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         lesson_id: lessonId,
       };
 
+      console.log("Creating new note with data:", noteData);
       const response = await axios.post(`${API_URL}/notes/create/`, noteData, {
         withCredentials: true,
       });
+      console.log("New note created:", response.data);
 
       setNotes((prevNotes) => [...prevNotes, response.data]);
       setActiveNote(response.data.id);
@@ -130,7 +133,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
 
       setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
-      console.error('Помилка створення нотатки:', error);
+      console.error('Error creating note:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus(null), 2000);
     }
@@ -155,9 +158,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         folder_id: activeFolder,
       };
 
+      console.log("Updating note with data:", noteData);
       const response = await axios.put(`${API_URL}/notes/${activeNote}/`, noteData, {
         withCredentials: true,
       });
+      console.log("Note updated:", response.data);
 
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
@@ -172,7 +177,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
 
       setTimeout(() => setSaveStatus(null), 2000);
     } catch (error) {
-      console.error('Помилка оновлення нотатки:', error);
+      console.error('Error updating note:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus(null), 2000);
     }
@@ -183,9 +188,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
 
     try {
       await getCsrfToken();
+      console.log("Deleting note with ID:", itemToDelete);
       await axios.delete(`${API_URL}/notes/${itemToDelete}/`, {
         withCredentials: true,
       });
+      console.log("Note deleted successfully");
 
       setNotes((prevNotes) => prevNotes.filter((note) => note.id !== itemToDelete));
 
@@ -196,14 +203,14 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
       setShowDeleteNoteDialog(false);
       setItemToDelete(null);
     } catch (error) {
-      console.error('Помилка видалення нотатки:', error);
-      alert('Не вдалося видалити нотатку. Спробуйте знову.');
+      console.error('Error deleting note:', error);
+      alert('Could not delete the note. Please try again.');
     }
   };
 
   const createNewFolder = async () => {
     if (!newFolderName.trim()) {
-      alert('Назва папки не може бути порожньою');
+      alert('Folder name cannot be empty');
       return;
     }
 
@@ -214,9 +221,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         name: newFolderName,
       };
 
+      console.log("Creating new folder with name:", newFolderName);
       const response = await axios.post(`${API_URL}/notes/folders/create/`, folderData, {
         withCredentials: true,
       });
+      console.log("New folder created:", response.data);
 
       setFolders((prevFolders) => [...prevFolders, response.data]);
       setIsCreatingFolder(false);
@@ -227,8 +236,8 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         [response.data.id]: true,
       }));
     } catch (error) {
-      console.error('Помилка створення папки:', error);
-      alert('Не вдалося створити папку. Спробуйте знову.');
+      console.error('Error creating folder:', error);
+      alert('Could not create folder. Please try again.');
     }
   };
 
@@ -237,9 +246,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
 
     try {
       await getCsrfToken();
+      console.log("Deleting folder with ID:", itemToDelete);
       await axios.delete(`${API_URL}/notes/folders/${itemToDelete}/`, {
         withCredentials: true,
       });
+      console.log("Folder deleted successfully");
 
       setFolders((prevFolders) => prevFolders.filter((folder) => folder.id !== itemToDelete));
 
@@ -255,20 +266,25 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
       setShowDeleteFolderDialog(false);
       setItemToDelete(null);
     } catch (error) {
-      console.error('Помилка видалення папки:', error);
-      alert('Не вдалося видалити папку. Спробуйте знову.');
+      console.error('Error deleting folder:', error);
+      alert('Could not delete folder. Please try again.');
     }
   };
 
   const selectNote = (noteId) => {
+    console.log("Selecting note with ID:", noteId);
     const note = notes.find((n) => n.id === noteId);
+    
     if (note) {
+      console.log("Found note:", note);
       setActiveNote(noteId);
       setEditTitle(note.title);
       setEditContent(note.content);
       setActiveFolder(note.folder_id);
       setIsEditing(false);
       setIsCreatingNote(false);
+    } else {
+      console.error("Note not found with ID:", noteId);
     }
   };
 
@@ -299,9 +315,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         folder_id: folderId,
       };
 
+      console.log("Moving note to folder:", { noteId, folderId });
       await axios.put(`${API_URL}/notes/${noteId}/`, noteData, {
         withCredentials: true,
       });
+      console.log("Note moved successfully");
 
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
@@ -313,8 +331,8 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
         setActiveFolder(folderId);
       }
     } catch (error) {
-      console.error('Помилка переміщення нотатки:', error);
-      alert('Не вдалося перемістити нотатку. Спробуйте знову.');
+      console.error('Error moving note to folder:', error);
+      alert('Could not move note to folder. Please try again.');
     }
   };
 
@@ -366,7 +384,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
       <div className="notes-panel" ref={notePanelRef}>
         <div className="notes-panel-header">
           <h2>
-            <BookOpen size={20} /> Мої нотатки
+            <BookOpen size={20} /> My Notes
           </h2>
           <button className="notes-panel-close-btn" onClick={onClose}>
             <X size={20} />
@@ -379,7 +397,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
               <div className="notes-search">
                 <input
                   type="text"
-                  placeholder="Пошук нотаток..."
+                  placeholder="Search notes..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -387,15 +405,21 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
               <div className="notes-actions-buttons">
                 <button
                   className="notes-action-btn"
-                  onClick={() => setIsCreatingNote(true)}
-                  title="Нова нотатка"
+                  onClick={() => {
+                    setIsCreatingNote(true);
+                    setEditTitle('New Note');
+                    setEditContent('');
+                    setActiveNote(null);
+                    setIsEditing(true);
+                  }}
+                  title="New Note"
                 >
                   <Plus size={16} />
                 </button>
                 <button
                   className="notes-action-btn"
                   onClick={() => setIsCreatingFolder(true)}
-                  title="Нова папка"
+                  title="New Folder"
                 >
                   <FolderPlus size={16} />
                 </button>
@@ -406,14 +430,14 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
               <div className="create-folder-form">
                 <input
                   type="text"
-                  placeholder="Назва папки"
+                  placeholder="Folder Name"
                   value={newFolderName}
                   onChange={(e) => setNewFolderName(e.target.value)}
                   autoFocus
                 />
                 <div className="create-folder-actions">
                   <button className="create-folder-btn" onClick={createNewFolder}>
-                    Створити
+                    Create
                   </button>
                   <button
                     className="cancel-folder-btn"
@@ -422,7 +446,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                       setNewFolderName('');
                     }}
                   >
-                    Скасувати
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -431,7 +455,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
             {loading ? (
               <div className="notes-loading">
                 <RefreshCw className="loading-icon" size={20} />
-                <span>Завантаження...</span>
+                <span>Loading...</span>
               </div>
             ) : error ? (
               <div className="notes-error">
@@ -461,7 +485,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                                 setItemToDelete(folder.id);
                                 setShowDeleteFolderDialog(true);
                               }}
-                              title="Видалити папку"
+                              title="Delete folder"
                             >
                               <Trash2 size={14} />
                             </button>
@@ -484,7 +508,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                                 ))
                               ) : (
                                 <div className="no-notes-message">
-                                  <span>Немає нотаток у цій папці</span>
+                                  <span>No notes in this folder</span>
                                 </div>
                               )}
                             </div>
@@ -497,7 +521,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
 
                 <div className="ungrouped-notes">
                   <div className="ungrouped-header">
-                    <span>Всі нотатки</span>
+                    <span>All Notes</span>
                   </div>
                   {getUngroupedNotes().length > 0 ? (
                     <div className="ungrouped-list">
@@ -516,7 +540,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                     </div>
                   ) : (
                     <div className="no-notes-message">
-                      <span>Немає некатегоризованих нотаток</span>
+                      <span>No uncategorized notes</span>
                     </div>
                   )}
                 </div>
@@ -534,7 +558,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                       className="note-title-input"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      placeholder="Назва нотатки"
+                      placeholder="Note Title"
                     />
                   ) : (
                     <h3>{editTitle}</h3>
@@ -550,7 +574,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                           }
                           disabled={isEditing}
                         >
-                          <option value="">Без папки</option>
+                          <option value="">No folder</option>
                           {folders.map((folder) => (
                             <option key={folder.id} value={folder.id}>
                               {folder.name}
@@ -563,7 +587,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                     <button
                       className="editor-action-btn"
                       onClick={toggleEditing}
-                      title={isEditing ? 'Зберегти' : 'Редагувати'}
+                      title={isEditing ? 'Save' : 'Edit'}
                     >
                       {isEditing ? <Save size={16} /> : <Edit size={16} />}
                     </button>
@@ -575,7 +599,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                           setItemToDelete(activeNote);
                           setShowDeleteNoteDialog(true);
                         }}
-                        title="Видалити"
+                        title="Delete"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -589,7 +613,7 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                       className="note-content-textarea"
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
-                      placeholder="Вміст нотатки"
+                      placeholder="Note content"
                     />
                   ) : (
                     <div className="note-content">{editContent}</div>
@@ -601,19 +625,19 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
                     {saveStatus === 'saving' && (
                       <>
                         <RefreshCw className="animate-spin" size={14} />
-                        <span>Збереження...</span>
+                        <span>Saving...</span>
                       </>
                     )}
                     {saveStatus === 'saved' && (
                       <>
                         <Check size={14} />
-                        <span>Збережено</span>
+                        <span>Saved</span>
                       </>
                     )}
                     {saveStatus === 'error' && (
                       <>
                         <AlertTriangle size={14} />
-                        <span>Помилка збереження</span>
+                        <span>Error saving</span>
                       </>
                     )}
                   </div>
@@ -622,11 +646,11 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
             ) : (
               <div className="no-note-selected">
                 <BookOpen size={48} />
-                <h3>Немає вибраної нотатки</h3>
-                <p>Виберіть існуючу або створіть нову нотатку</p>
+                <h3>No note selected</h3>
+                <p>Select an existing note or create a new one</p>
                 <button className="create-note-btn" onClick={() => setIsCreatingNote(true)}>
                   <Plus size={16} />
-                  Створити нотатку
+                  Create Note
                 </button>
               </div>
             )}
@@ -640,8 +664,8 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
             setItemToDelete(null);
           }}
           onConfirm={deleteNote}
-          title="Видалити нотатку"
-          message="Ви впевнені, що хочете видалити цю нотатку?"
+          title="Delete Note"
+          message="Are you sure you want to delete this note?"
         />
 
         <ConfirmationDialog
@@ -651,8 +675,8 @@ const NotesPanel = ({ lessonId, courseId, isOpen, onClose }) => {
             setItemToDelete(null);
           }}
           onConfirm={deleteFolder}
-          title="Видалити папку"
-          message="Ви впевнені, що хочете видалити цю папку? Усі нотатки в цій папці будуть переміщені до загального списку."
+          title="Delete Folder"
+          message="Are you sure you want to delete this folder? All notes in this folder will be moved to the general list."
         />
       </div>
     </div>
