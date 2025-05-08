@@ -1,0 +1,432 @@
+/* settings.css */
+
+.settings-page {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+  }
+  
+  .settings-container {
+    padding: 40px 0;
+  }
+  
+  .settings-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .settings-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .settings-header p {
+    font-size: 16px;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .settings-content {
+    display: flex;
+    gap: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Sidebar */
+  .settings-sidebar {
+    width: 250px;
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-right: 1px solid #ebebeb;
+  }
+  
+  .settings-menu h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .settings-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .settings-menu li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #555;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  
+  .settings-menu li.active {
+    background-color: #fff3e6;
+    color: #ff6600;
+  }
+  
+  .settings-menu li:hover:not(.active) {
+    background-color: #f0f0f0;
+  }
+  
+  /* Main Content */
+  .settings-main {
+    flex: 1;
+    padding: 25px;
+  }
+  
+  .settings-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  
+  .settings-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .settings-section-header {
+    margin-bottom: 20px;
+  }
+  
+  .settings-section-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 5px;
+  }
+  
+  .settings-section-header p {
+    color: #666;
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  /* Theme Settings */
+  .theme-settings {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .theme-option {
+    flex: 1;
+  }
+  
+  .theme-switch {
+    display: flex;
+    margin-bottom: 10px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 4px;
+  }
+  
+  .theme-button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .theme-button.active {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .theme-button:first-child.active {
+    color: #ff6600;
+  }
+  
+  .theme-button:last-child.active {
+    color: #6c5ce7;
+  }
+  
+  .theme-description {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+  }
+  
+  /* Form Styles */
+  .password-form,
+  .email-form {
+    max-width: 500px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .password-input-container,
+  .email-input-container {
+    position: relative;
+  }
+  
+  .password-input-container input,
+  .email-input-container input {
+    width: 100%;
+    padding: 12px;
+    padding-right: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  .password-input-container input:focus,
+  .email-input-container input:focus {
+    outline: none;
+    border-color: #ff6600;
+  }
+  
+  .password-input-container input.error,
+  .email-input-container input.error {
+    border-color: #f44336;
+  }
+  
+  .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+  }
+  
+  .email-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+  }
+  
+  .email-input-container input {
+    padding-left: 40px;
+  }
+  
+  .error-text {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  .success-message,
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .success-message {
+    background-color: #e8f5e9;
+    color: #4caf50;
+  }
+  
+  .error-message {
+    background-color: #ffebee;
+    color: #f44336;
+  }
+  
+  .btn-change-password,
+  .btn-reset-password {
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .btn-change-password:hover,
+  .btn-reset-password:hover {
+    background-color: #e65c00;
+  }
+  
+  .btn-change-password:disabled,
+  .btn-reset-password:disabled {
+    background-color: #ffb380;
+    cursor: not-allowed;
+  }
+  
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Dark Theme Styles */
+  body.dark-theme {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+  }
+  
+  body.dark-theme .settings-page {
+    background-color: #1a1a1a;
+  }
+  
+  body.dark-theme .settings-header h1 {
+    color: #f0f0f0;
+  }
+  
+  body.dark-theme .settings-header p {
+    color: #c0c0c0;
+  }
+  
+  body.dark-theme .settings-content {
+    background-color: #2a2a2a;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  body.dark-theme .settings-sidebar {
+    background-color: #333;
+    border-right-color: #444;
+  }
+  
+  body.dark-theme .settings-menu h3 {
+    color: #f0f0f0;
+  }
+  
+  body.dark-theme .settings-menu li {
+    color: #d0d0d0;
+  }
+  
+  body.dark-theme .settings-menu li.active {
+    background-color: #ff66001a;
+    color: #ff9966;
+  }
+  
+  body.dark-theme .settings-menu li:hover:not(.active) {
+    background-color: #444;
+  }
+  
+  body.dark-theme .settings-section-header h2 {
+    color: #f0f0f0;
+  }
+  
+  body.dark-theme .settings-section-header p {
+    color: #c0c0c0;
+  }
+  
+  body.dark-theme .settings-section {
+    border-bottom-color: #444;
+  }
+  
+  body.dark-theme .theme-switch {
+    background-color: #333;
+  }
+  
+  body.dark-theme .theme-button.active {
+    background-color: #444;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+  
+  body.dark-theme .theme-description {
+    color: #c0c0c0;
+  }
+  
+  body.dark-theme .form-group label {
+    color: #f0f0f0;
+  }
+  
+  body.dark-theme .password-input-container input,
+  body.dark-theme .email-input-container input {
+    background-color: #333;
+    border-color: #444;
+    color: #f0f0f0;
+  }
+  
+  body.dark-theme .password-input-container input:focus,
+  body.dark-theme .email-input-container input:focus {
+    border-color: #ff9966;
+  }
+  
+  body.dark-theme .password-toggle,
+  body.dark-theme .email-icon {
+    color: #c0c0c0;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 992px) {
+    .settings-content {
+      flex-direction: column;
+    }
+    
+    .settings-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #ebebeb;
+    }
+    
+    body.dark-theme .settings-sidebar {
+      border-bottom-color: #444;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .settings-container {
+      padding: 20px 15px;
+    }
+    
+    .settings-header h1 {
+      font-size: 28px;
+    }
+    
+    .theme-settings {
+      flex-direction: column;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .settings-header h1 {
+      font-size: 24px;
+    }
+    
+    .password-form,
+    .email-form {
+      max-width: 100%;
+    }
+  }

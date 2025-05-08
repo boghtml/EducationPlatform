@@ -85,7 +85,9 @@ function Login() {
       sessionStorage.setItem('userEmail', response.data.userEmail);
       sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
       sessionStorage.setItem('userRole', response.data.role);
-      
+
+      window.dispatchEvent(new Event('auth:login'));
+
       setLoginMessage({ 
         type: 'success', 
         message: 'Login successful. Redirecting...' 
@@ -124,7 +126,9 @@ function Login() {
       sessionStorage.setItem('userEmail', response.data.userEmail);
       sessionStorage.setItem('profileImageUrl', response.data.profileImageUrl);
       sessionStorage.setItem('userRole', response.data.role);
-      
+
+      window.dispatchEvent(new Event('auth:login'));
+
       setLoginMessage({ 
         type: 'success', 
         message: 'Google login successful. Redirecting...' 

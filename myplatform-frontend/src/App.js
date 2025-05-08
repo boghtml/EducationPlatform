@@ -26,9 +26,11 @@ import ParticipantsTab from './components/ParticipantsTab';
 import GradesTab from './components/GradesTab';
 import NotesManagement from './components/NotesManagement';
 import SiteMap from './components/SiteMap';
-import Contact  from './components/Contact';
+import Contact from './components/Contact';
 import FAQ from './components/FAQ';
 import HelpCenter from './components/HelpCenter';
+import Subscription from './components/Subscription';
+import Settings from './components/Settings';
 
 import './css/auth.css';
 import './css/courseCatalog.css';
@@ -36,6 +38,8 @@ import './css/header.css';
 import './css/dashboard.css';
 import './css/NotesPanel.css';
 import './css/NotesManagement.css';
+import './css/subscription.css';
+import './css/settings.css';
 
 function App() {
   return (
@@ -53,12 +57,16 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/site-map" element={< SiteMap/>} />
+        <Route path="/site-map" element={<SiteMap/>} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/contact" element={<Contact  />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/help" element={<HelpCenter />} />
 
+        {/* New Routes */}
+        <Route path="/profile/:userId" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/subscription" element={<Subscription />} />
 
         <Route path="/notes-management" element={<NotesManagement />} />
         <Route path="/my-courses/:courseId" element={<WorkingWithCourse />}>
@@ -74,7 +82,6 @@ function App() {
         <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<LessonDetail />} />
         <Route path="/assignments/:assignmentId" element={<AssignmentDetails />} />
         <Route path="/qa/:questionId" element={<QADetails />} />
-        <Route path="/profile/:userId" element={<Profile />} />
       </Routes>
     </Router>
   );
