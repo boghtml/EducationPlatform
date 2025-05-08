@@ -1,432 +1,754 @@
-/* settings.css */
+/* Enhanced settings.css */
 
 .settings-page {
-    min-height: 100vh;
-    background-color: #f8f9fa;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.settings-container {
+  padding: 40px 0;
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.settings-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.settings-header p {
+  font-size: 16px;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.settings-content {
+  display: flex;
+  gap: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Sidebar */
+.settings-sidebar {
+  width: 250px;
+  background-color: #f9f9f9;
+  padding: 25px;
+  border-right: 1px solid #ebebeb;
+}
+
+.settings-menu h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.settings-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+}
+
+.profile-image-wrapper:hover .profile-image-overlay {
+  opacity: 1;
+}
+
+.profile-image-overlay svg {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.profile-image-overlay span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-upload-image {
+  width: 100%;
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-upload-image:hover {
+  background-color: #e65c00;
+}
+
+.btn-upload-image:disabled {
+  background-color: #ffb380;
+  cursor: not-allowed;
+}
+
+.profile-image-error {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.profile-form {
+  flex: 1;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 0;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Form Styles */
+.password-form,
+.email-form,
+.reset-password-form,
+.profile-form,
+.general-settings-form {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-input-container,
+.email-input-container {
+  position: relative;
+}
+
+.password-input-container input,
+.email-input-container input,
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.email-input-container input {
+  padding-left: 40px;
+}
+
+.password-input-container input {
+  padding-right: 40px;
+}
+
+.password-input-container input:focus,
+.email-input-container input:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ff6600;
+}
+
+.password-input-container input.error,
+.email-input-container input.error,
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: #f44336;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.email-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.error-text {
+  color: #f44336;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.success-message,
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #f44336;
+}
+
+.btn-change-password,
+.btn-reset-password,
+.btn-update-profile,
+.btn-save-settings {
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-change-password:hover,
+.btn-reset-password:hover,
+.btn-update-profile:hover,
+.btn-save-settings:hover {
+  background-color: #e65c00;
+}
+
+.btn-change-password:disabled,
+.btn-reset-password:disabled,
+.btn-update-profile:disabled,
+.btn-save-settings:disabled {
+  background-color: #ffb380;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .settings-container {
-    padding: 40px 0;
-  }
-  
-  .settings-header {
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  
-  .settings-header h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
-  .settings-header p {
-    font-size: 16px;
-    color: #666;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
+}
+
+/* General Settings Styles */
+.settings-checkbox-group {
+  margin: 20px 0;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+  accent-color: #ff6600;
+}
+
+.checkbox-container label {
+  margin-bottom: 0;
+  font-weight: normal;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.slider-container span:first-child {
+  font-size: 14px;
+}
+
+.slider-container span:last-child {
+  font-size: 20px;
+}
+
+.slider-container input[type="range"] {
+  flex: 1;
+  accent-color: #ff6600;
+}
+
+.accessibility-settings {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.settings-slider-group {
+  margin-bottom: 20px;
+}
+
+.settings-slider-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+/* Notification Settings Styles */
+.notification-settings {
+  margin-top: 20px;
+}
+
+.notification-channels,
+.notification-types {
+  margin-bottom: 30px;
+}
+
+.notification-channels h3,
+.notification-types h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.toggle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.toggle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.toggle-item:hover {
+  background-color: #f0f0f0;
+}
+
+.toggle-label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.toggle-label > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.toggle-description {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0 0 28px;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.toggle-button.active {
+  color: #ff6600;
+}
+
+.notification-schedule {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.notification-days {
+  margin-top: 20px;
+}
+
+.notification-days h4 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.day-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.day-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.day-btn.active {
+  background-color: #ff6600;
+  border-color: #ff6600;
+  color: white;
+}
+
+.day-btn:not(.active):hover {
+  border-color: #ff6600;
+  color: #ff6600;
+}
+
+/* Dark Theme Styles */
+body.dark-theme {
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+}
+
+body.dark-theme .settings-page {
+  background-color: #1a1a1a;
+}
+
+body.dark-theme .settings-header h1 {
+  color: #f0f0f0;
+}
+
+body.dark-theme .settings-header p {
+  color: #c0c0c0;
+}
+
+body.dark-theme .settings-content {
+  background-color: #2a2a2a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .settings-sidebar {
+  background-color: #333;
+  border-right-color: #444;
+}
+
+body.dark-theme .settings-menu h3 {
+  color: #f0f0f0;
+}
+
+body.dark-theme .settings-menu li {
+  color: #d0d0d0;
+}
+
+body.dark-theme .settings-menu li.active {
+  background-color: #ff66001a;
+  color: #ff9966;
+}
+
+body.dark-theme .settings-menu li:hover:not(.active) {
+  background-color: #444;
+}
+
+body.dark-theme .settings-section-header h2 {
+  color: #f0f0f0;
+}
+
+body.dark-theme .settings-section-header p {
+  color: #c0c0c0;
+}
+
+body.dark-theme .settings-section {
+  border-bottom-color: #444;
+}
+
+body.dark-theme .theme-switch {
+  background-color: #333;
+}
+
+body.dark-theme .theme-button.active {
+  background-color: #444;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .form-group label {
+  color: #f0f0f0;
+}
+
+body.dark-theme .password-input-container input,
+body.dark-theme .email-input-container input,
+body.dark-theme .form-group input,
+body.dark-theme .form-group select,
+body.dark-theme .form-group textarea {
+  background-color: #333;
+  border-color: #444;
+  color: #f0f0f0;
+}
+
+body.dark-theme .toggle-item,
+body.dark-theme .notification-schedule,
+body.dark-theme .accessibility-settings {
+  background-color: #333;
+}
+
+body.dark-theme .toggle-item:hover {
+  background-color: #444;
+}
+
+body.dark-theme .day-btn:not(.active) {
+  color: #d0d0d0;
+  border-color: #444;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
   .settings-content {
-    display: flex;
-    gap: 30px;
-    background-color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    flex-direction: column;
   }
   
-  /* Sidebar */
   .settings-sidebar {
-    width: 250px;
-    background-color: #f9f9f9;
-    padding: 25px;
-    border-right: 1px solid #ebebeb;
-  }
-  
-  .settings-menu h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 15px;
-  }
-  
-  .settings-menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .settings-menu li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #555;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-  
-  .settings-menu li.active {
-    background-color: #fff3e6;
-    color: #ff6600;
-  }
-  
-  .settings-menu li:hover:not(.active) {
-    background-color: #f0f0f0;
-  }
-  
-  /* Main Content */
-  .settings-main {
-    flex: 1;
-    padding: 25px;
-  }
-  
-  .settings-section {
-    margin-bottom: 30px;
-    padding-bottom: 30px;
+    width: 100%;
+    border-right: none;
     border-bottom: 1px solid #ebebeb;
   }
   
-  .settings-section:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-  }
-  
-  .settings-section-header {
-    margin-bottom: 20px;
-  }
-  
-  .settings-section-header h2 {
-    font-size: 22px;
-    font-weight: 600;
-    color: #333;
-    margin: 0 0 5px;
-  }
-  
-  .settings-section-header p {
-    color: #666;
-    margin: 0;
-    font-size: 14px;
-  }
-  
-  /* Theme Settings */
-  .theme-settings {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .theme-option {
-    flex: 1;
-  }
-  
-  .theme-switch {
-    display: flex;
-    margin-bottom: 10px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
-    padding: 4px;
-  }
-  
-  .theme-button {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-  
-  .theme-button.active {
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .theme-button:first-child.active {
-    color: #ff6600;
-  }
-  
-  .theme-button:last-child.active {
-    color: #6c5ce7;
-  }
-  
-  .theme-description {
-    font-size: 14px;
-    color: #666;
-    margin: 0;
-  }
-  
-  /* Form Styles */
-  .password-form,
-  .email-form {
-    max-width: 500px;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .password-input-container,
-  .email-input-container {
-    position: relative;
-  }
-  
-  .password-input-container input,
-  .email-input-container input {
-    width: 100%;
-    padding: 12px;
-    padding-right: 40px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s;
-  }
-  
-  .password-input-container input:focus,
-  .email-input-container input:focus {
-    outline: none;
-    border-color: #ff6600;
-  }
-  
-  .password-input-container input.error,
-  .email-input-container input.error {
-    border-color: #f44336;
-  }
-  
-  .password-toggle {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 5px;
-  }
-  
-  .email-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-  }
-  
-  .email-input-container input {
-    padding-left: 40px;
-  }
-  
-  .error-text {
-    color: #f44336;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-  
-  .success-message,
-  .error-message {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .success-message {
-    background-color: #e8f5e9;
-    color: #4caf50;
-  }
-  
-  .error-message {
-    background-color: #ffebee;
-    color: #f44336;
-  }
-  
-  .btn-change-password,
-  .btn-reset-password {
-    background-color: #ff6600;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .btn-change-password:hover,
-  .btn-reset-password:hover {
-    background-color: #e65c00;
-  }
-  
-  .btn-change-password:disabled,
-  .btn-reset-password:disabled {
-    background-color: #ffb380;
-    cursor: not-allowed;
-  }
-  
-  .spinner {
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  /* Dark Theme Styles */
-  body.dark-theme {
-    background-color: #1a1a1a;
-    color: #f0f0f0;
-  }
-  
-  body.dark-theme .settings-page {
-    background-color: #1a1a1a;
-  }
-  
-  body.dark-theme .settings-header h1 {
-    color: #f0f0f0;
-  }
-  
-  body.dark-theme .settings-header p {
-    color: #c0c0c0;
-  }
-  
-  body.dark-theme .settings-content {
-    background-color: #2a2a2a;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  }
-  
   body.dark-theme .settings-sidebar {
-    background-color: #333;
-    border-right-color: #444;
-  }
-  
-  body.dark-theme .settings-menu h3 {
-    color: #f0f0f0;
-  }
-  
-  body.dark-theme .settings-menu li {
-    color: #d0d0d0;
-  }
-  
-  body.dark-theme .settings-menu li.active {
-    background-color: #ff66001a;
-    color: #ff9966;
-  }
-  
-  body.dark-theme .settings-menu li:hover:not(.active) {
-    background-color: #444;
-  }
-  
-  body.dark-theme .settings-section-header h2 {
-    color: #f0f0f0;
-  }
-  
-  body.dark-theme .settings-section-header p {
-    color: #c0c0c0;
-  }
-  
-  body.dark-theme .settings-section {
     border-bottom-color: #444;
   }
   
-  body.dark-theme .theme-switch {
-    background-color: #333;
+  .profile-edit-container {
+    flex-direction: column;
+    align-items: center;
   }
   
-  body.dark-theme .theme-button.active {
-    background-color: #444;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 20px 15px;
   }
   
-  body.dark-theme .theme-description {
-    color: #c0c0c0;
+  .settings-header h1 {
+    font-size: 28px;
   }
   
-  body.dark-theme .form-group label {
-    color: #f0f0f0;
+  .theme-settings {
+    flex-direction: column;
   }
   
-  body.dark-theme .password-input-container input,
-  body.dark-theme .email-input-container input {
-    background-color: #333;
-    border-color: #444;
-    color: #f0f0f0;
+  .day-buttons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .settings-header h1 {
+    font-size: 24px;
   }
   
-  body.dark-theme .password-input-container input:focus,
-  body.dark-theme .email-input-container input:focus {
-    border-color: #ff9966;
+  .password-form,
+  .email-form,
+  .reset-password-form,
+  .profile-form,
+  .general-settings-form {
+    max-width: 100%;
   }
-  
-  body.dark-theme .password-toggle,
-  body.dark-theme .email-icon {
-    color: #c0c0c0;
-  }
-  
-  /* Responsive Styles */
-  @media (max-width: 992px) {
-    .settings-content {
-      flex-direction: column;
-    }
-    
-    .settings-sidebar {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid #ebebeb;
-    }
-    
-    body.dark-theme .settings-sidebar {
-      border-bottom-color: #444;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .settings-container {
-      padding: 20px 15px;
-    }
-    
-    .settings-header h1 {
-      font-size: 28px;
-    }
-    
-    .theme-settings {
-      flex-direction: column;
-    }
-  }
-  
-  @media (max-width: 576px) {
-    .settings-header h1 {
-      font-size: 24px;
-    }
-    
-    .password-form,
-    .email-form {
-      max-width: 100%;
-    }
-  }
+}
+
+.settings-menu li.active {
+  background-color: #fff3e6;
+  color: #ff6600;
+}
+
+.settings-menu li:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+/* Main Content */
+.settings-main {
+  flex: 1;
+  padding: 25px;
+  overflow: auto;
+}
+
+.settings-section {
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.settings-section-header {
+  margin-bottom: 20px;
+}
+
+.settings-section-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 5px;
+}
+
+.settings-section-header p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Theme Settings */
+.theme-settings {
+  display: flex;
+  gap: 20px;
+}
+
+.theme-option {
+  flex: 1;
+}
+
+.theme-switch {
+  display: flex;
+  margin-bottom: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.theme-button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.theme-button.active {
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.theme-button:first-child.active {
+  color: #ff6600;
+}
+
+.theme-button:last-child.active {
+  color: #6c5ce7;
+}
+
+.theme-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* Profile Section */
+.profile-edit-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.profile-image-container {
+  flex-shrink: 0;
+}
+
+.profile-image-wrapper {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
