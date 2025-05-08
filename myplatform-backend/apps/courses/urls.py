@@ -2,7 +2,7 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet, CourseUpdateIntroVideoView, CourseUpdateImageView, CourseParticipantsView
+from .views import CourseViewSet, CourseUpdateIntroVideoView, CourseUpdateImageView, CourseParticipantsView, TeacherCoursesView
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet)
@@ -13,5 +13,5 @@ urlpatterns = [
     path('courses/<int:pk>/upload-image/', CourseUpdateImageView.as_view(), name='upload_image'),
 
     path('course/<int:course_id>/participants/', CourseParticipantsView.as_view(), name='course_participants'),
-
+    path('teacher/<int:teacher_id>/courses/', TeacherCoursesView.as_view(), name='teacher_courses'),
 ]

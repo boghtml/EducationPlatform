@@ -1,0 +1,502 @@
+/* Teacher Header Component Styling */
+
+.teacher-header {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .teacher-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  
+  /* Left Side - Logo and Search */
+  .teacher-header-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+  
+  .teacher-logo {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    margin-right: 24px;
+  }
+  
+  .teacher-logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4a6cf7;
+  }
+  
+  .teacher-logo-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  
+  .teacher-search-form {
+    display: flex;
+    flex: 1;
+    max-width: 600px;
+  }
+  
+  .teacher-search-container {
+    position: relative;
+    flex: 1;
+    margin-right: 12px;
+  }
+  
+  .teacher-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+  }
+  
+  .teacher-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .teacher-search-input:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+  }
+  
+  .teacher-search-btn {
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .teacher-search-btn:hover {
+    background-color: #3a57d7;
+  }
+  
+  /* Right Side - Notifications, Messages, Help, Profile */
+  .teacher-header-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .teacher-header-notifications,
+  .teacher-header-messages,
+  .teacher-header-help,
+  .teacher-header-profile {
+    position: relative;
+    margin-left: 16px;
+  }
+  
+  /* Notifications Button */
+  .teacher-notifications-btn,
+  .teacher-messages-btn,
+  .teacher-help-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 20px;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    position: relative;
+  }
+  
+  .teacher-notifications-btn:hover,
+  .teacher-messages-btn:hover,
+  .teacher-help-btn:hover {
+    color: #4a6cf7;
+  }
+  
+  .teacher-notifications-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 10px;
+    font-weight: 600;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Notifications Dropdown */
+  .teacher-notifications-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  
+  .teacher-notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .teacher-notifications-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+  
+  .teacher-mark-read-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #4a6cf7;
+    cursor: pointer;
+  }
+  
+  .teacher-mark-read-btn:hover {
+    text-decoration: underline;
+  }
+  
+  .teacher-notifications-list {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  
+  .teacher-notification-item {
+    display: flex;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .teacher-notification-item:last-child {
+    border-bottom: none;
+  }
+  
+  .teacher-notification-item:hover {
+    background-color: #f9fafb;
+  }
+  
+  .teacher-notification-item.unread {
+    background-color: #f0f9ff;
+  }
+  
+  .teacher-notification-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  
+  .teacher-notification-content {
+    flex: 1;
+  }
+  
+  .teacher-notification-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px;
+  }
+  
+  .teacher-notification-content p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0 0 4px;
+    line-height: 1.4;
+  }
+  
+  .teacher-notification-time {
+    font-size: 11px;
+    color: #9ca3af;
+  }
+  
+  .teacher-notifications-footer {
+    padding: 12px 16px;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .teacher-notifications-footer a {
+    font-size: 12px;
+    color: #4a6cf7;
+    text-decoration: none;
+  }
+  
+  .teacher-notifications-footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .teacher-no-notifications {
+    padding: 24px;
+    text-align: center;
+  }
+  
+  .teacher-no-notifications p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  /* Profile Button */
+  .teacher-profile-btn {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .teacher-profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+  }
+  
+  .teacher-profile-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1f2937;
+  }
+  
+  /* Profile Dropdown */
+  .teacher-profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 260px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  
+  .teacher-profile-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .teacher-profile-dropdown-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+  }
+  
+  .teacher-profile-details h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px;
+  }
+  
+  .teacher-profile-details p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  .teacher-profile-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .teacher-profile-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #1f2937;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .teacher-profile-link:hover {
+    background-color: #f9fafb;
+  }
+  
+  .teacher-profile-link svg {
+    margin-right: 12px;
+    color: #6b7280;
+    font-size: 16px;
+  }
+  
+  .teacher-logout-btn {
+    color: #ef4444;
+  }
+  
+  .teacher-logout-btn svg {
+    color: #ef4444;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .teacher-header-container {
+      padding: 12px 16px;
+    }
+    
+    .teacher-search-form {
+      max-width: 400px;
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .teacher-search-btn {
+      display: none;
+    }
+    
+    .teacher-search-container {
+      margin-right: 0;
+    }
+    
+    .teacher-profile-name {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .teacher-header-left {
+      max-width: 60%;
+    }
+    
+    .teacher-logo {
+      margin-right: 12px;
+    }
+    
+    .teacher-logo-text {
+      font-size: 16px;
+    }
+    
+    .teacher-logo-badge {
+      font-size: 8px;
+    }
+    
+    .teacher-header-notifications,
+    .teacher-header-messages,
+    .teacher-header-help {
+      margin-left: 8px;
+    }
+    
+    .teacher-notifications-btn,
+    .teacher-messages-btn,
+    .teacher-help-btn {
+      font-size: 18px;
+      padding: 6px;
+    }
+    
+    .teacher-notifications-dropdown,
+    .teacher-profile-dropdown {
+      width: 280px;
+      right: -40px;
+    }
+    
+    .teacher-notifications-dropdown::before,
+    .teacher-profile-dropdown::before {
+      right: 48px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .teacher-header-container {
+      padding: 8px 12px;
+    }
+    
+    .teacher-logo {
+      margin-right: 8px;
+    }
+    
+    .teacher-logo-text {
+      font-size: 14px;
+    }
+    
+    .teacher-search-container {
+      display: none;
+    }
+    
+    .teacher-notifications-dropdown,
+    .teacher-profile-dropdown {
+      width: 100vw;
+      right: -12px;
+      left: -12px;
+      border-radius: 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .teacher-notifications-dropdown::before,
+    .teacher-profile-dropdown::before {
+      display: none;
+    }
+    
+    .teacher-profile-header {
+      padding: 12px;
+    }
+    
+    .teacher-profile-link {
+      padding: 10px 12px;
+    }
+    
+    .teacher-notification-item {
+      padding: 10px 12px;
+    }
+    
+    .teacher-notifications-header {
+      padding: 12px;
+    }
+    
+    .teacher-notifications-footer {
+      padding: 10px 12px;
+    }
+  }

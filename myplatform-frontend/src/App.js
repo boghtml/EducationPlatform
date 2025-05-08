@@ -31,7 +31,27 @@ import FAQ from './components/FAQ';
 import HelpCenter from './components/HelpCenter';
 import Subscription from './components/Subscription';
 import Settings from './components/Settings';
+import ProtectedRoute from './components/ProtectedRoute';
 
+// Teacher components import
+import TeacherDashboard from './components/teacher/TeacherDashboard';
+import TeacherCourses from './components/teacher/TeacherCourses';
+import TeacherAssignments from './components/teacher/TeacherAssignments';
+import TeacherMaterials from './components/teacher/TeacherMaterials';
+import TeacherStudents from './components/teacher/TeacherStudents';
+/*
+import TeacherQA from './components/teacher/TeacherQA';
+import TeacherAnalytics from './components/teacher/TeacherAnalytics';
+import TeacherLessons from './components/teacher/TeacherLessons';
+import TeacherSettings from './components/teacher/TeacherSettings';
+import TeacherNotifications from './components/teacher/TeacherNotifications';
+import TeacherAnnouncements from './components/teacher/TeacherAnnouncements';
+import TeacherSchedule from './components/teacher/TeacherSchedule';
+import TeacherDiscussions from './components/teacher/TeacherDiscussions';
+import TeacherHelp from './components/teacher/TeacherHelp';
+*/
+
+// Import CSS files
 import './css/auth.css';
 import './css/courseCatalog.css';
 import './css/header.css';
@@ -45,6 +65,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<CourseCatalogPage />} />
         <Route path="/courses/:id" element={<CourseDetail />} />
         <Route path="/about" element={<About />} />
@@ -54,8 +75,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/site-map" element={<SiteMap/>} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
@@ -63,13 +82,44 @@ function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/help" element={<HelpCenter />} />
 
-        {/* New Routes */}
-        <Route path="/profile/:userId" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/subscription" element={<Subscription />} />
+        {/* Protected student routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute 
+            element={<Dashboard />} 
+            allowedRoles={['student']} 
+          />
+        } />
+        <Route path="/profile/:userId" element={
+          <ProtectedRoute 
+            element={<Profile />} 
+            allowedRoles={['student', 'teacher', 'admin']} 
+          />
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute 
+            element={<Settings />} 
+            allowedRoles={['student', 'teacher', 'admin']} 
+          />
+        } />
+        <Route path="/subscription" element={
+          <ProtectedRoute 
+            element={<Subscription />} 
+            allowedRoles={['student']} 
+          />
+        } />
 
-        <Route path="/notes-management" element={<NotesManagement />} />
-        <Route path="/my-courses/:courseId" element={<WorkingWithCourse />}>
+        <Route path="/notes-management" element={
+          <ProtectedRoute 
+            element={<NotesManagement />}
+            allowedRoles={['student']} 
+          />
+        } />
+        <Route path="/my-courses/:courseId" element={
+          <ProtectedRoute 
+            element={<WorkingWithCourse />}
+            allowedRoles={['student']} 
+          />
+        }>
           <Route index element={<LessonsTab />} />
           <Route path="lessons" element={<LessonsTab />} />
           <Route path="assignments" element={<AssignmentsTab />} />
@@ -79,12 +129,160 @@ function App() {
           <Route path="participants" element={<ParticipantsTab />} />
           <Route path="grades" element={<GradesTab />} />
         </Route>
-        <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={<LessonDetail />} />
-        <Route path="/assignments/:assignmentId" element={<AssignmentDetails />} />
-        <Route path="/qa/:questionId" element={<QADetails />} />
+        <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={
+          <ProtectedRoute 
+            element={<LessonDetail />}
+            allowedRoles={['student']} 
+          />
+        } />
+        <Route path="/assignments/:assignmentId" element={
+          <ProtectedRoute 
+            element={<AssignmentDetails />}
+            allowedRoles={['student']} 
+          />
+        } />
+        <Route path="/qa/:questionId" element={
+          <ProtectedRoute 
+            element={<QADetails />}
+            allowedRoles={['student', 'teacher']} 
+          />
+        } />
+        
+        {/* Teacher routes - доступ тільки з роллю 'teacher' */}
+        <Route path="/teacher/dashboard" element={
+          <ProtectedRoute 
+            element={<TeacherDashboard />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/courses" element={
+          <ProtectedRoute 
+            element={<TeacherCourses />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/courses/:courseId" element={
+          <ProtectedRoute 
+            element={<TeacherCourses />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/courses/create" element={
+          <ProtectedRoute 
+            element={<TeacherCourses />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/assignments" element={
+          <ProtectedRoute 
+            element={<TeacherAssignments />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/materials" element={
+          <ProtectedRoute 
+            element={<TeacherMaterials />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/materials/create" element={
+          <ProtectedRoute 
+            element={<TeacherMaterials />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/materials/:materialId" element={
+          <ProtectedRoute 
+            element={<TeacherMaterials />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/materials/:materialId/edit" element={
+          <ProtectedRoute 
+            element={<TeacherMaterials />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/students" element={
+          <ProtectedRoute 
+            element={<TeacherStudents />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/students/:studentId/progress" element={
+          <ProtectedRoute 
+            element={<TeacherStudents />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+       
+       
+
+        
+        {
+          /*
+           <Route path="/teacher/analytics" element={
+          <ProtectedRoute 
+            element={<TeacherAnalytics />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+      
+              <Route path="/teacher/lessons" element={
+          <ProtectedRoute 
+            element={<TeacherLessons />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+
+           <Route path="/teacher/qa" element={
+          <ProtectedRoute 
+            element={<TeacherQA />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+                    <Route path="/teacher/announcements" element={
+          <ProtectedRoute 
+            element={<TeacherAnnouncements />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/notifications" element={
+          <ProtectedRoute 
+            element={<TeacherNotifications />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/schedule" element={
+          <ProtectedRoute 
+            element={<TeacherSchedule />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/discussions" element={
+          <ProtectedRoute 
+            element={<TeacherDiscussions />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/settings" element={
+          <ProtectedRoute 
+            element={<TeacherSettings />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/help" element={
+          <ProtectedRoute 
+            element={<TeacherHelp />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+          */
+        }
       </Routes>
     </Router>
   );
 }
 
 export default App;
+         

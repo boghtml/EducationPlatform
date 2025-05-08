@@ -1,0 +1,583 @@
+/* Teacher Materials Component Styling */
+
+.teacher-materials-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .teacher-materials-container {
+    display: flex;
+    flex: 1;
+  }
+  
+  .teacher-materials-content {
+    flex: 1;
+    padding: 24px;
+    background-color: #f5f7fa;
+  }
+  
+  .teacher-materials-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .teacher-materials-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .btn-create-material {
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+  }
+  
+  .btn-create-material svg {
+    margin-right: 8px;
+  }
+  
+  .btn-create-material:hover {
+    background-color: #3a57d7;
+  }
+  
+  /* Filters Section */
+  .teacher-materials-filters {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .search-filter {
+    flex: 1;
+    margin-right: 16px;
+  }
+  
+  .search-input-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px 10px 10px 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+  }
+  
+  .course-filter,
+  .type-filter {
+    position: relative;
+    margin-left: 12px;
+  }
+  
+  .filter-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    z-index: 1;
+  }
+  
+  .filter-select {
+    padding: 10px 16px 10px 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    min-width: 180px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+  }
+  
+  .filter-select:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+  }
+  
+  /* Materials Grid */
+  .teacher-materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .material-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .material-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .material-header {
+    margin-bottom: 12px;
+  }
+  
+  .material-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+  
+  .material-course {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #4b5563;
+    font-size: 14px;
+  }
+  
+  .material-course svg {
+    margin-right: 8px;
+    color: #6b7280;
+  }
+  
+  .material-date {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #4b5563;
+    font-size: 14px;
+  }
+  
+  .material-date svg {
+    margin-right: 8px;
+    color: #6b7280;
+  }
+  
+  .material-description {
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.5;
+  }
+  
+  .material-files {
+    background-color: #f9fafb;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .material-files h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px;
+  }
+  
+  .files-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .file-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .file-item:last-child {
+    border-bottom: none;
+  }
+  
+  .file-icon {
+    margin-right: 12px;
+    color: #6b7280;
+    font-size: 16px;
+    width: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .file-info {
+    flex: 1;
+  }
+  
+  .file-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  
+  .file-size {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  .file-download {
+    color: #4a6cf7;
+    padding: 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .file-download:hover {
+    background-color: #e0e7ff;
+  }
+  
+  .files-more {
+    font-size: 12px;
+    color: #6b7280;
+    padding: 8px 0;
+    text-align: center;
+    font-style: italic;
+  }
+  
+  .material-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    margin-left: 8px;
+    transition: opacity 0.2s;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .btn-action:hover {
+    opacity: 0.9;
+  }
+  
+  .btn-action.edit {
+    background-color: #4a6cf7;
+  }
+  
+  .btn-action.view {
+    background-color: #6b7280;
+  }
+  
+  .btn-action.delete {
+    background-color: #ef4444;
+  }
+  
+  /* No Materials State */
+  .no-materials-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    text-align: center;
+  }
+  
+  .no-materials-icon {
+    font-size: 48px;
+    color: #9ca3af;
+    margin-bottom: 16px;
+  }
+  
+  .no-materials-found h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px;
+  }
+  
+  .no-materials-found p {
+    font-size: 14px;
+    color: #6b7280;
+    max-width: 400px;
+    margin: 0 0 16px;
+  }
+  
+  .btn-primary {
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3a57d7;
+  }
+  
+  /* Delete Confirmation Modal */
+  .delete-confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .delete-confirmation-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+  }
+  
+  .delete-confirmation-content h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 16px;
+  }
+  
+  .delete-confirmation-content p {
+    font-size: 14px;
+    color: #4b5563;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+  
+  .delete-confirmation-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .btn-cancel {
+    background-color: white;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 12px;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+  
+  .btn-delete {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-delete:hover {
+    background-color: #dc2626;
+  }
+  
+  /* Loading State */
+  .teacher-materials-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+  }
+  
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+    font-size: 32px;
+    color: #4a6cf7;
+    margin-bottom: 16px;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .teacher-materials-loading p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  /* Error State */
+  .teacher-materials-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    text-align: center;
+    padding: 24px;
+  }
+  
+  .teacher-materials-error svg {
+    font-size: 48px;
+    color: #ef4444;
+    margin-bottom: 16px;
+  }
+  
+  .teacher-materials-error h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px;
+  }
+  
+  .teacher-materials-error p {
+    font-size: 16px;
+    color: #6b7280;
+    max-width: 400px;
+    margin: 0 0 24px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .teacher-materials-filters {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .search-filter {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 12px;
+    }
+    
+    .course-filter,
+    .type-filter {
+      width: 100%;
+      margin-left: 0;
+      margin-top: 8px;
+    }
+    
+    .filter-select {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .teacher-materials-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .btn-create-material {
+      margin-top: 16px;
+    }
+    
+    .material-card {
+      min-width: 100%;
+    }
+    
+    .teacher-materials-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .file-name {
+      max-width: 120px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .teacher-materials-content {
+      padding: 16px;
+    }
+    
+    .material-actions {
+      justify-content: space-between;
+    }
+    
+    .delete-confirmation-actions {
+      flex-direction: column;
+    }
+    
+    .btn-cancel {
+      margin-right: 0;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+    
+    .btn-delete {
+      width: 100%;
+    }
+    
+    .file-name {
+      max-width: 100px;
+    }
+  }

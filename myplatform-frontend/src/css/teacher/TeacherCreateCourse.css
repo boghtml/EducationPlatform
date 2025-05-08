@@ -1,0 +1,468 @@
+/* Teacher Create Course Component Styling */
+
+.teacher-create-course-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .teacher-create-course-container {
+    display: flex;
+    flex: 1;
+  }
+  
+  .teacher-create-course-content {
+    flex: 1;
+    padding: 24px;
+    background-color: #f5f7fa;
+  }
+  
+  .create-course-header {
+    margin-bottom: 24px;
+  }
+  
+  .create-course-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .create-course-form-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .create-course-form {
+    padding: 24px;
+  }
+  
+  /* Form Steps Indicator */
+  .steps-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  
+  .step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    color: #6b7280;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .step-label {
+    font-size: 14px;
+    color: #6b7280;
+    transition: color 0.3s ease;
+  }
+  
+  .step-connector {
+    flex: 1;
+    height: 2px;
+    background-color: #e5e7eb;
+    margin: 0 10px;
+    position: relative;
+    z-index: 1;
+    margin-top: -16px;
+  }
+  
+  .step-indicator.active .step-number {
+    background-color: #4a6cf7;
+    color: white;
+  }
+  
+  .step-indicator.active .step-label {
+    color: #4a6cf7;
+    font-weight: 600;
+  }
+  
+  .step-indicator.completed .step-number {
+    background-color: #10b981;
+    color: white;
+  }
+  
+  /* Form Groups */
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group-half {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  
+  .form-icon {
+    margin-right: 8px;
+    color: #6b7280;
+  }
+  
+  label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 8px;
+  }
+  
+  .required {
+    color: #ef4444;
+    margin-left: 4px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+  }
+  
+  .is-invalid {
+    border-color: #ef4444 !important;
+  }
+  
+  .invalid-feedback {
+    display: block;
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 4px;
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .form-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  
+  /* Categories */
+  .categories-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .category-checkbox {
+    display: flex;
+    align-items: center;
+    background-color: #f9fafb;
+    border-radius: 4px;
+    padding: 8px 12px;
+  }
+  
+  .category-checkbox input[type="checkbox"] {
+    margin-right: 8px;
+  }
+  
+  /* Media Upload */
+  .media-upload-container {
+    background-color: #f9fafb;
+    border: 2px dashed #e5e7eb;
+    border-radius: 6px;
+    padding: 24px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .media-upload-container:hover {
+    border-color: #4a6cf7;
+  }
+  
+  .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #6b7280;
+  }
+  
+  .upload-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  
+  .upload-placeholder span {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .media-preview {
+    position: relative;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 4px;
+  }
+  
+  .video-preview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 4px;
+  }
+  
+  .remove-media-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .remove-media-btn:hover {
+    background-color: rgba(239, 68, 68, 0.8);
+  }
+  
+  /* Form Navigation */
+  .form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+  }
+  
+  .btn-primary, 
+  .btn-secondary {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: none;
+  }
+  
+  .btn-primary {
+    background-color: #4a6cf7;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3a57d7;
+  }
+  
+  .btn-primary:disabled {
+    background-color: #a4b5fc;
+    cursor: not-allowed;
+  }
+  
+  .btn-secondary {
+    background-color: white;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+  
+  /* Submit Error */
+  .submit-error {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .submit-error svg {
+    margin-right: 8px;
+  }
+  
+  /* Success Message */
+  .success-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  
+  .success-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 64px;
+    height: 64px;
+    background-color: #dcfce7;
+    color: #166534;
+    border-radius: 50%;
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+  
+  .success-message h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+  }
+  
+  .success-message p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  /* Loading */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-radius: 50%;
+    border-top-color: #4a6cf7;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .loading-container p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .form-group-half {
+      width: 100%;
+    }
+    
+    .steps-indicator {
+      margin-bottom: 24px;
+    }
+    
+    .step-label {
+      font-size: 12px;
+    }
+    
+    .form-navigation {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .btn-primary, 
+    .btn-secondary {
+      width: 100%;
+    }
+    
+    .btn-secondary {
+      order: 2;
+    }
+    
+    .btn-primary {
+      order: 1;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .teacher-create-course-content {
+      padding: 16px;
+    }
+    
+    .create-course-form {
+      padding: 16px;
+    }
+    
+    .steps-indicator {
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .step-connector {
+      width: 2px;
+      height: 20px;
+      margin: 0;
+    }
+    
+    .categories-container {
+      max-height: 150px;
+    }
+  }

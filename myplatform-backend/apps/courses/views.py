@@ -221,3 +221,25 @@ class CourseParticipantsView(APIView):
             'teachers': teachers_data,
             'admins': admins_data  
         }, status=status.HTTP_200_OK)
+
+
+class TeacherCoursesView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, teacher_id):
+        try:
+            if request.user.id != teacher_id and request.user.role != 'admin':
+                return Response({"error": "You don't have permission to view these courses"}, 
+                               status=status.HTTP_403_FORBIDDEN)
+            
+            courses = Course.objects.filter(teacher_id=teacher_id)
+            
+            for course in courses:
+                course.students_count = course.enrollment_set.count()
+            
+            serializer = CourseSerializer(courses, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

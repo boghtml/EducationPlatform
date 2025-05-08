@@ -1,0 +1,706 @@
+/* Teacher Dashboard Component Styling */
+
+.teacher-dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .teacher-dashboard-container {
+    display: flex;
+    flex: 1;
+  }
+  
+  .teacher-dashboard-content {
+    flex: 1;
+    padding: 24px;
+    background-color: #f5f7fa;
+  }
+  
+  /* Welcome Section */
+  .teacher-dashboard-welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .teacher-dashboard-welcome h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px;
+  }
+  
+  .teacher-dashboard-welcome p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  .btn-create-course {
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  
+  .btn-create-course svg {
+    margin-right: 8px;
+  }
+  
+  .btn-create-course:hover {
+    background-color: #3a57d7;
+  }
+  
+  /* Stats Section */
+  .teacher-stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .teacher-stat-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .teacher-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    font-size: 20px;
+  }
+  
+  .teacher-stat-icon.courses {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .teacher-stat-icon.students {
+    background-color: #e0e7ff;
+    color: #4338ca;
+  }
+  
+  .teacher-stat-icon.assignments {
+    background-color: #fef9c3;
+    color: #854d0e;
+  }
+  
+  .teacher-stat-icon.submissions {
+    background-color: #ffedd5;
+    color: #9a3412;
+  }
+  
+  .teacher-stat-icon.progress {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .teacher-stat-icon.completed {
+    background-color: #bbf7d0;
+    color: #15803d;
+  }
+  
+  .teacher-stat-content {
+    flex: 1;
+  }
+  
+  .teacher-stat-content h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px;
+  }
+  
+  .teacher-stat-content p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  /* Dashboard Main */
+  .teacher-dashboard-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+  
+  /* Courses Section */
+  .teacher-courses-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .section-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+  
+  .view-all-link {
+    font-size: 14px;
+    color: #4a6cf7;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .view-all-link:hover {
+    color: #3a57d7;
+    text-decoration: underline;
+  }
+  
+  .teacher-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  
+  .teacher-course-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .teacher-course-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .teacher-course-image-container {
+    position: relative;
+    height: 150px;
+  }
+  
+  .teacher-course-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .teacher-course-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .teacher-course-status.free {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .teacher-course-status.premium {
+    background-color: #e0e7ff;
+    color: #4338ca;
+  }
+  
+  .teacher-course-content {
+    padding: 16px;
+  }
+  
+  .teacher-course-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 12px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 42px;
+  }
+  
+  .teacher-course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #6b7280;
+    margin-right: 12px;
+    margin-bottom: 4px;
+  }
+  
+  .meta-item svg {
+    margin-right: 4px;
+  }
+  
+  .teacher-course-actions {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .btn-secondary,
+  .btn-outline {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .btn-secondary {
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #3a57d7;
+  }
+  
+  .btn-outline {
+    background-color: white;
+    color: #4a6cf7;
+    border: 1px solid #4a6cf7;
+  }
+  
+  .btn-outline:hover {
+    background-color: #f0f9ff;
+  }
+  
+  /* No Courses State */
+  .no-courses {
+    padding: 24px;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+    background-color: #f9fafb;
+  }
+  
+  .no-courses-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  
+  .no-courses-icon {
+    font-size: 48px;
+    color: #9ca3af;
+    margin-bottom: 16px;
+  }
+  
+  .no-courses-content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px;
+  }
+  
+  .no-courses-content p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 16px;
+    max-width: 300px;
+  }
+  
+  .btn-primary {
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3a57d7;
+  }
+  
+  /* Dashboard Sidebar */
+  .teacher-dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  /* Recent Activities */
+  .teacher-recent-activities,
+  .teacher-upcoming-deadlines {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .teacher-recent-activities h3,
+  .teacher-upcoming-deadlines h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 16px;
+  }
+  
+  .teacher-activities-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .teacher-activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .teacher-activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .teacher-activity-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 12px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  
+  .teacher-activity-icon.new-student {
+    background-color: #e0e7ff;
+    color: #4338ca;
+  }
+  
+  .teacher-activity-icon.submission {
+    background-color: #fef9c3;
+    color: #854d0e;
+  }
+  
+  .teacher-activity-icon.question {
+    background-color: #ffedd5;
+    color: #9a3412;
+  }
+  
+  .teacher-activity-icon.feedback {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .teacher-activity-icon.graded {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .teacher-activity-icon.completed {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+  
+  .teacher-activity-icon.enrolled {
+    background-color: #fae8ff;
+    color: #7e22ce;
+  }
+  
+  .teacher-activity-content {
+    flex: 1;
+  }
+  
+  .teacher-activity-title {
+    font-size: 14px;
+    color: #1f2937;
+    margin: 0 0 4px;
+  }
+  
+  .teacher-activity-time {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  
+  /* Upcoming Deadlines */
+  .teacher-deadlines-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .teacher-deadline-item {
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    margin-bottom: 12px;
+  }
+  
+  .teacher-deadline-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .teacher-deadline-item.urgent {
+    border-left: 3px solid #ef4444;
+  }
+  
+  .teacher-deadline-item.approaching {
+    border-left: 3px solid #f59e0b;
+  }
+  
+  .teacher-deadline-item.normal {
+    border-left: 3px solid #10b981;
+  }
+  
+  .teacher-deadline-date {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+  
+  .teacher-deadline-date svg {
+    margin-right: 6px;
+  }
+  
+  .teacher-deadline-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px;
+  }
+  
+  .teacher-deadline-content p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0 0 8px;
+  }
+  
+  .teacher-deadline-progress {
+    margin-top: 8px;
+  }
+  
+  .teacher-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  
+  .teacher-progress-bar {
+    height: 6px;
+    background-color: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .teacher-progress-fill {
+    height: 100%;
+    background-color: #4a6cf7;
+    border-radius: 3px;
+  }
+  
+  /* No Data States */
+  .teacher-no-data {
+    padding: 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    background-color: #f9fafb;
+    border-radius: 6px;
+  }
+  
+  /* Loading State */
+  .teacher-dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+  }
+  
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+    font-size: 32px;
+    color: #4a6cf7;
+    margin-bottom: 16px;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .teacher-dashboard-loading p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  /* Error State */
+  .teacher-dashboard-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    text-align: center;
+    padding: 24px;
+  }
+  
+  .teacher-dashboard-error svg {
+    font-size: 48px;
+    color: #ef4444;
+    margin-bottom: 16px;
+  }
+  
+  .teacher-dashboard-error h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px;
+  }
+  
+  .teacher-dashboard-error p {
+    font-size: 16px;
+    color: #6b7280;
+    max-width: 400px;
+    margin: 0 0 24px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .teacher-dashboard-main {
+      grid-template-columns: 1fr;
+    }
+    
+    .teacher-dashboard-sidebar {
+      margin-top: 24px;
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .teacher-dashboard-welcome {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .btn-create-course {
+      margin-top: 16px;
+    }
+    
+    .teacher-stats-section {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    
+    .teacher-stat-card {
+      padding: 16px;
+    }
+    
+    .teacher-stat-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+    }
+    
+    .teacher-stat-content h3 {
+      font-size: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .teacher-courses-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .teacher-deadline-item {
+      padding: 12px 8px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .teacher-dashboard-content {
+      padding: 16px;
+    }
+    
+    .teacher-stats-section {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    .teacher-stat-card {
+      padding: 12px;
+    }
+    
+    .teacher-stat-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
+      margin-right: 12px;
+    }
+    
+    .teacher-stat-content h3 {
+      font-size: 18px;
+    }
+    
+    .teacher-stat-content p {
+      font-size: 12px;
+    }
+    
+    .teacher-course-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .btn-secondary,
+    .btn-outline {
+      width: 100%;
+      text-align: center;
+    }
+  }
