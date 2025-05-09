@@ -70,16 +70,33 @@ class CourseViewSet(viewsets.ModelViewSet):
         return serializer.save()
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        course = self.perform_create(serializer)
 
+        print("Request data:", request.data)
+        print("User ID:", request.user.id)
+        print("User role:", request.user.role)
+
+        if request.user.role != 'teacher' and request.user.role != 'admin':
+            return Response({"error": "Only teachers or admin can create courses"}, 
+                        status=status.HTTP_403_FORBIDDEN)
+    
+        data = request.data.copy()
+        data['teacher'] = request.user.id 
+        
+        serializer = self.get_serializer(data=data)  
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        course = serializer.save(teacher_id=request.user.id)
+        
         try:
             create_course_folders_in_s3(course.id)
         except Exception as e:
+            course.delete()
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        return Response({'message': 'Course created successfully', 'course': serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Course created successfully', 'course': serializer.data}, 
+                    status=status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):
         instance.delete()

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../../api';
 import TeacherSidebar from './TeacherSidebar';
 import TeacherHeader from './TeacherHeader';
 import '../../css/teacher/TeacherCourses.css';
+
 import { 
   FaGraduationCap, 
   FaUsers, 
@@ -22,7 +23,9 @@ import {
   FaCopy,
   FaEye,
   FaLock,
-  FaClock
+  FaClock,
+  FaBook,
+  FaBookOpen
 } from 'react-icons/fa';
 
 function TeacherCourses() {
@@ -31,15 +34,21 @@ function TeacherCourses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [courseFilter, setCourseFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortField, setSortField] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courseModules, setCourseModules] = useState([]);
+  const [loadingModules, setLoadingModules] = useState(false);
   const navigate = useNavigate();
+  const { courseId } = useParams();
 
   useEffect(() => {
     
     const userRole = sessionStorage.getItem('userRole');
+    
     if (userRole !== 'teacher') {
       navigate('/login');
       return;
@@ -61,6 +70,11 @@ function TeacherCourses() {
           setFilteredCourses(response.data);
         }
         
+        // Якщо є параметр courseId, завантажити деталі курсу і його модулі
+        if (courseId) {
+          await fetchCourseDetails(courseId);
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -70,7 +84,37 @@ function TeacherCourses() {
     };
 
     fetchCourses();
-  }, [navigate]);
+  }, [navigate, courseId]);
+
+  const fetchCourseDetails = async (id) => {
+    try {
+      setLoadingModules(true);
+      
+      // Отримуємо деталі курсу
+      const courseResponse = await axios.get(`${API_URL}/courses/${id}/`, {
+        withCredentials: true
+      });
+      
+      if (courseResponse.data) {
+        setSelectedCourse(courseResponse.data);
+      }
+      
+      // Отримуємо модулі курсу
+      const modulesResponse = await axios.get(`${API_URL}/modules/get_modules/${id}/`, {
+        withCredentials: true
+      });
+      
+      if (modulesResponse.data) {
+        setCourseModules(modulesResponse.data);
+      }
+      
+      setLoadingModules(false);
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+      setError("Не вдалося завантажити деталі курсу.");
+      setLoadingModules(false);
+    }
+  };
 
   useEffect(() => {
     if (!courses.length) return;
@@ -128,6 +172,10 @@ function TeacherCourses() {
     }
   };
 
+  const handleCourseClick = (courseId) => {
+    navigate(`/teacher/courses/${courseId}`);
+  };
+
   const deleteCourse = async (courseId) => {
     try {
         
@@ -139,6 +187,12 @@ function TeacherCourses() {
       
       setCourses(courses.filter(course => course.id !== courseId));
       setConfirmDelete(null);
+      
+      // Якщо видаляється поточний вибраний курс, перенаправляємо на загальну сторінку курсів
+      if (selectedCourse && selectedCourse.id === courseId) {
+        setSelectedCourse(null);
+        navigate('/teacher/courses');
+      }
       
     } catch (error) {
       console.error("Error deleting course:", error);
@@ -181,6 +235,14 @@ function TeacherCourses() {
     }
   };
 
+  const handleCreateModule = (courseId) => {
+    navigate(`/teacher/courses/${courseId}/create-module`);
+  };
+
+  const handleCreateLesson = (moduleId) => {
+    navigate(`/teacher/modules/${moduleId}/create-lesson`);
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'Не вказано';
     return new Date(dateString).toLocaleDateString('uk-UA', {
@@ -189,6 +251,214 @@ function TeacherCourses() {
       year: 'numeric'
     });
   };
+
+  // Якщо вибрано конкретний курс, показуємо деталі цього курсу
+  if (selectedCourse) {
+    return (
+      <div className="teacher-courses-wrapper">
+        <TeacherHeader />
+        
+        <div className="teacher-courses-container">
+          <TeacherSidebar />
+          
+          <div className="teacher-courses-content">
+            <div className="course-details-header">
+              <button 
+                className="btn-back"
+                onClick={() => {
+                  setSelectedCourse(null);
+                  navigate('/teacher/courses');
+                }}
+              >
+                <FaArrowLeft /> Назад до списку курсів
+              </button>
+              
+              <h1>{selectedCourse.title}</h1>
+              
+              <div className="course-details-actions">
+                <button 
+                  className="btn-edit"
+                  onClick={() => handleEditCourse(selectedCourse.id)}
+                >
+                  <FaEdit /> Редагувати курс
+                </button>
+                
+                <button 
+                  className="btn-create-module"
+                  onClick={() => handleCreateModule(selectedCourse.id)}
+                >
+                  <FaPlus /> Додати модуль
+                </button>
+              </div>
+            </div>
+            
+            <div className="course-details-content">
+              <div className="course-details-section">
+                <h3>Інформація про курс</h3>
+                
+                <div className="course-info-grid">
+                  <div className="course-info-item">
+                    <span className="info-label">Статус:</span>
+                    <span className={`course-status ${selectedCourse.status}`}>
+                      {selectedCourse.status === 'free' ? 'Безкоштовний' : 'Преміум'}
+                    </span>
+                  </div>
+                  
+                  <div className="course-info-item">
+                    <span className="info-label">Студенти:</span>
+                    <span>{selectedCourse.students_count || 0}</span>
+                  </div>
+                  
+                  <div className="course-info-item">
+                    <span className="info-label">Дата початку:</span>
+                    <span>{formatDate(selectedCourse.start_date)}</span>
+                  </div>
+                  
+                  <div className="course-info-item">
+                    <span className="info-label">Тривалість:</span>
+                    <span>{selectedCourse.duration} тижнів</span>
+                  </div>
+                  
+                  <div className="course-info-item">
+                    <span className="info-label">Дата створення:</span>
+                    <span>{formatDate(selectedCourse.created_at)}</span>
+                  </div>
+                  
+                  <div className="course-info-item">
+                    <span className="info-label">Останнє оновлення:</span>
+                    <span>{formatDate(selectedCourse.updated_at)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="course-details-section">
+                <h3>Опис курсу</h3>
+                <div className="course-description">
+                  {selectedCourse.description}
+                </div>
+              </div>
+              
+              <div className="course-details-section">
+                <div className="section-header">
+                  <h3>Модулі курсу</h3>
+                  <button 
+                    className="btn-add-module"
+                    onClick={() => handleCreateModule(selectedCourse.id)}
+                  >
+                    <FaPlus /> Додати модуль
+                  </button>
+                </div>
+                
+                {loadingModules ? (
+                  <div className="modules-loading">
+                    <FaSpinner className="spinner" />
+                    <p>Завантаження модулів...</p>
+                  </div>
+                ) : courseModules.length === 0 ? (
+                  <div className="no-modules">
+                    <p>У цього курсу поки немає модулів. Додайте перший модуль, щоб почати наповнювати курс.</p>
+                    <button 
+                      className="btn-create-first-module"
+                      onClick={() => handleCreateModule(selectedCourse.id)}
+                    >
+                      <FaPlus /> Створити перший модуль
+                    </button>
+                  </div>
+                ) : (
+                  <div className="modules-list">
+                    {courseModules.map(module => (
+                      <div key={module.id} className="module-item">
+                        <div className="module-header">
+                          <h4 className="module-title">{module.title}</h4>
+                          
+                          <div className="module-actions">
+                            <button 
+                              className="module-action-btn"
+                              onClick={() => handleEditModule(module.id)}
+                              title="Редагувати модуль"
+                            >
+                              <FaEdit />
+                            </button>
+                            
+                            <button 
+                              className="module-action-btn"
+                              onClick={() => handleCreateLesson(module.id)}
+                              title="Додати урок"
+                            >
+                              <FaPlus />
+                            </button>
+                            
+                            <button 
+                              className="module-action-btn delete"
+                              onClick={() => handleDeleteModule(module.id)}
+                              title="Видалити модуль"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="module-content">
+                          <p className="module-description">{module.description}</p>
+                          
+                          {module.lessons && module.lessons.length > 0 ? (
+                            <div className="lessons-list">
+                              <h5>Уроки модуля:</h5>
+                              {module.lessons.map(lesson => (
+                                <div key={lesson.id} className="lesson-item">
+                                  <div className="lesson-icon">
+                                    <FaBookOpen />
+                                  </div>
+                                  <span className="lesson-title">{lesson.title}</span>
+                                  <div className="lesson-actions">
+                                    <button 
+                                      className="lesson-action-btn"
+                                      onClick={() => handleEditLesson(lesson.id)}
+                                      title="Редагувати урок"
+                                    >
+                                      <FaEdit />
+                                    </button>
+                                    
+                                    <button 
+                                      className="lesson-action-btn delete"
+                                      onClick={() => handleDeleteLesson(lesson.id)}
+                                      title="Видалити урок"
+                                    >
+                                      <FaTrash />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                              <button 
+                                className="btn-add-lesson"
+                                onClick={() => handleCreateLesson(module.id)}
+                              >
+                                <FaPlus /> Додати урок
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="no-lessons">
+                              <p>У цього модуля поки немає уроків.</p>
+                              <button 
+                                className="btn-create-first-lesson"
+                                onClick={() => handleCreateLesson(module.id)}
+                              >
+                                <FaPlus /> Створити перший урок
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -366,13 +636,13 @@ function TeacherCourses() {
                       </td>
                       <td>
                         <div className="course-actions">
-                          <Link 
-                            to={`/teacher/courses/${course.id}`} 
+                          <button 
+                            onClick={() => handleCourseClick(course.id)} 
                             className="action-button edit"
-                            title="Редагувати курс"
+                            title="Управління курсом"
                           >
                             <FaEdit />
-                          </Link>
+                          </button>
                           
                           <Link 
                             to={`/teacher/courses/${course.id}/analytics`} 
@@ -443,5 +713,38 @@ function TeacherCourses() {
     </div>
   );
 }
+
+// Додаємо потрібні але відсутні раніше функції
+const FaArrowLeft = (props) => <span {...props}>←</span>; // Заміна для імпорту FaArrowLeft
+
+const handleEditCourse = (courseId) => {
+  // Функція для редагування курсу
+  console.log(`Редагування курсу з ID: ${courseId}`);
+  // Тут буде логіка для переходу на сторінку редагування курсу
+};
+
+const handleEditModule = (moduleId) => {
+  // Функція для редагування модуля
+  console.log(`Редагування модуля з ID: ${moduleId}`);
+  // Тут буде логіка для переходу на сторінку редагування модуля
+};
+
+const handleDeleteModule = (moduleId) => {
+  // Функція для видалення модуля
+  console.log(`Видалення модуля з ID: ${moduleId}`);
+  // Тут буде логіка для видалення модуля
+};
+
+const handleEditLesson = (lessonId) => {
+  // Функція для редагування уроку
+  console.log(`Редагування уроку з ID: ${lessonId}`);
+  // Тут буде логіка для переходу на сторінку редагування уроку
+};
+
+const handleDeleteLesson = (lessonId) => {
+  // Функція для видалення уроку
+  console.log(`Видалення уроку з ID: ${lessonId}`);
+  // Тут буде логіка для видалення уроку
+};
 
 export default TeacherCourses;

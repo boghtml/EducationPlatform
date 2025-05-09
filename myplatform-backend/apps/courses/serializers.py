@@ -41,11 +41,25 @@ class CourseSerializer(serializers.ModelSerializer):
         return CourseCategorySerializer(categories, many=True).data
 
     def create(self, validated_data):
+        
+        teacher = validated_data.get('teacher')
+        if not teacher:
+            request = self.context.get('request')
+            if request and hasattr(request, 'user') and request.user.is_authenticated:
+                validated_data['teacher'] = request.user
+            else:
+                raise serializers.ValidationError({"teacher": "Teacher is required."})
+        
         category_ids = validated_data.pop('category_ids', [])
         course = Course.objects.create(**validated_data)
+        
         for category_id in category_ids:
-            category = CourseCategory.objects.get(id=category_id)
-            CourseCategoryRelation.objects.create(course=course, category=category)
+            try:
+                category = CourseCategory.objects.get(id=category_id)
+                CourseCategoryRelation.objects.create(course=course, category=category)
+            except CourseCategory.DoesNotExist:
+                pass  
+                
         return course
 
     def update(self, instance, validated_data):

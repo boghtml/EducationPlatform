@@ -4,7 +4,8 @@ import axios from 'axios';
 import API_URL from '../../api';
 import TeacherHeader from './TeacherHeader';
 import TeacherSidebar from './TeacherSidebar';
-import '../../../css/TeacherCreateModule.css';
+import '../../css/teacher/TeacherCreateModule.css';
+
 import { 
   FaBook, 
   FaInfo,

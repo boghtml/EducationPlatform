@@ -39,6 +39,14 @@ import TeacherCourses from './components/teacher/TeacherCourses';
 import TeacherAssignments from './components/teacher/TeacherAssignments';
 import TeacherMaterials from './components/teacher/TeacherMaterials';
 import TeacherStudents from './components/teacher/TeacherStudents';
+
+import TeacherCreateCourse from './components/teacher/TeacherCreateCourse';
+import TeacherCreateModule from './components/teacher/TeacherCreateModule';
+import TeacherCreateLesson from './components/teacher/TeacherCreateLesson';
+import TeacherCourseDetail from './components/teacher/TeacherCourseDetail';
+import TeacherEditCourse from './components/teacher/TeacherEditCourse';
+import TeacherEditModule from './components/teacher/TeacherEditModule';
+import TeacherModuleDetail from './components/teacher/TeacherModuleDetail';
 /*
 import TeacherQA from './components/teacher/TeacherQA';
 import TeacherAnalytics from './components/teacher/TeacherAnalytics';
@@ -163,13 +171,44 @@ function App() {
         } />
         <Route path="/teacher/courses/:courseId" element={
           <ProtectedRoute 
-            element={<TeacherCourses />}
+            element={<TeacherCourseDetail />}
             allowedRoles={['teacher']} 
           />
         } />
+        <Route path="/teacher/courses/:courseId/edit" element={
+          <ProtectedRoute 
+            element={<TeacherEditCourse />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        {/* Нові маршрути для створення курсу, модуля та уроку */}
         <Route path="/teacher/courses/create" element={
           <ProtectedRoute 
-            element={<TeacherCourses />}
+            element={<TeacherCreateCourse />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/courses/:courseId/create-module" element={
+          <ProtectedRoute 
+            element={<TeacherCreateModule />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/modules/:moduleId/create-lesson" element={
+          <ProtectedRoute 
+            element={<TeacherCreateLesson />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/modules/:moduleId/edit" element={
+          <ProtectedRoute 
+            element={<TeacherEditModule />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/modules/:moduleId" element={
+          <ProtectedRoute 
+            element={<TeacherModuleDetail />}
             allowedRoles={['teacher']} 
           />
         } />
@@ -285,4 +324,3 @@ function App() {
 }
 
 export default App;
-         

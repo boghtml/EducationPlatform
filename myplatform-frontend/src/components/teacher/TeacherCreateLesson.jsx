@@ -4,7 +4,7 @@ import axios from 'axios';
 import API_URL from '../../api';
 import TeacherHeader from './TeacherHeader';
 import TeacherSidebar from './TeacherSidebar';
-import '../../../css/TeacherCreateLesson.css';
+import '../../css/teacher/TeacherCreateLesson.css';
 import { 
   FaBookOpen, 
   FaFileAlt, 
@@ -52,58 +52,38 @@ function TeacherCreateLesson() {
 
   useEffect(() => {
     const userRole = sessionStorage.getItem('userRole');
-    
     if (userRole !== 'teacher') {
       navigate('/login');
       return;
     }
 
-    const fetchModuleAndCourse = async () => {
+    const fetchModuleDetails = async () => {
       try {
         setLoading(true);
         
-        // Fetch CSRF token
         await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
         
-        // Fetch module data
+        // Fetch module details
         const moduleResponse = await axios.get(`${API_URL}/modules/update/${moduleId}/`, {
           withCredentials: true
         });
         
         if (moduleResponse.data) {
-          setModule(moduleResponse.data);
-          
-          // Set module_id in formData
-          setFormData(prev => ({
-            ...prev,
-            module_id: parseInt(moduleId)
-          }));
-          
-          // Fetch course data
-          const courseResponse = await axios.get(`${API_URL}/courses/${moduleResponse.data.course}/`, {
-            withCredentials: true
-          });
-          
-          if (courseResponse.data) {
-            setCourse(courseResponse.data);
-          }
-        } else {
-          setErrors({
-            general: 'Не вдалося отримати дані модуля'
-          });
+          const moduleData = moduleResponse.data;
+          setModule(moduleData);
         }
         
         setLoading(false);
       } catch (error) {
-        console.error("Помилка отримання модуля та курсу:", error);
-        setErrors({
-          general: 'Не вдалося отримати дані модуля'
-        });
+        console.error("Error fetching module details:", error);
         setLoading(false);
+        setErrors({
+          general: 'Не вдалося завантажити дані модуля'
+        });
       }
     };
 
-    fetchModuleAndCourse();
+    fetchModuleDetails();
   }, [moduleId, navigate]);
 
   const handleInputChange = (e) => {
@@ -334,46 +314,29 @@ function TeacherCreateLesson() {
     }
     
     setSubmitting(true);
-    setErrors({});
     
     try {
-      // Fetch CSRF token
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Create lesson
-      const lessonResponse = await axios.post(`${API_URL}/lessons/create_lesson/`, formData, {
+      // Create lesson with correct endpoint
+      const response = await axios.post(`${API_URL}/lessons/create_lesson/`, {
+        ...formData,
+        module_id: moduleId
+      }, {
         withCredentials: true
       });
       
-      if (lessonResponse.data && lessonResponse.data.id) {
-        const lessonId = lessonResponse.data.id;
-        setCreatedLessonId(lessonId);
-        
-        // Save files and links
-        await saveFilesAndLinks(lessonId);
-        
-        setSuccess(true);
-        
-        // Redirect to course page after 2 seconds
-        setTimeout(() => {
-          navigate(`/teacher/courses/${course.id}`);
-        }, 2000);
-      } else {
-        throw new Error('Не вдалося створити урок');
-      }
-    } catch (error) {
-      console.error("Помилка створення уроку:", error);
+      setSuccess(true);
+      setTimeout(() => {
+        navigate(`/teacher/modules/${moduleId}`);
+      }, 2000);
       
-      if (error.response && error.response.data) {
-        setErrors({
-          submit: error.response.data.message || 'Помилка при створенні уроку. Спробуйте знову.'
-        });
-      } else {
-        setErrors({
-          submit: error.message || 'Помилка при створенні уроку. Спробуйте знову.'
-        });
-      }
-    } finally {
+    } catch (error) {
+      console.error("Error creating lesson:", error);
+      setErrors(prev => ({
+        ...prev,
+        submit: 'Не вдалося створити урок. Будь ласка, спробуйте пізніше.'
+      }));
       setSubmitting(false);
     }
   };

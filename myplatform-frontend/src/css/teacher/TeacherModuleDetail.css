@@ -1,0 +1,275 @@
+.teacher-module-detail-wrapper {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.teacher-module-detail-container {
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+}
+
+.teacher-module-detail-content {
+  flex: 1;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.module-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-back:hover {
+  background: #e0e0e0;
+}
+
+.module-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-create {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #2196f3;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #1976d2;
+}
+
+.btn-delete {
+  background: #f44336;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #d32f2f;
+}
+
+.btn-create {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-create:hover {
+  background: #388e3c;
+}
+
+.module-detail-content h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.module-info {
+  margin-top: 20px;
+}
+
+.info-item {
+  margin-bottom: 24px;
+}
+
+.info-item .icon {
+  margin-right: 8px;
+  color: #666;
+}
+
+.info-item .label {
+  font-weight: 500;
+  color: #333;
+  margin-right: 8px;
+}
+
+.info-item p {
+  margin-top: 8px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.module-lessons {
+  margin-top: 30px;
+}
+
+.module-lessons h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lesson-item:hover {
+  background: #e9ecef;
+  transform: translateX(4px);
+}
+
+.lesson-info {
+  flex: 1;
+}
+
+.lesson-info h3 {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.lesson-meta {
+  display: flex;
+  gap: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.lesson-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-right {
+  transform: rotate(180deg);
+  color: #999;
+  transition: transform 0.2s;
+}
+
+.lesson-item:hover .icon-right {
+  transform: rotate(180deg) translateX(-4px);
+  color: #666;
+}
+
+.no-lessons {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.no-lessons p {
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  font-size: 24px;
+  color: #2196f3;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-icon {
+  font-size: 24px;
+  color: #f44336;
+  margin-bottom: 16px;
+}
+
+.delete-confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-confirmation-content {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.delete-confirmation-content h2 {
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.delete-confirmation-content p {
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.delete-confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #e0e0e0;
+}
