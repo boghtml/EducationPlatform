@@ -47,6 +47,10 @@ import TeacherCourseDetail from './components/teacher/TeacherCourseDetail';
 import TeacherEditCourse from './components/teacher/TeacherEditCourse';
 import TeacherEditModule from './components/teacher/TeacherEditModule';
 import TeacherModuleDetail from './components/teacher/TeacherModuleDetail';
+import TeacherEditLesson from './components/teacher/TeacherEditLesson';
+import TeacherLessonDetail from './components/teacher/TeacherLessonDetail';
+import TeacherLessonFiles from './components/teacher/TeacherLessonFiles';
+import TeacherLessonLinks from './components/teacher/TeacherLessonLinks';
 /*
 import TeacherQA from './components/teacher/TeacherQA';
 import TeacherAnalytics from './components/teacher/TeacherAnalytics';
@@ -197,6 +201,30 @@ function App() {
         <Route path="/teacher/modules/:moduleId/create-lesson" element={
           <ProtectedRoute 
             element={<TeacherCreateLesson />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/lessons/:lessonId/edit" element={
+          <ProtectedRoute 
+            element={<TeacherEditLesson />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/lessons/:lessonId" element={
+          <ProtectedRoute 
+            element={<TeacherLessonDetail />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/lessons/:lessonId/files" element={
+          <ProtectedRoute 
+            element={<TeacherLessonFiles />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/lessons/:lessonId/links" element={
+          <ProtectedRoute 
+            element={<TeacherLessonLinks />}
             allowedRoles={['teacher']} 
           />
         } />

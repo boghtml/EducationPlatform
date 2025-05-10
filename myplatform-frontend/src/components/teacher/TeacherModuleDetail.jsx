@@ -85,6 +85,29 @@ function TeacherModuleDetail() {
     navigate(`/teacher/lessons/${lessonId}`);
   };
 
+  const handleDeleteLesson = async (lessonId) => {
+    try {
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      await axios.delete(`${API_URL}/lessons/lesson/delete/${lessonId}/`, {
+        withCredentials: true
+      });
+
+      // Update the lessons list in the module state
+      setModule(prev => ({
+        ...prev,
+        lessons: prev.lessons.filter(lesson => lesson.id !== lessonId)
+      }));
+    } catch (error) {
+      console.error("Error deleting lesson:", error);
+      setError('Не вдалося видалити урок');
+    }
+  };
+
+  const handleEditLesson = (lessonId) => {
+    navigate(`/teacher/lessons/${lessonId}/edit`);
+  };
+
   if (loading) {
     return (
       <div className="teacher-module-detail-wrapper">
@@ -215,6 +238,30 @@ function TeacherModuleDetail() {
                             <span className="students-completed">
                               <FaGraduationCap /> {lesson.students_completed || 0} студентів завершили
                             </span>
+                          </div>
+                          <div className="lesson-actions">
+                            <button 
+                              className="btn-edit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditLesson(lesson.id);
+                              }}
+                              title="Редагувати урок"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button 
+                              className="btn-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if(window.confirm('Ви впевнені, що хочете видалити цей урок?')) {
+                                  handleDeleteLesson(lesson.id);
+                                }
+                              }}
+                              title="Видалити урок"
+                            >
+                              <FaTrash />
+                            </button>
                           </div>
                         </div>
                         <FaArrowLeft className="icon-right" />

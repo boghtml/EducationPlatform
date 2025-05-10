@@ -214,11 +214,6 @@
     font-size: 14px;
 }
 
-.alert-success {
-    background-color: #4caf50;
-    color: #fff;
-}
-
 .alert-danger {
     background-color: #f44336;
     color: #fff;

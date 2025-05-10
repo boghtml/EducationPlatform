@@ -28,7 +28,7 @@ import {
   FaImage
 } from 'react-icons/fa';
 
-function TeacherCreateLesson() {
+function TeacherEditLesson() {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -37,17 +37,16 @@ function TeacherCreateLesson() {
   });
   const [errors, setErrors] = useState({});
   const [module, setModule] = useState(null);
-  const [course, setCourse] = useState(null);
+  const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [createdLessonId, setCreatedLessonId] = useState(null);
   const [lessonFiles, setLessonFiles] = useState([]);
-  const [tempFiles, setTempFiles] = useState([]); // Temporary storage for files before lesson creation
+  const [tempFiles, setTempFiles] = useState([]);
   const [lessonLinks, setLessonLinks] = useState([]);
   const [newLink, setNewLink] = useState('');
   const [fileUploading, setFileUploading] = useState(false);
-  const { moduleId } = useParams();
+  const { lessonId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,34 +56,41 @@ function TeacherCreateLesson() {
       return;
     }
 
-    const fetchModuleDetails = async () => {
+    const fetchLessonDetails = async () => {
       try {
         setLoading(true);
-        
         await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
         
-        // Fetch module details using the correct endpoint
-        const moduleResponse = await axios.get(`${API_URL}/modules/detail/${moduleId}/`, {
+        const lessonResponse = await axios.get(`${API_URL}/lessons/${lessonId}/`, {
           withCredentials: true
         });
         
-        if (moduleResponse.data) {
-          const moduleData = moduleResponse.data;
-          setModule(moduleData);
+        if (lessonResponse.data) {
+          const lessonData = lessonResponse.data;
+          setLesson(lessonData);
+          setFormData({
+            title: lessonData.title,
+            content: lessonData.content,
+            duration: lessonData.duration,
+            module_id: lessonData.module
+          });
+          setLessonFiles(lessonData.files || []);
+          setLessonLinks(lessonData.links || []);
+          setModule(lessonData.module);
         }
         
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching module details:", error);
+        console.error("Error fetching lesson details:", error);
         setLoading(false);
         setErrors({
-          general: 'Не вдалося завантажити дані модуля'
+          general: 'Не вдалося завантажити дані уроку'
         });
       }
     };
 
-    fetchModuleDetails();
-  }, [moduleId, navigate]);
+    fetchLessonDetails();
+  }, [lessonId, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -107,7 +113,6 @@ function TeacherCreateLesson() {
     
     if (!file) return;
     
-    // Validate file size (e.g., max 50MB)
     if (file.size > 50 * 1024 * 1024) {
       setErrors(prev => ({
         ...prev,
@@ -116,46 +121,23 @@ function TeacherCreateLesson() {
       return;
     }
 
-    // Validate file type
-    const allowedTypes = [
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'video/mp4',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/zip',
-      'application/x-rar-compressed'
-    ];
-    if (!allowedTypes.includes(file.type)) {
-      setErrors(prev => ({
-        ...prev,
-        fileUpload: 'Непідтримуваний формат файлу. Дозволені: PDF, JPEG, PNG, MP4, DOC, DOCX, ZIP, RAR'
-      }));
-      return;
-    }
-
     setFileUploading(true);
     
     try {
-      if (createdLessonId) {
-        // Upload file directly if lesson is created
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const response = await axios.post(`${API_URL}/lessons/upload-file/${createdLessonId}/`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          withCredentials: true
-        });
-        
-        if (response.data) {
-          setLessonFiles(prev => [...prev, { ...response.data, name: file.name, type: file.type }]);
-        }
-      } else {
-        // Store file temporarily if lesson is not yet created
-        setTempFiles(prev => [...prev, { file, name: file.name, type: file.type, id: Date.now() }]);
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await axios.post(`${API_URL}/lessons/upload-file/${lessonId}/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+      });
+      
+      if (response.data) {
+        setLessonFiles(prev => [...prev, { ...response.data, name: file.name, type: file.type }]);
       }
     } catch (error) {
       console.error("Помилка завантаження файлу:", error);
@@ -168,18 +150,15 @@ function TeacherCreateLesson() {
     }
   };
 
-  const handleRemoveFile = async (fileId, isTemp = false) => {
+  const handleRemoveFile = async (fileId) => {
     try {
-      if (!isTemp && createdLessonId) {
-        // Delete file from server
-        await axios.delete(`${API_URL}/lessons/delete-temp-file/${fileId}/`, {
-          withCredentials: true
-        });
-        setLessonFiles(prev => prev.filter(file => file.id !== fileId));
-      } else {
-        // Remove temporary file
-        setTempFiles(prev => prev.filter(file => file.id !== fileId));
-      }
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      await axios.delete(`${API_URL}/lessons/delete-file/${fileId}/`, {
+        withCredentials: true
+      });
+      
+      setLessonFiles(prev => prev.filter(file => file.id !== fileId));
     } catch (error) {
       console.error("Помилка видалення файлу:", error);
       setErrors(prev => ({
@@ -253,59 +232,6 @@ function TeacherCreateLesson() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const saveFilesAndLinks = async (lessonId) => {
-    // Upload temporary files
-    if (tempFiles.length > 0) {
-      try {
-        for (const tempFile of tempFiles) {
-          const formData = new FormData();
-          formData.append('file', tempFile.file);
-          
-          const response = await axios.post(`${API_URL}/lessons/upload-file/${lessonId}/`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            },
-            withCredentials: true
-          });
-          
-          if (response.data) {
-            setLessonFiles(prev => [...prev, { ...response.data, name: tempFile.name, type: tempFile.type }]);
-          }
-        }
-        setTempFiles([]); // Clear temporary files
-      } catch (error) {
-        console.error("Помилка підтвердження файлів:", error);
-        throw new Error('Помилка при збереженні файлів');
-      }
-    }
-    
-    // Confirm uploaded files
-    if (lessonFiles.length > 0 || tempFiles.length > 0) {
-      try {
-        await axios.post(`${API_URL}/lessons/confirm-temp-files/${lessonId}/`, {}, {
-          withCredentials: true
-        });
-      } catch (error) {
-        console.error("Помилка підтвердження файлів:", error);
-        throw new Error('Помилка при збереженні файлів');
-      }
-    }
-    
-    // Save links
-    if (lessonLinks.length > 0) {
-      try {
-        await axios.post(`${API_URL}/lessons/add-lesson-links/${lessonId}/`, {
-          links: lessonLinks.map(link => link.url)
-        }, {
-          withCredentials: true
-        });
-      } catch (error) {
-        console.error("Помилка додавання посилань:", error);
-        throw new Error('Помилка при збереженні посилань');
-      }
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -317,73 +243,38 @@ function TeacherCreateLesson() {
     
     try {
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-      
-      // Create lesson
-      const response = await axios.post(`${API_URL}/lessons/create_lesson/`, {
+        await axios.put(`${API_URL}/lessons/lesson/update/${lessonId}/`, {
         ...formData,
-        module_id: moduleId
+        links: lessonLinks.map(link => link.url)
       }, {
         withCredentials: true
       });
-
-      const createdLessonId = response.data.id;
-
-      // Upload files if any
-      if (tempFiles.length > 0) {
-        for (const tempFile of tempFiles) {
-          const formData = new FormData();
-          formData.append('file', tempFile.file);
-          
-          await axios.post(`${API_URL}/lessons/upload-file/${createdLessonId}/`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            },
-            withCredentials: true
-          });
-        }
-
-        // Confirm uploaded files
-        await axios.post(`${API_URL}/lessons/confirm-temp-files/${createdLessonId}/`, {}, {
-          withCredentials: true
-        });
-      }
-
-      // Add links if any
-      if (lessonLinks.length > 0) {
-        await axios.post(`${API_URL}/lessons/add-lesson-links/${createdLessonId}/`, {
-          links: lessonLinks.map(link => link.url)
-        }, {
-          withCredentials: true
-        });
-      }
       
       setSuccess(true);
       setTimeout(() => {
-        navigate(`/teacher/modules/${moduleId}`);
+        navigate(`/teacher/modules/${module.id}`);
       }, 2000);
       
     } catch (error) {
-      console.error("Error creating lesson:", error);
+      console.error("Error updating lesson:", error);
       setErrors(prev => ({
         ...prev,
-        submit: 'Не вдалося створити урок. Будь ласка, спробуйте пізніше.'
+        submit: 'Не вдалося оновити урок. Будь ласка, спробуйте пізніше.'
       }));
       setSubmitting(false);
     }
   };
 
   const handleCancel = () => {
-    navigate(`/teacher/courses/${course?.id}`);
+    navigate(`/teacher/modules/${module?.id}`);
   };
 
   if (loading) {
     return (
       <div className="teacher-create-lesson-wrapper">
         <TeacherHeader />
-        
         <div className="teacher-create-lesson-container">
           <TeacherSidebar />
-          
           <div className="teacher-create-lesson-content">
             <div className="loading-container">
               <FaSpinner className="spinner" />
@@ -399,10 +290,8 @@ function TeacherCreateLesson() {
     return (
       <div className="teacher-create-lesson-wrapper">
         <TeacherHeader />
-        
         <div className="teacher-create-lesson-container">
           <TeacherSidebar />
-          
           <div className="teacher-create-lesson-content">
             <div className="error-container">
               <FaExclamationTriangle className="error-icon" />
@@ -424,18 +313,16 @@ function TeacherCreateLesson() {
   return (
     <div className="teacher-create-lesson-wrapper">
       <TeacherHeader />
-      
       <div className="teacher-create-lesson-container">
         <TeacherSidebar />
-        
         <div className="teacher-create-lesson-content">
           {success ? (
             <div className="success-container">
               <div className="success-icon">
                 <FaCheck />
               </div>
-              <h2>Урок успішно створено!</h2>
-              <p>Ви будете перенаправлені на сторінку курсу через кілька секунд...</p>
+              <h2>Урок успішно оновлено!</h2>
+              <p>Ви будете перенаправлені на сторінку модуля через кілька секунд...</p>
             </div>
           ) : (
             <>
@@ -444,11 +331,11 @@ function TeacherCreateLesson() {
                   className="btn-back"
                   onClick={handleCancel}
                 >
-                  <FaArrowLeft /> До курсу
+                  <FaArrowLeft /> До модуля
                 </button>
-                <h1>Новий урок для модуля "{module?.title}"</h1>
+                <h1>Редагування уроку</h1>
                 <div className="course-path">
-                  Курс: {course?.title} &gt; Модуль: {module?.title}
+                  Курс: {module?.course?.title} &gt; Модуль: {module?.title}
                 </div>
               </div>
               
@@ -510,98 +397,6 @@ function TeacherCreateLesson() {
                     {errors.duration && <div className="error-text">{errors.duration}</div>}
                   </div>
                   
-                  <div className="form-group">
-                    <label>
-                      <FaFileAlt /> Завантажити файли
-                    </label>
-                    <div className="file-upload-container">
-                      <input
-                        type="file"
-                        id="lesson-file"
-                        onChange={handleFileUpload}
-                        disabled={fileUploading}
-                        accept=".pdf,.jpg,.jpeg,.png,.mp4,.doc,.docx,.zip,.rar"
-                        style={{ display: 'none' }}
-                      />
-                      <button
-                        type="button"
-                        className="btn-upload"
-                        onClick={() => document.getElementById('lesson-file').click()}
-                        disabled={fileUploading}
-                      >
-                        {fileUploading ? (
-                          <>
-                            <FaSpinner className="spinner" />
-                            Завантаження...
-                          </>
-                        ) : (
-                          <>
-                            <FaUpload /> Вибрати файл
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    {errors.fileUpload && <div className="error-text">{errors.fileUpload}</div>}
-                    {(lessonFiles.length > 0 || tempFiles.length > 0) && (
-                      <div className="file-list">
-                        {[...lessonFiles, ...tempFiles].map(file => (
-                          <div key={file.id} className="file-item">
-                            <span className="file-icon">{getFileIcon(file.type)}</span>
-                            <span className="file-name">{file.name}</span>
-                            <button
-                              type="button"
-                              className="btn-remove"
-                              onClick={() => handleRemoveFile(file.id, !lessonFiles.includes(file))}
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>
-                      <FaLink /> Додати посилання
-                    </label>
-                    <div className="link-input-container">
-                      <input
-                        type="url"
-                        value={newLink}
-                        onChange={(e) => setNewLink(e.target.value)}
-                        className={errors.link ? 'error' : ''}
-                        placeholder="Введіть URL посилання (наприклад, https://example.com)"
-                      />
-                      <button
-                        type="button"
-                        className="btn-add-link"
-                        onClick={handleAddLink}
-                      >
-                        <FaPlus /> Додати
-                      </button>
-                    </div>
-                    {errors.link && <div className="error-text">{errors.link}</div>}
-                    {lessonLinks.length > 0 && (
-                      <div className="link-list">
-                        {lessonLinks.map(link => (
-                          <div key={link.id} className="link-item">
-                            <a href={link.url} target="_blank" rel="noopener noreferrer">
-                              {link.url}
-                            </a>
-                            <button
-                              type="button"
-                              className="btn-remove"
-                              onClick={() => handleRemoveLink(link.id)}
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
                   <div className="form-actions">
                     <button
                       type="submit"
@@ -615,7 +410,7 @@ function TeacherCreateLesson() {
                         </>
                       ) : (
                         <>
-                          <FaSave /> Зберегти урок
+                          <FaSave /> Зберегти зміни
                         </>
                       )}
                     </button>
@@ -637,4 +432,4 @@ function TeacherCreateLesson() {
   );
 }
 
-export default TeacherCreateLesson;
+export default TeacherEditLesson;
