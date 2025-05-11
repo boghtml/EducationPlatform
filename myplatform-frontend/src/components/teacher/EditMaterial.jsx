@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../../api';
@@ -18,9 +18,42 @@ import {
   FaSpinner,
   FaExclamationTriangle,
   FaArrowLeft,
-  FaCheck
+  FaCheck,
+  FaCheckCircle,
+  FaTimes,
+  FaCloudUploadAlt,
+  FaPlus,
+  FaClock,
+  FaLink
 } from 'react-icons/fa';
-import '../../css/teacher/CreateMaterial.css';
+import '../../css/teacher/EditMaterial.css';
+
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+const ALLOWED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'video/mp4',
+  'video/avi',
+  'video/mov',
+  'application/zip',
+  'application/x-rar-compressed',
+  'text/javascript',
+  'text/x-python',
+  'text/x-java-source',
+  'text/plain'
+];
+
+const UPLOAD_STATES = {
+  IDLE: 'idle',
+  UPLOADING: 'uploading',
+  SUCCESS: 'success',
+  ERROR: 'error'
+};
 
 function EditMaterial() {
   const navigate = useNavigate();
@@ -36,6 +69,13 @@ function EditMaterial() {
   const [newFilesPreview, setNewFilesPreview] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
+  const [deletingFiles, setDeletingFiles] = useState({});
+  const [hasChanges, setHasChanges] = useState(false);
+  const [saveAsDraft, setSaveAsDraft] = useState(false);
+
+  const [originalData, setOriginalData] = useState({});
 
   useEffect(() => {
     const userRole = sessionStorage.getItem('userRole');
@@ -49,27 +89,34 @@ function EditMaterial() {
         setLoading(true);
         await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
 
-        // Fetch courses
-        const coursesResponse = await axios.get(`${API_URL}/courses/`, {
-          withCredentials: true,
-          params: { teacher_id: sessionStorage.getItem('userId') }
-        });
+        const [coursesResponse, materialResponse] = await Promise.all([
+          axios.get(`${API_URL}/courses/`, {
+            withCredentials: true,
+            params: { teacher_id: sessionStorage.getItem('userId') }
+          }),
+          axios.get(`${API_URL}/materials/${materialId}/`, {
+            withCredentials: true
+          })
+        ]);
 
         if (coursesResponse.data) {
           setCourses(coursesResponse.data);
         }
 
-        // Fetch material details
-        const materialResponse = await axios.get(`${API_URL}/materials/${materialId}/`, {
-          withCredentials: true
-        });
-
         if (materialResponse.data) {
           const material = materialResponse.data;
           setTitle(material.title);
           setDescription(material.description);
-          setSelectedCourse(material.course.id);
+          setSelectedCourse(material.course?.id || '');
           setExistingFiles(material.files || []);
+          
+          // Save original data for change detection
+          setOriginalData({
+            title: material.title,
+            description: material.description,
+            course: material.course?.id || '',
+            files: material.files || []
+          });
         }
 
         setLoading(false);
@@ -83,18 +130,87 @@ function EditMaterial() {
     fetchMaterialAndCourses();
   }, [materialId, navigate]);
 
-  const handleFileChange = (e) => {
+  // Track changes
+  useEffect(() => {
+    const hasFormChanges = 
+      title !== originalData.title ||
+      description !== originalData.description ||
+      selectedCourse !== originalData.course ||
+      newFiles.length > 0 ||
+      existingFiles.length !== originalData.files?.length;
+    
+    setHasChanges(hasFormChanges);
+  }, [title, description, selectedCourse, newFiles, existingFiles, originalData]);
+
+  const validateFile = (file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      return `Файл "${file.name}" занадто великий. Максимальний розмір: ${MAX_FILE_SIZE / 1024 / 1024}MB`;
+    }
+
+    if (!ALLOWED_FILE_TYPES.includes(file.type) && file.type !== '') {
+      return `Тип файлу "${file.type}" не підтримується`;
+    }
+
+    return null;
+  };
+
+  const handleFileChange = useCallback((e) => {
     const selectedFiles = Array.from(e.target.files);
-    setNewFiles(selectedFiles);
+    processFiles(selectedFiles);
+  }, []);
+
+  const processFiles = useCallback((selectedFiles) => {
+    const validFiles = [];
+    const errors = [];
+
+    selectedFiles.forEach(file => {
+      const error = validateFile(file);
+      if (error) {
+        errors.push(error);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (errors.length > 0) {
+      setError(errors.join('\n'));
+    }
+
+    setNewFiles(prev => [...prev, ...validFiles]);
 
     // Create previews for selected files
-    const previews = selectedFiles.map(file => ({
+    const previews = validFiles.map(file => ({
       name: file.name,
       size: file.size,
-      type: file.type
+      type: file.type,
+      id: Date.now() + Math.random(),
+      uploadState: UPLOAD_STATES.IDLE,
+      progress: 0
     }));
-    setNewFilesPreview(previews);
-  };
+    
+    setNewFilesPreview(prev => [...prev, ...previews]);
+  }, []);
+
+  const handleDrag = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFiles(Array.from(e.dataTransfer.files));
+    }
+  }, [processFiles]);
+
   const getFileIcon = (type) => {
     if (!type) return <FaFile />;
     if (type.includes('pdf')) return <FaFilePdf />;
@@ -116,7 +232,10 @@ function EditMaterial() {
 
   const handleRemoveExistingFile = async (fileId) => {
     try {
-      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });      await axios.delete(`${API_URL}/materials/files/${fileId}/delete/`, {
+      setDeletingFiles(prev => ({ ...prev, [fileId]: true }));
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      await axios.delete(`${API_URL}/materials/files/${fileId}/delete/`, {
         withCredentials: true
       });
       
@@ -124,6 +243,8 @@ function EditMaterial() {
     } catch (error) {
       console.error("Error removing file:", error);
       setError("Не вдалося видалити файл");
+    } finally {
+      setDeletingFiles(prev => ({ ...prev, [fileId]: false }));
     }
   };
 
@@ -136,6 +257,39 @@ function EditMaterial() {
     setNewFilesPreview(newPreviewsList);
   };
 
+  const saveDraft = async () => {
+    if (!title) {
+      setError("Будь ласка, введіть назву матеріалу");
+      return;
+    }
+
+    try {
+      setSaveAsDraft(true);
+      
+      // Implement draft saving logic here
+      const draftData = {
+        title,
+        description,
+        course: selectedCourse,
+        isDraft: true
+      };
+      
+      // You can implement actual draft saving logic here
+      console.log('Saving draft:', draftData);
+      
+      // Show success message
+      setTimeout(() => {
+        setError(null);
+        setSaveAsDraft(false);
+      }, 1000);
+      
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      setError("Не вдалося зберегти чернетку");
+      setSaveAsDraft(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -146,7 +300,9 @@ function EditMaterial() {
 
     try {
       setSubmitting(true);
-        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      setError(null);
+
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
 
       // Update material details
       await axios.put(`${API_URL}/materials/${materialId}/edit/`, {
@@ -160,17 +316,44 @@ function EditMaterial() {
       // Upload new files if any
       if (newFiles.length > 0) {
         const formData = new FormData();
-        newFiles.forEach(file => {
+        
+        newFiles.forEach((file, index) => {
           formData.append('files', file);
-        });        await axios.post(`${API_URL}/materials/${materialId}/add-files/`, formData, {
+          
+          // Update preview state
+          setNewFilesPreview(prev => {
+            const updated = [...prev];
+            updated[index] = {
+              ...updated[index],
+              uploadState: UPLOAD_STATES.UPLOADING
+            };
+            return updated;
+          });
+        });
+
+        const response = await axios.post(`${API_URL}/materials/${materialId}/add-files/`, formData, {
           withCredentials: true,
           headers: {
             'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            
+            // Update progress for all files
+            setNewFilesPreview(prev => prev.map(file => ({
+              ...file,
+              progress: percentCompleted,
+              uploadState: percentCompleted === 100 ? UPLOAD_STATES.SUCCESS : UPLOAD_STATES.UPLOADING
+            })));
           }
         });
       }
 
       setSuccess(true);
+      
+      // Show success animation
       setTimeout(() => {
         navigate('/teacher/materials');
       }, 2000);
@@ -178,17 +361,24 @@ function EditMaterial() {
     } catch (error) {
       console.error("Error updating material:", error);
       setError("Не вдалося оновити матеріал. Будь ласка, спробуйте пізніше.");
+      
+      // Update file states to error
+      setNewFilesPreview(prev => prev.map(file => ({
+        ...file,
+        uploadState: UPLOAD_STATES.ERROR
+      })));
+      
       setSubmitting(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="create-material-wrapper">
+      <div className="edit-material-wrapper">
         <TeacherHeader />
-        <div className="create-material-container">
+        <div className="edit-material-container">
           <TeacherSidebar />
-          <div className="loading-container">
+          <div className="edit-material-loading">
             <FaSpinner className="loading-spinner" />
             <p>Завантаження даних...</p>
           </div>
@@ -199,12 +389,15 @@ function EditMaterial() {
 
   if (success) {
     return (
-      <div className="create-material-wrapper">
+      <div className="edit-material-wrapper">
         <TeacherHeader />
-        <div className="create-material-container">
+        <div className="edit-material-container">
           <TeacherSidebar />
-          <div className="create-material-success">
-            <FaCheck className="success-icon" />
+          <div className="edit-material-success">
+            <div className="success-animation">
+              <FaCheckCircle className="success-icon" />
+              <div className="success-ripple"></div>
+            </div>
             <h2>Матеріал успішно оновлено!</h2>
             <p>Зараз вас буде перенаправлено на сторінку матеріалів...</p>
           </div>
@@ -214,156 +407,248 @@ function EditMaterial() {
   }
 
   return (
-    <div className="create-material-wrapper">
+    <div className="edit-material-wrapper">
       <TeacherHeader />
-      <div className="create-material-container">
+      <div className="edit-material-container">
         <TeacherSidebar />
         
-        <div className="create-material-content">
-          <div className="create-material-header">
+        <div className="edit-material-content">
+          <div className="edit-material-header">
             <button className="btn-back" onClick={() => navigate('/teacher/materials')}>
               <FaArrowLeft /> Назад до матеріалів
             </button>
-            <h1>Редагування матеріалу</h1>
+            <div className="header-actions">
+              <h1>Редагування матеріалу</h1>
+              <button 
+                className="btn-save-draft"
+                onClick={saveDraft}
+                disabled={saveAsDraft || !title}
+              >
+                {saveAsDraft ? <FaSpinner className="loading-spinner-small" /> : <FaLink />}
+                Зберегти як чернетку
+              </button>
+            </div>
           </div>
 
           {error && (
             <div className="error-message">
               <FaExclamationTriangle />
-              <p>{error}</p>
+              <pre>{error}</pre>
+              <button onClick={() => setError(null)}>
+                <FaTimes />
+              </button>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="create-material-form">
-            <div className="form-group">
-              <label htmlFor="title">Назва матеріалу*</label>
-              <input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Введіть назву матеріалу"
-                required
-              />
+          <form onSubmit={handleSubmit} className="edit-material-form">
+            <div className="form-section">
+              <h3>Основна інформація</h3>
+              
+              <div className="form-group">
+                <label htmlFor="title">
+                  Назва матеріалу <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Введіть назву матеріалу"
+                  required
+                  maxLength={255}
+                />
+                <span className="char-count">{title.length}/255</span>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">
+                  Опис матеріалу <span className="required">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Введіть детальний опис матеріалу"
+                  required
+                  maxLength={1000}
+                />
+                <span className="char-count">{description.length}/1000</span>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="course">
+                  Курс <span className="required">*</span>
+                </label>
+                <select
+                  id="course"
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  required
+                >
+                  <option value="">Виберіть курс</option>
+                  {courses.map(course => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="description">Опис матеріалу*</label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Введіть опис матеріалу"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="course">Курс*</label>
-              <select
-                id="course"
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
-                required
-              >
-                <option value="">Виберіть курс</option>
-                {courses.map(course => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Поточні файли</label>
+            <div className="form-section existing-files-section">
+              <h3>Поточні файли</h3>
+              
               {existingFiles.length > 0 ? (
-                <div className="files-preview">
+                <div className="files-grid">
                   {existingFiles.map(file => (
-                    <div key={file.id} className="file-preview-item">
-                      <div className="file-preview-info">
-                        {getFileIcon(file.type)}
-                        <div className="file-preview-details">
-                          <span className="file-name">{file.name}</span>
-                          <span className="file-size">{formatFileSize(file.size)}</span>
+                    <div key={file.id} className="file-card">
+                      <div className="file-preview">
+                        <div className="file-icon">
+                          {getFileIcon(file.file_type)}
+                        </div>
+                        <div className="file-overlay">
+                          <button
+                            type="button"
+                            className="file-action"
+                            onClick={() => handleRemoveExistingFile(file.id)}
+                            disabled={deletingFiles[file.id]}
+                          >
+                            {deletingFiles[file.id] ? (
+                              <FaSpinner className="loading-spinner-small" />
+                            ) : (
+                              <FaTrash />
+                            )}
+                          </button>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        className="btn-remove-file"
-                        onClick={() => handleRemoveExistingFile(file.id)}
-                      >
-                        <FaTrash />
-                      </button>
+                      <div className="file-info">
+                        <div className="file-name">{file.file_name || 'Unnamed file'}</div>
+                        <div className="file-details">
+                          <span>{formatFileSize(file.file_size)}</span>
+                          <span>{file.file_type || 'Unknown'}</span>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="no-files">Немає прикріплених файлів</p>
+                <div className="no-files">
+                  <FaFileAlt />
+                  <h3>Немає файлів</h3>
+                  <p>До цього матеріалу не додано жодного файлу</p>
+                </div>
               )}
             </div>
 
-            <div className="form-group">
-              <label>Додати нові файли</label>
-              <div className="file-upload-container">
-                <label className="file-upload-label">
-                  <FaUpload />
-                  <span>Виберіть файли для завантаження</span>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.mp4,.zip,.rar"
-                  />
-                </label>
+            <div className="form-section new-files-section">
+              <h3>Додати нові файли</h3>
+              
+              <div 
+                className={`file-upload-zone ${dragActive ? 'drag-active' : ''}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <div className="upload-icon">
+                  <FaCloudUploadAlt />
+                </div>
+                <h4>Перетягніть файли сюди або клацніть для вибору</h4>
+                <p>Підтримувані формати: PDF, Word, зображення, відео, архіви, код</p>
+                <p className="upload-limits">Максимальний розмір файлу: 100MB</p>
+                
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.zip,.rar,.js,.py,.java,.txt"
+                  className="file-input"
+                />
+                
+                <button type="button" className="btn-select-files">
+                  <FaPlus /> Вибрати файли
+                </button>
               </div>
 
               {newFilesPreview.length > 0 && (
-                <div className="files-preview">
-                  {newFilesPreview.map((file, index) => (
-                    <div key={index} className="file-preview-item">
-                      <div className="file-preview-info">
-                        {getFileIcon(file.type)}
-                        <div className="file-preview-details">
-                          <span className="file-name">{file.name}</span>
-                          <span className="file-size">{formatFileSize(file.size)}</span>
+                <div className="new-files-preview">
+                  <h4>Нові файли ({newFilesPreview.length})</h4>
+                  <div className="new-files-list">
+                    {newFilesPreview.map((file, index) => (
+                      <div key={file.id} className="file-preview-item">
+                        <div className="file-preview-info">
+                          <div className="file-icon-container">
+                            {getFileIcon(file.type)}
+                            {file.uploadState === UPLOAD_STATES.SUCCESS && (
+                              <FaCheckCircle className="upload-success-badge" />
+                            )}
+                            {file.uploadState === UPLOAD_STATES.ERROR && (
+                              <FaTimes className="upload-error-badge" />
+                            )}
+                          </div>
+                          <div className="file-preview-details">
+                            <span className="file-preview-name">{file.name}</span>
+                            <span className="file-preview-size">{formatFileSize(file.size)}</span>
+                            <div className="file-upload-progress">
+                              <div 
+                                className={`progress-bar ${file.uploadState}`}
+                                style={{ width: `${file.progress}%` }}
+                              />
+                              <span className="progress-text">{file.progress}%</span>
+                            </div>
+                          </div>
                         </div>
+                        {!submitting && (
+                          <button
+                            type="button"
+                            className="btn-remove-file"
+                            onClick={() => handleRemoveNewFile(index)}
+                          >
+                            <FaTrash />
+                          </button>
+                        )}
                       </div>
-                      <button
-                        type="button"
-                        className="btn-remove-file"
-                        onClick={() => handleRemoveNewFile(index)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
 
             <div className="form-actions">
-              <button
-                type="button"
-                className="btn-cancel"
-                onClick={() => navigate('/teacher/materials')}
-              >
-                Скасувати
-              </button>
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <>
-                    <FaSpinner className="loading-spinner" />
-                    Збереження...
-                  </>
-                ) : (
-                  'Зберегти зміни'
-                )}
-              </button>
+              {hasChanges && (
+                <div className="changes-indicator">
+                  <FaClock />
+                  Є незбережені зміни
+                </div>
+              )}
+              
+              <div className="form-actions-right">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={() => navigate('/teacher/materials')}
+                  disabled={submitting}
+                >
+                  Скасувати
+                </button>
+                <button
+                  type="submit"
+                  className="btn-save"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <FaSpinner className="loading-spinner" />
+                      Збереження...
+                    </>
+                  ) : (
+                    <>
+                      <FaCheck />
+                      Зберегти зміни
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         </div>

@@ -108,7 +108,7 @@ function TeacherHeader() {
               <FaSearch className="teacher-search-icon" />
               <input
                 type="text"
-                placeholder="Пошук по курсах, завданнях..."
+                placeholder="       Пошук по курсах, завданнях..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="teacher-search-input"
