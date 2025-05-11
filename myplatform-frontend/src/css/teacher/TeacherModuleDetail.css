@@ -48,15 +48,18 @@
 .btn-edit,
 .btn-delete,
 .btn-create {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-edit {
@@ -66,6 +69,17 @@
 
 .btn-edit:hover {
   background: #1976d2;
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-edit:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
+.btn-edit svg {
+  font-size: 16px;
 }
 
 .btn-delete {
@@ -75,6 +89,17 @@
 
 .btn-delete:hover {
   background: #d32f2f;
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-delete:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+.btn-delete svg {
+  font-size: 16px;
 }
 
 .btn-create {
