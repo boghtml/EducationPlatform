@@ -37,6 +37,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import TeacherDashboard from './components/teacher/TeacherDashboard';
 import TeacherCourses from './components/teacher/TeacherCourses';
 import TeacherAssignments from './components/teacher/TeacherAssignments';
+import TeacherAssignmentAnalytics from './components/teacher/TeacherAssignmentAnalytics';
+import TeacherAssignmentSubmissions from './components/teacher/TeacherAssignmentSubmissions';
+import TeacherCreateAssignment from './components/teacher/TeacherCreateAssignment';
+import TeacherEditAssignment from './components/teacher/TeacherEditAssignment';
+import TeacherSubmissionDetail from './components/teacher/TeacherSubmissionDetail';
 import TeacherMaterials from './components/teacher/TeacherMaterials';
 import TeacherStudents from './components/teacher/TeacherStudents';
 import CreateMaterial from './components/teacher/CreateMaterial';
@@ -54,6 +59,8 @@ import TeacherEditLesson from './components/teacher/TeacherEditLesson';
 import TeacherLessonDetail from './components/teacher/TeacherLessonDetail';
 import TeacherLessonFiles from './components/teacher/TeacherLessonFiles';
 import TeacherLessonLinks from './components/teacher/TeacherLessonLinks';
+import StudentAssignmentDetail from './components/teacher/StudentAssignmentDetail';
+
 /*
 import TeacherQA from './components/teacher/TeacherQA';
 import TeacherAnalytics from './components/teacher/TeacherAnalytics';
@@ -149,10 +156,15 @@ function App() {
             element={<LessonDetail />}
             allowedRoles={['student']} 
           />
-        } />
-        <Route path="/assignments/:assignmentId" element={
+        } />        <Route path="/assignments/:assignmentId" element={
           <ProtectedRoute 
             element={<AssignmentDetails />}
+            allowedRoles={['student']} 
+          />
+        } />
+        <Route path="/assignments/:assignmentId/student-detail" element={
+          <ProtectedRoute 
+            element={<StudentAssignmentDetail />}
             allowedRoles={['student']} 
           />
         } />
@@ -242,10 +254,40 @@ function App() {
             element={<TeacherModuleDetail />}
             allowedRoles={['teacher']} 
           />
-        } />
+        } />        {/* Assignment routes */}
         <Route path="/teacher/assignments" element={
           <ProtectedRoute 
             element={<TeacherAssignments />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/assignments/create" element={
+          <ProtectedRoute 
+            element={<TeacherCreateAssignment />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/assignments/:assignmentId/edit" element={
+          <ProtectedRoute 
+            element={<TeacherEditAssignment />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/assignments/:assignmentId/submissions" element={
+          <ProtectedRoute 
+            element={<TeacherAssignmentSubmissions />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/assignments/:assignmentId/analytics" element={
+          <ProtectedRoute 
+            element={<TeacherAssignmentAnalytics />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        <Route path="/teacher/assignments/:assignmentId/submissions/:submissionId" element={
+          <ProtectedRoute 
+            element={<TeacherSubmissionDetail />}
             allowedRoles={['teacher']} 
           />
         } />

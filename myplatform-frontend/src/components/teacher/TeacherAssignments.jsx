@@ -227,7 +227,7 @@ function TeacherAssignments() {
                 <FaSearch className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Пошук завдань..."
+                  placeholder="      Пошук завдань..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input"
