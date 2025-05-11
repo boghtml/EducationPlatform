@@ -37,6 +37,8 @@ function TeacherMaterials() {
   const [searchQuery, setSearchQuery] = useState('');
   const [courseFilter, setCourseFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [sortField, setSortField] = useState('created_at');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [confirmDelete, setConfirmDelete] = useState(null);
   const navigate = useNavigate();
 
@@ -86,47 +88,48 @@ function TeacherMaterials() {
 
   useEffect(() => {
     if (!materials.length) return;
-    
+
     let results = [...materials];
-    
+
+    // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(material => 
-        material.title.toLowerCase().includes(query) ||
-        material.description?.toLowerCase().includes(query)
+        material.title.toLowerCase().includes(query) || 
+        material.description.toLowerCase().includes(query)
       );
     }
-    
+
+    // Apply course filter
     if (courseFilter !== 'all') {
-      results = results.filter(material => material.course.toString() === courseFilter);
+      results = results.filter(material => 
+        material.course && material.course.id.toString() === courseFilter
+      );
     }
-    
+
+    // Apply type filter
     if (typeFilter !== 'all') {
-      results = results.filter(material => {
-        
-        return material.files?.some(file => {
-          const fileType = file.file_type?.toLowerCase() || '';
-          
-          switch (typeFilter) {
-            case 'document':
-              return fileType.includes('pdf') || fileType.includes('doc') || fileType.includes('txt');
-            case 'image':
-              return fileType.includes('jpg') || fileType.includes('jpeg') || fileType.includes('png') || fileType.includes('gif');
-            case 'video':
-              return fileType.includes('mp4') || fileType.includes('avi') || fileType.includes('mov') || fileType.includes('video');
-            case 'audio':
-              return fileType.includes('mp3') || fileType.includes('wav') || fileType.includes('audio');
-            case 'archive':
-              return fileType.includes('zip') || fileType.includes('rar') || fileType.includes('7z');
-            default:
-              return true;
-          }
-        });
-      });
+      results = results.filter(material => material.type === typeFilter);
     }
-    
+
+    // Apply sorting
+    results.sort((a, b) => {
+      const direction = sortDirection === 'asc' ? 1 : -1;
+
+      switch (sortField) {
+        case 'title':
+          return direction * a.title.localeCompare(b.title);
+        case 'created_at':
+          return direction * (new Date(a.created_at) - new Date(b.created_at));
+        case 'course':
+          return direction * (a.course?.title || '').localeCompare(b.course?.title || '');
+        default:
+          return 0;
+      }
+    });
+
     setFilteredMaterials(results);
-  }, [materials, searchQuery, courseFilter, typeFilter]);
+  }, [materials, searchQuery, courseFilter, typeFilter, sortField, sortDirection]);
 
   const deleteMaterial = async (materialId) => {
     try {
@@ -160,17 +163,35 @@ function TeacherMaterials() {
     return course ? course.title : 'Невідомий курс';
   };
 
-  const getFileIcon = (fileType) => {
-    const type = fileType?.toLowerCase() || '';
-    
-    if (type.includes('pdf')) return <FaFilePdf />;
-    if (type.includes('doc')) return <FaFileWord />;
-    if (type.includes('image') || type.includes('jpg') || type.includes('png')) return <FaFileImage />;
-    if (type.includes('video') || type.includes('mp4')) return <FaFileVideo />;
-    if (type.includes('zip') || type.includes('rar')) return <FaFileArchive />;
-    if (type.includes('html') || type.includes('js') || type.includes('css')) return <FaFileCode />;
-    
-    return <FaFile />;
+  const getFileIcon = (type) => {
+    switch (type) {
+      case 'pdf':
+        return <FaFilePdf />;
+      case 'doc':
+      case 'docx':
+        return <FaFileWord />;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return <FaFileImage />;
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+        return <FaFileVideo />;
+      case 'zip':
+      case 'rar':
+        return <FaFileArchive />;
+      case 'js':
+      case 'jsx':
+      case 'ts':
+      case 'tsx':
+      case 'py':
+      case 'java':
+        return <FaFileCode />;
+      default:
+        return <FaFile />;
+    }
   };
 
   const getFileSize = (bytes) => {
@@ -198,6 +219,49 @@ function TeacherMaterials() {
     }
     
     return fileName;
+  };
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleDelete = async (materialId) => {
+    try {
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+        await axios.delete(`${API_URL}/materials/${materialId}/delete/`, {
+        withCredentials: true
+      });
+      
+      setMaterials(materials.filter(material => material.id !== materialId));
+      setConfirmDelete(null);
+    } catch (error) {
+      console.error("Error deleting material:", error);
+      setError("Не вдалося видалити матеріал. Будь ласка, спробуйте пізніше.");
+    }
+  };
+
+  const handleDownload = async (materialId, fileName) => {
+    try {      const response = await axios.get(`${API_URL}/materials/files/${materialId}/download/`, {
+        responseType: 'blob',
+        withCredentials: true
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error downloading material:", error);
+      setError("Не вдалося завантажити матеріал. Будь ласка, спробуйте пізніше.");
+    }
   };
 
   if (loading) {
@@ -240,163 +304,109 @@ function TeacherMaterials() {
   return (
     <div className="teacher-materials-wrapper">
       <TeacherHeader />
-      
       <div className="teacher-materials-container">
         <TeacherSidebar />
         
         <div className="teacher-materials-content">
-          <div className="teacher-materials-header">
-            <h1>Управління матеріалами</h1>
-            
+          <div className="materials-header">
+            <h1>Навчальні матеріали</h1>
             <Link to="/teacher/materials/create" className="btn-create-material">
-              <FaPlus /> Додати нові матеріали
+              <FaPlus /> Додати матеріал
             </Link>
           </div>
-          
-          <div className="teacher-materials-filters">
-            <div className="search-filter">
-              <div className="search-input-container">
-                <FaSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Пошук матеріалів..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input"
-                />
+
+          <div className="materials-tools">
+            <div className="search-bar">
+              <FaSearch />
+              <input
+                type="text"
+                placeholder="Пошук матеріалів..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="filter-section">
+              <div className="filter-group">
+                <FaFilter />
+                <select 
+                  value={courseFilter} 
+                  onChange={(e) => setCourseFilter(e.target.value)}
+                >
+                  <option value="all">Всі курси</option>
+                  {courses.map(course => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <FaFileAlt />
+                <select 
+                  value={typeFilter} 
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                >
+                  <option value="all">Всі типи</option>
+                  <option value="pdf">PDF</option>
+                  <option value="doc">Word</option>
+                  <option value="image">Зображення</option>
+                  <option value="video">Відео</option>
+                  <option value="archive">Архів</option>
+                  <option value="code">Код</option>
+                  <option value="other">Інше</option>
+                </select>
               </div>
             </div>
-            
-            <div className="course-filter">
-              <FaGraduationCap className="filter-icon" />
-              <select
-                value={courseFilter}
-                onChange={(e) => setCourseFilter(e.target.value)}
-                className="filter-select"
-              >
-                <option value="all">Всі курси</option>
-                {courses.map(course => (
-                  <option key={course.id} value={course.id.toString()}>
-                    {course.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div className="type-filter">
-              <FaFilter className="filter-icon" />
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="filter-select"
-              >
-                <option value="all">Всі типи</option>
-                <option value="document">Документи</option>
-                <option value="image">Зображення</option>
-                <option value="video">Відео</option>
-                <option value="audio">Аудіо</option>
-                <option value="archive">Архіви</option>
-              </select>
-            </div>
           </div>
-          
-          {filteredMaterials.length === 0 ? (
-            <div className="no-materials-found">
-              <FaFileAlt className="no-materials-icon" />
-              <h3>Матеріали не знайдено</h3>
-              <p>
-                {materials.length === 0
-                  ? "У вас поки немає матеріалів. Додайте нові матеріали для своїх курсів."
-                  : "Не знайдено матеріалів за вашим запитом. Спробуйте змінити параметри пошуку."}
-              </p>
-              {materials.length === 0 && (
-                <Link to="/teacher/materials/create" className="btn-primary">
-                  Додати матеріали
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="teacher-materials-grid">
+
+          {filteredMaterials.length > 0 ? (
+            <div className="materials-grid">
               {filteredMaterials.map(material => (
-                <div className="material-card" key={material.id}>
-                  <div className="material-header">
-                    <h3 className="material-title">{material.title}</h3>
+                <div key={material.id} className="material-card">
+                  <div className="material-icon">
+                    {getFileIcon(material.type)}
                   </div>
                   
-                  <div className="material-course">
-                    <FaGraduationCap />
-                    <span>{getCourseTitle(material.course)}</span>
+                  <div className="material-info">
+                    <h3>{material.title}</h3>
+                    <p className="material-description">{material.description}</p>
+                    
+                    <div className="material-meta">
+                      <span className="course-info">
+                        <FaGraduationCap />
+                        {material.course?.title || 'Без курсу'}
+                      </span>
+                      <span className="date-info">
+                        <FaCalendarAlt />
+                        {formatDate(material.created_at)}
+                      </span>
+                    </div>
                   </div>
-                  
-                  <div className="material-date">
-                    <FaCalendarAlt />
-                    <span>Додано: {formatDate(material.created_at)}</span>
-                  </div>
-                  
-                  <div className="material-description">
-                    {material.description
-                      ? material.description.length > 100
-                        ? `${material.description.substring(0, 100)}...`
-                        : material.description
-                      : 'Опис відсутній'}
-                  </div>
-                  
-                  <div className="material-files">
-                    <h4>Файли ({material.files?.length || 0})</h4>
-                    <ul className="files-list">
-                      {material.files?.slice(0, 3).map((file, index) => (
-                        <li key={index} className="file-item">
-                          <div className="file-icon">
-                            {getFileIcon(file.file_type)}
-                          </div>
-                          <div className="file-info">
-                            <div className="file-name" title={getFileName(file.file_url)}>
-                              {getFileName(file.file_url)}
-                            </div>
-                            <div className="file-size">
-                              {getFileSize(file.file_size)}
-                            </div>
-                          </div>
-                          <a 
-                            href={file.file_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="file-download"
-                            title="Завантажити файл"
-                          >
-                            <FaDownload />
-                          </a>
-                        </li>
-                      ))}
-                      {material.files?.length > 3 && (
-                        <li className="files-more">
-                          ...і ще {material.files.length - 3} файл(ів)
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                  
+
                   <div className="material-actions">
-                    <Link 
-                      to={`/teacher/materials/${material.id}/edit`}
-                      className="btn-action edit"
-                      title="Редагувати матеріал"
+                    <button 
+                      className="btn-view"
+                      onClick={() => navigate(`/teacher/materials/${material.id}`)}
+                    >
+                      <FaEye /> Перегляд
+                    </button>
+                    <button 
+                      className="btn-download"
+                      onClick={() => handleDownload(material.id, material.file_name)}
+                    >
+                      <FaDownload /> Завантажити
+                    </button>
+                    <button 
+                      className="btn-edit"
+                      onClick={() => navigate(`/teacher/materials/${material.id}/edit`)}
                     >
                       <FaEdit />
-                    </Link>
-                    
-                    <Link 
-                      to={`/teacher/materials/${material.id}`}
-                      className="btn-action view"
-                      title="Переглянути матеріал"
-                    >
-                      <FaEye />
-                    </Link>
-                    
-                    <button
-                      className="btn-action delete"
-                      onClick={() => setConfirmDelete(material.id)}
-                      title="Видалити матеріал"
+                    </button>
+                    <button 
+                      className="btn-delete"
+                      onClick={() => setConfirmDelete(material)}
                     >
                       <FaTrash />
                     </button>
@@ -404,34 +414,38 @@ function TeacherMaterials() {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="no-materials">
+              <FaFileAlt />
+              <h3>Матеріали відсутні</h3>
+              <p>У вас поки немає навчальних матеріалів. Натисніть кнопку "Додати матеріал" щоб створити перший матеріал.</p>
+            </div>
           )}
         </div>
-      </div>
-      
-      {confirmDelete && (
-        <div className="delete-confirmation-modal">
-          <div className="delete-confirmation-content">
-            <h2>Видалити матеріал?</h2>
-            <p>Ви впевнені, що хочете видалити цей матеріал? Ця дія не може бути скасована. Всі файли, пов'язані з цим матеріалом, також будуть видалені.</p>
-            
-            <div className="delete-confirmation-actions">
-              <button 
-                className="btn-cancel"
-                onClick={() => setConfirmDelete(null)}
-              >
-                Скасувати
-              </button>
-              
-              <button 
-                className="btn-delete"
-                onClick={() => deleteMaterial(confirmDelete)}
-              >
-                Видалити матеріал
-              </button>
+
+        {confirmDelete && (
+          <div className="delete-confirmation-modal">
+            <div className="delete-confirmation-content">
+              <h2>Видалення матеріалу</h2>
+              <p>Ви впевнені, що хочете видалити матеріал "{confirmDelete.title}"?</p>
+              <div className="delete-confirmation-actions">
+                <button 
+                  className="btn-cancel"
+                  onClick={() => setConfirmDelete(null)}
+                >
+                  Скасувати
+                </button>
+                <button 
+                  className="btn-confirm-delete"
+                  onClick={() => handleDelete(confirmDelete.id)}
+                >
+                  Видалити
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

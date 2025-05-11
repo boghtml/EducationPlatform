@@ -39,6 +39,9 @@ import TeacherCourses from './components/teacher/TeacherCourses';
 import TeacherAssignments from './components/teacher/TeacherAssignments';
 import TeacherMaterials from './components/teacher/TeacherMaterials';
 import TeacherStudents from './components/teacher/TeacherStudents';
+import CreateMaterial from './components/teacher/CreateMaterial';
+import EditMaterial from './components/teacher/EditMaterial';
+import MaterialDetail from './components/teacher/MaterialDetail';
 
 import TeacherCreateCourse from './components/teacher/TeacherCreateCourse';
 import TeacherCreateModule from './components/teacher/TeacherCreateModule';
@@ -246,6 +249,7 @@ function App() {
             allowedRoles={['teacher']} 
           />
         } />
+        {/* Material management routes */}
         <Route path="/teacher/materials" element={
           <ProtectedRoute 
             element={<TeacherMaterials />}
@@ -254,19 +258,19 @@ function App() {
         } />
         <Route path="/teacher/materials/create" element={
           <ProtectedRoute 
-            element={<TeacherMaterials />}
+            element={<CreateMaterial />}
             allowedRoles={['teacher']} 
           />
         } />
         <Route path="/teacher/materials/:materialId" element={
           <ProtectedRoute 
-            element={<TeacherMaterials />}
+            element={<MaterialDetail />}
             allowedRoles={['teacher']} 
           />
         } />
         <Route path="/teacher/materials/:materialId/edit" element={
           <ProtectedRoute 
-            element={<TeacherMaterials />}
+            element={<EditMaterial />}
             allowedRoles={['teacher']} 
           />
         } />
