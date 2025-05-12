@@ -37,8 +37,8 @@ function TeacherAssignmentSubmissions() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('all'); // 'all', 'submitted', 'graded', 'returned', 'assigned'
-  const [sortBy, setSortBy] = useState('date'); // 'date', 'name', 'status', 'grade'
+  const [filter, setFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -48,11 +48,8 @@ function TeacherAssignmentSubmissions() {
   const fetchAssignmentData = async () => {
     try {
       setLoading(true);
-
-      // Get CSRF token
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Get basic assignment details
       const assignmentResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/`,
         { withCredentials: true }
@@ -60,13 +57,11 @@ function TeacherAssignmentSubmissions() {
       
       setAssignment(assignmentResponse.data);
       
-      // Use our enhanced submissions endpoint to get all submissions
       const enhancedSubmissionsResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/all-submissions/`,
         { withCredentials: true }
       );
       
-      // Set the submissions and stats from our enhanced endpoint
       setSubmissions(enhancedSubmissionsResponse.data.submissions);
       setStats(enhancedSubmissionsResponse.data.stats);
       
@@ -115,13 +110,10 @@ function TeacherAssignmentSubmissions() {
     }
   };
 
-  // Filter and sort submissions
   const filteredSubmissions = submissions
     .filter(submission => {
-      // Apply status filter
       if (filter !== 'all' && submission.status !== filter) return false;
       
-      // Apply search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const studentName = `${submission.student.first_name} ${submission.student.last_name}`.toLowerCase();
@@ -133,7 +125,6 @@ function TeacherAssignmentSubmissions() {
       return true;
     })
     .sort((a, b) => {
-      // Apply sorting
       switch (sortBy) {
         case 'name':
           const aName = `${a.student.first_name} ${a.student.last_name}`;
@@ -154,7 +145,6 @@ function TeacherAssignmentSubmissions() {
         
         case 'date':
         default: {
-          // Handle comparison when one or both dates are missing
           if (!a.submission_date && !b.submission_date) return 0;
           if (!a.submission_date) return 1;
           if (!b.submission_date) return -1;

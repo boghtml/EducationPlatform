@@ -31,23 +31,20 @@ function TeacherAssignmentAnalytics() {
   useEffect(() => {
     fetchAnalyticsData();
   }, [assignmentId]);
+
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
       
-      // Get CSRF token
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Use the new specialized analytics endpoint
       const analyticsResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/analytics/`,
         { withCredentials: true }
       );
       
-      // Set the analytics data directly from the response
       setAnalytics(analyticsResponse.data);
       
-      // Get basic assignment info if needed
       const assignmentResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/`,
         { withCredentials: true }
@@ -68,17 +65,14 @@ function TeacherAssignmentAnalytics() {
     const graded = submissions.filter(s => s.status === 'graded').length;
     const returned = submissions.filter(s => s.status === 'returned').length;
     
-    // Розрахунок середньої оцінки
     const gradedSubmissions = submissions.filter(s => s.status === 'graded' && s.grade !== null);
     const averageGrade = gradedSubmissions.length > 0
       ? gradedSubmissions.reduce((sum, s) => sum + s.grade, 0) / gradedSubmissions.length
       : 0;
     
-    // Розрахунок вчасності подачі
     const onTimeSubmissions = submissions.filter(s => s.on_time === 'вчасно').length;
     const lateSubmissions = submissions.filter(s => s.on_time === 'пізно').length;
     
-    // Розподіл за датами подачі
     const submissionsByDate = submissions.reduce((acc, submission) => {
       if (submission.submission_date) {
         const date = new Date(submission.submission_date).toISOString().split('T')[0];
@@ -128,11 +122,9 @@ function TeacherAssignmentAnalytics() {
         const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
         
         if (daysDiff <= 0) {
-          // Здано вчасно або раніше
           const key = daysDiff === 0 ? 'on-due-date' : `${Math.abs(daysDiff)}-days-early`;
           acc[key] = (acc[key] || 0) + 1;
         } else {
-          // Здано пізно
           const key = `${daysDiff}-days-late`;
           acc[key] = (acc[key] || 0) + 1;
         }
@@ -152,7 +144,6 @@ function TeacherAssignmentAnalytics() {
       
       const submissions = submissionsResponse.data;
       
-      // Створюємо CSV контент
       const csvContent = [
         ['Student Name', 'Email', 'Submission Date', 'Status', 'Grade', 'On Time', 'Feedback'],
         ...submissions.map(submission => [
@@ -166,12 +157,10 @@ function TeacherAssignmentAnalytics() {
         ])
       ];
       
-      // Конвертуємо у CSV
       const csvString = csvContent
         .map(row => row.map(cell => `"${cell}"`).join(','))
         .join('\n');
       
-      // Створюємо і завантажуємо файл
       const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -280,7 +269,6 @@ function TeacherAssignmentAnalytics() {
             </button>
           </div>
           
-          {/* Overview Statistics */}
           <div className="analytics-overview">
             <div className="stat-card">
               <div className="stat-icon total">
@@ -324,7 +312,6 @@ function TeacherAssignmentAnalytics() {
             </div>
           </div>
 
-          {/* Timeliness Statistics */}
           <div className="analytics-section">
             <h3>Вчасність подачі</h3>
             <div className="timeliness-stats">
@@ -344,7 +331,6 @@ function TeacherAssignmentAnalytics() {
             </div>
           </div>
 
-          {/* Grade Distribution */}
           {Object.keys(analytics.grade_stats.grade_distribution).length > 0 && (
             <div className="analytics-section">
               <h3>Розподіл оцінок</h3>
@@ -369,7 +355,6 @@ function TeacherAssignmentAnalytics() {
             </div>
           )}
 
-          {/* Submission Timeline */}
           {analytics.submission_timeline && analytics.submission_timeline.length > 0 && (
             <div className="analytics-section">
               <h3>Графік подачі робіт</h3>
@@ -399,11 +384,11 @@ function TeacherAssignmentAnalytics() {
 }
 
 function getGradeColor(grade) {
-  if (grade >= 90) return '#059669'; // green
-  if (grade >= 80) return '#65a30d'; // lime
-  if (grade >= 70) return '#ca8a04'; // yellow
-  if (grade >= 60) return '#ea580c'; // orange
-  return '#dc2626'; // red
+  if (grade >= 90) return '#059669';
+  if (grade >= 80) return '#65a30d';
+  if (grade >= 70) return '#ca8a04';
+  if (grade >= 60) return '#ea580c';
+  return '#dc2626';
 }
 
 export default TeacherAssignmentAnalytics;

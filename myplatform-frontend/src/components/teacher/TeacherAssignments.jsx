@@ -52,10 +52,8 @@ function TeacherAssignments() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
         await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
         
-        // Get courses taught by the teacher
         const coursesResponse = await axios.get(`${API_URL}/courses/`, {
           withCredentials: true,
           params: { teacher_id: sessionStorage.getItem('userId') }
@@ -65,23 +63,19 @@ function TeacherAssignments() {
           setCourses(coursesResponse.data);
         }
         
-        // Get all assignments created by the teacher
         const assignmentsResponse = await axios.get(`${API_URL}/assignments/`, {
           withCredentials: true
         });
         
         if (assignmentsResponse.data) {
-          // Fetch detailed info for each assignment to get proper stats
           const assignmentsWithDetails = await Promise.all(
             assignmentsResponse.data.map(async (assignment) => {
               try {
-                // Get assignment details including student submission stats
                 const detailResponse = await axios.get(
                   `${API_URL}/assignments/${assignment.id}/detail/`,
                   { withCredentials: true }
                 );
                 
-                // If we have detailed stats, merge them with the assignment data
                 if (detailResponse.data) {
                   return {
                     ...assignment,
@@ -120,7 +114,6 @@ function TeacherAssignments() {
     
     let results = [...assignments];
     
-    // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(assignment => 
@@ -129,12 +122,10 @@ function TeacherAssignments() {
       );
     }
     
-    // Apply course filter
     if (courseFilter !== 'all') {
       results = results.filter(assignment => assignment.course.toString() === courseFilter);
     }
     
-    // Apply status filter
     if (statusFilter !== 'all') {
       results = results.filter(assignment => {
         const dueDate = new Date(assignment.due_date);
@@ -148,7 +139,7 @@ function TeacherAssignments() {
     }
     
     setFilteredAssignments(results);
-    setPage(1); // Reset to first page when filtering
+    setPage(1);
   }, [assignments, searchQuery, courseFilter, statusFilter]);
 
   const deleteAssignment = async (assignmentId) => {
@@ -196,7 +187,6 @@ function TeacherAssignments() {
   };
 
   const getSubmissionStats = (assignment) => {
-    // First check if we have the enhanced stats from the detail endpoint
     if (assignment.total_students !== undefined) {
       return {
         total: assignment.total_students || 0,
@@ -207,7 +197,6 @@ function TeacherAssignments() {
       };
     }
     
-    // Fall back to the old method if no enhanced stats
     const total = assignment.submissions_count || 0;
     const graded = assignment.graded_submissions || 0;
     const pending = total - graded;
@@ -221,7 +210,6 @@ function TeacherAssignments() {
     };
   };
 
-  // Pagination
   const indexOfLastItem = page * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredAssignments.slice(indexOfFirstItem, indexOfLastItem);
@@ -460,7 +448,6 @@ function TeacherAssignments() {
                 })}
               </div>
               
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="pagination">
                   <button 

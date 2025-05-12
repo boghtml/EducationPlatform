@@ -54,7 +54,6 @@ function TeacherEditAssignment() {
     try {
       setLoading(true);
       
-      // Отримуємо дані про завдання
       const assignmentResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/`,
         { withCredentials: true }
@@ -63,7 +62,6 @@ function TeacherEditAssignment() {
       const assignmentData = assignmentResponse.data;
       setAssignment(assignmentData);
       
-      // Форматуємо дату для input[type="datetime-local"]
       const dueDate = assignmentData.due_date ? 
         new Date(assignmentData.due_date).toISOString().slice(0, 16) : '';
       
@@ -74,12 +72,10 @@ function TeacherEditAssignment() {
         course: assignmentData.course
       });
       
-      // Отримуємо файли
       if (assignmentData.files) {
         setExistingFiles(assignmentData.files);
       }
       
-      // Отримуємо посилання
       if (assignmentData.links) {
         setExistingLinks(assignmentData.links);
       }
@@ -252,7 +248,6 @@ function TeacherEditAssignment() {
     setError(null);
     
     try {
-      // Оновлення основної інформації
       await axios.put(
         `${API_URL}/assignments/${assignmentId}/`,
         {
@@ -262,7 +257,6 @@ function TeacherEditAssignment() {
         { withCredentials: true }
       );
       
-      // Підтвердження тимчасових файлів
       if (tempFiles.length > 0) {
         await axios.post(
           `${API_URL}/assignments/${assignmentId}/confirm-files/`,
@@ -271,7 +265,6 @@ function TeacherEditAssignment() {
         );
       }
       
-      // Додавання нових посилань
       if (newLinks.length > 0) {
         await axios.post(
           `${API_URL}/assignments/${assignmentId}/add-links/`,
@@ -282,7 +275,6 @@ function TeacherEditAssignment() {
         );
       }
       
-      // Перехід назад
       navigate(`/teacher/assignments/${assignmentId}`);
       
     } catch (error) {
@@ -427,7 +419,6 @@ function TeacherEditAssignment() {
               <div className="upload-section">
                 <h3>Файли</h3>
                 
-                {/* Existing Files */}
                 {existingFiles.length > 0 && (
                   <div className="files-list">
                     <h4>Поточні файли:</h4>
@@ -466,7 +457,6 @@ function TeacherEditAssignment() {
                   </div>
                 )}
                 
-                {/* Temp Files */}
                 {tempFiles.length > 0 && (
                   <div className="files-list">
                     <h4>Нещодавно додані файли:</h4>
@@ -524,7 +514,6 @@ function TeacherEditAssignment() {
               <div className="links-section">
                 <h3>Посилання</h3>
                 
-                {/* Existing Links */}
                 {existingLinks.length > 0 && (
                   <div className="links-list">
                     <h4>Поточні посилання:</h4>
@@ -565,7 +554,6 @@ function TeacherEditAssignment() {
                   </div>
                 )}
                 
-                {/* New Links */}
                 {newLinks.length > 0 && (
                   <div className="links-list">
                     <h4>Нові посилання:</h4>

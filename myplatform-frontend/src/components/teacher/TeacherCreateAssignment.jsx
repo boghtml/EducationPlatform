@@ -49,6 +49,8 @@ function TeacherCreateAssignment() {
   const fetchCourses = async () => {
     try {
       setLoading(true);
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
       const response = await axios.get(`${API_URL}/courses/`, {
         withCredentials: true,
         params: { teacher_id: sessionStorage.getItem('userId') }
@@ -84,7 +86,6 @@ function TeacherCreateAssignment() {
       errors.course = 'Оберіть курс';
     }
     
-    // Валідація дедлайну (опціонально)
     if (formData.due_date) {
       const dueDate = new Date(formData.due_date);
       const now = new Date();
@@ -105,7 +106,6 @@ function TeacherCreateAssignment() {
       [name]: value
     }));
     
-    // Очистка помилок валідації при зміні
     if (validationErrors[name]) {
       setValidationErrors(prev => ({
         ...prev,
@@ -118,7 +118,6 @@ function TeacherCreateAssignment() {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Валідація розміру файлу (наприклад, 50MB)
     if (file.size > 50 * 1024 * 1024) {
       setError('Розмір файлу не повинен перевищувати 50MB');
       return;
@@ -133,15 +132,12 @@ function TeacherCreateAssignment() {
     setError(null);
 
     try {
-      // Спочатку треба створити завдання або отримати його ID
       let assignmentId;
       
-      // Якщо завдання ще не існує, тимчасово збережемо файл
       if (!assignmentId) {
         console.log('Temporarily storing file...');
-        // Логіка для тимчасового збереження файлу
         const tempFile = {
-          id: Date.now(), // Тимчасовий ID
+          id: Date.now(),
           name: file.name,
           size: file.size,
           type: file.type,
@@ -156,7 +152,6 @@ function TeacherCreateAssignment() {
         return;
       }
 
-      // Якщо є assignmentId, завантажуємо файл
       const formDataFile = new FormData();
       formDataFile.append('file', file);
 
@@ -189,7 +184,6 @@ function TeacherCreateAssignment() {
   const addLink = () => {
     if (!newLink.trim()) return;
     
-    // Простіша валідація URL
     try {
       new URL(newLink);
     } catch {
@@ -198,7 +192,7 @@ function TeacherCreateAssignment() {
     }
     
     const link = {
-      id: Date.now(), // Тимчасовий ID
+      id: Date.now(),
       link_url: newLink.trim(),
       description: ''
     };
@@ -222,7 +216,6 @@ function TeacherCreateAssignment() {
     setError(null);
     
     try {
-      // Створення завдання
       const assignmentResponse = await axios.post(
         `${API_URL}/assignments/`,
         {
@@ -234,7 +227,6 @@ function TeacherCreateAssignment() {
       
       const assignmentId = assignmentResponse.data.id;
       
-      // Завантаження тимчасових файлів
       for (const tempFile of tempFiles) {
         const formDataFile = new FormData();
         formDataFile.append('file', tempFile.file);
@@ -251,7 +243,6 @@ function TeacherCreateAssignment() {
         );
       }
       
-      // Підтвердження файлів
       if (tempFiles.length > 0) {
         await axios.post(
           `${API_URL}/assignments/${assignmentId}/confirm-files/`,
@@ -260,7 +251,6 @@ function TeacherCreateAssignment() {
         );
       }
       
-      // Додавання посилань
       if (links.length > 0) {
         await axios.post(
           `${API_URL}/assignments/${assignmentId}/add-links/`,
@@ -271,7 +261,6 @@ function TeacherCreateAssignment() {
         );
       }
       
-      // Перехід до списку завдань курсу
       navigate(`/teacher/courses/${formData.course}/assignments`);
       
     } catch (error) {
