@@ -9,6 +9,9 @@ from apps.courses.models import Course
 from apps.users.models import CustomUser
 
 from django.db import transaction
+from django.db.models import Count, Avg, Max, Min
+from django.db.models.functions import TruncDay
+import math
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from .models import Assignment, AssignmentFile, AssignmentLink, Submission, SubmissionFile
@@ -704,3 +707,222 @@ class StudentAssignmentDetailView(APIView):
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class TeacherAssignmentAnalyticsView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, assignment_id):
+        try:
+            
+            if request.user.role != 'teacher':
+                return Response({"error": "Only teachers can access this data"}, status=status.HTTP_403_FORBIDDEN)
+            
+            assignment = get_object_or_404(Assignment, id=assignment_id)
+            
+            if assignment.teacher.id != request.user.id:
+                return Response({"error": "Not authorized to view this assignment's analytics"}, 
+                                status=status.HTTP_403_FORBIDDEN)
+            
+            course = assignment.course
+            
+            total_students = Enrollment.objects.filter(course=course).count()
+            
+            submitted_count = Submission.objects.filter(
+                assignment=assignment, status='submitted').count()
+            
+            returned_count = Submission.objects.filter(
+                assignment=assignment, status='returned').count()
+            
+            graded_count = Submission.objects.filter(
+                assignment=assignment, status='graded').count()
+            
+            assigned_count = total_students - submitted_count - returned_count - graded_count
+            
+            on_time_submissions = 0
+            late_submissions = 0
+            
+            if assignment.due_date:
+                on_time_submissions = Submission.objects.filter(
+                    assignment=assignment,
+                    submission_date__lte=assignment.due_date,
+                    status__in=['submitted', 'graded', 'returned']
+                ).count()
+                
+                late_submissions = Submission.objects.filter(
+                    assignment=assignment,
+                    submission_date__gt=assignment.due_date,
+                    status__in=['submitted', 'graded', 'returned']
+                ).count()
+            
+            grade_stats = Submission.objects.filter(
+                assignment=assignment,
+                status='graded'
+            ).aggregate(
+                avg_grade=Avg('grade'),
+                max_grade=Max('grade'),
+                min_grade=Min('grade')
+            )
+            
+            graded_submissions = Submission.objects.filter(
+                assignment=assignment, 
+                status='graded'
+            ).values('grade')
+            
+            grade_distribution = {}
+            for submission in graded_submissions:
+                grade = submission.get('grade')
+                if grade is not None:
+                    grade_range = math.floor(grade / 10) * 10
+                    range_key = f"{grade_range}-{grade_range + 9}"
+                    grade_distribution[range_key] = grade_distribution.get(range_key, 0) + 1
+            
+            timeline_data = Submission.objects.filter(
+                assignment=assignment,
+                submission_date__isnull=False
+            ).annotate(
+                date=TruncDay('submission_date')
+            ).values('date').annotate(
+                count=Count('id')
+            ).order_by('date')
+            
+            submission_timeline = [
+                {'date': item['date'].strftime('%Y-%m-%d'), 'count': item['count']}
+                for item in timeline_data
+            ]
+            
+            analytics_data = {
+                'assignment_info': {
+                    'id': assignment.id,
+                    'title': assignment.title,
+                    'description': assignment.description,
+                    'due_date': assignment.due_date,
+                    'course': {
+                        'id': course.id,
+                        'title': course.title
+                    }
+                },
+                'submission_stats': {
+                    'total_students': total_students,
+                    'submitted_count': submitted_count,
+                    'returned_count': returned_count,
+                    'graded_count': graded_count,
+                    'assigned_count': assigned_count,
+                    'submission_rate': round((submitted_count + returned_count + graded_count) / total_students * 100, 1) if total_students > 0 else 0
+                },
+                'timeliness_stats': {
+                    'on_time_submissions': on_time_submissions,
+                    'late_submissions': late_submissions,
+                },
+                'grade_stats': {
+                    'average_grade': round(grade_stats['avg_grade'] or 0, 1),
+                    'max_grade': grade_stats['max_grade'] or 0,
+                    'min_grade': grade_stats['min_grade'] or 0,
+                    'grade_distribution': grade_distribution
+                },
+                'submission_timeline': submission_timeline
+            }
+            
+            return Response(analytics_data)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred while retrieving analytics: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class EnhancedAssignmentSubmissionsView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, assignment_id):
+        try:
+            
+            if request.user.role != 'teacher':
+                return Response({"error": "Only teachers can access this data"}, status=status.HTTP_403_FORBIDDEN)
+            
+            assignment = get_object_or_404(Assignment, id=assignment_id)
+            
+            if assignment.teacher.id != request.user.id:
+                return Response({"error": "Not authorized to view these submissions"}, 
+                                status=status.HTTP_403_FORBIDDEN)
+            
+            enrolled_students = Enrollment.objects.filter(
+                course=assignment.course
+            ).values_list('student', flat=True)
+            
+            existing_submissions = Submission.objects.filter(
+                assignment=assignment
+            ).select_related('student')
+            
+            submission_by_student = {sub.student.id: sub for sub in existing_submissions}
+            
+            all_submissions = []
+            
+            for student_id in enrolled_students:
+                try:
+                    student = CustomUser.objects.get(id=student_id)
+                    
+                    if student_id in submission_by_student:
+                        submission = submission_by_student[student_id]
+                        
+                        submission_data = {
+                            'id': submission.id,
+                            'student': {
+                                'id': student.id,
+                                'username': student.username,
+                                'email': student.email,
+                                'first_name': student.first_name,
+                                'last_name': student.last_name
+                            },
+                            'status': submission.status,
+                            'submission_date': submission.submission_date,
+                            'grade': submission.grade,
+                            'feedback': submission.feedback,
+                            'on_time': 'вчасно' if submission.submission_date and 
+                                               assignment.due_date and 
+                                               submission.submission_date <= assignment.due_date 
+                                        else 'пізно' if submission.submission_date else None
+                        }
+                    else:
+                        
+                        submission_data = {
+                            'id': None, 
+                            'student': {
+                                'id': student.id,
+                                'username': student.username,
+                                'email': student.email,
+                                'first_name': student.first_name,
+                                'last_name': student.last_name
+                            },
+                            'status': 'assigned',
+                            'submission_date': None,
+                            'grade': None,
+                            'feedback': None,
+                            'on_time': None
+                        }
+                    
+                    all_submissions.append(submission_data)
+                    
+                except CustomUser.DoesNotExist:
+                    continue
+            
+            stats = {
+                'total': len(all_submissions),
+                'assigned': len([s for s in all_submissions if s['status'] == 'assigned']),
+                'submitted': len([s for s in all_submissions if s['status'] == 'submitted']),
+                'graded': len([s for s in all_submissions if s['status'] == 'graded']),
+                'returned': len([s for s in all_submissions if s['status'] == 'returned']),
+            }
+            
+            return Response({
+                'stats': stats,
+                'submissions': all_submissions
+            })
+            
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred while retrieving submissions: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

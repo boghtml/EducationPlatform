@@ -38,26 +38,22 @@ function TeacherAssignmentAnalytics() {
       // Get CSRF token
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Отримуємо дані про завдання
+      // Use the new specialized analytics endpoint
+      const analyticsResponse = await axios.get(
+        `${API_URL}/assignments/${assignmentId}/analytics/`,
+        { withCredentials: true }
+      );
+      
+      // Set the analytics data directly from the response
+      setAnalytics(analyticsResponse.data);
+      
+      // Get basic assignment info if needed
       const assignmentResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/`,
         { withCredentials: true }
       );
       
       setAssignment(assignmentResponse.data);
-      
-      // Генеруємо аналітику на основі існуючих даних
-      const submissionsResponse = await axios.get(
-        `${API_URL}/assignments/${assignmentId}/submissions/`,
-        { withCredentials: true }
-      );
-      
-      const submissions = submissionsResponse.data;
-      
-      // Розраховуємо статистику
-      const analytics = calculateAnalytics(submissions, assignmentResponse.data);
-      setAnalytics(analytics);
-      
       setLoading(false);
     } catch (error) {
       console.error("Error fetching analytics data:", error);
@@ -291,19 +287,19 @@ function TeacherAssignmentAnalytics() {
                 <FaUsers />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{analytics.overview.total}</div>
-                <div className="stat-label">Всього студентів</div>
+                <div className="stat-value">{analytics.submission_stats.total_students}</div>
+                  <div className="stat-label">Всього студентів</div>
+                </div>
               </div>
-            </div>
             
             <div className="stat-card">
               <div className="stat-icon submitted">
                 <FaCheckCircle />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{analytics.overview.submitted}</div>
+                <div className="stat-value">{analytics.submission_stats.submitted_count + analytics.submission_stats.graded_count + analytics.submission_stats.returned_count}</div>
                 <div className="stat-label">Подано робіт</div>
-                <div className="stat-percentage">{analytics.overview.submissionRate}%</div>
+                <div className="stat-percentage">{analytics.submission_stats.submission_rate}%</div>
               </div>
             </div>
             
@@ -312,9 +308,8 @@ function TeacherAssignmentAnalytics() {
                 <FaChartBar />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{analytics.overview.graded}</div>
+                <div className="stat-value">{analytics.submission_stats.graded_count}</div>
                 <div className="stat-label">Оцінено</div>
-                <div className="stat-percentage">{analytics.overview.gradeRate}%</div>
               </div>
             </div>
             
@@ -323,45 +318,45 @@ function TeacherAssignmentAnalytics() {
                 <FaChartBar />
               </div>
               <div className="stat-content">
-                <div className="stat-value">{analytics.overview.averageGrade}</div>
+                <div className="stat-value">{analytics.grade_stats.average_grade}</div>
                 <div className="stat-label">Середня оцінка</div>
               </div>
             </div>
           </div>
-          
+
           {/* Timeliness Statistics */}
           <div className="analytics-section">
             <h3>Вчасність подачі</h3>
             <div className="timeliness-stats">
               <div className="timeliness-item on-time">
-                <div className="timeliness-value">{analytics.overview.onTimeSubmissions}</div>
+                <div className="timeliness-value">{analytics.timeliness_stats.on_time_submissions}</div>
                 <div className="timeliness-label">
                   <FaCheckCircle /> Вчасно
                 </div>
               </div>
               
               <div className="timeliness-item late">
-                <div className="timeliness-value">{analytics.overview.lateSubmissions}</div>
+                <div className="timeliness-value">{analytics.timeliness_stats.late_submissions}</div>
                 <div className="timeliness-label">
                   <FaExclamationCircle /> Пізно
                 </div>
               </div>
             </div>
           </div>
-          
+
           {/* Grade Distribution */}
-          {Object.keys(analytics.gradeDistribution).length > 0 && (
+          {Object.keys(analytics.grade_stats.grade_distribution).length > 0 && (
             <div className="analytics-section">
               <h3>Розподіл оцінок</h3>
               <div className="grade-distribution">
-                {Object.entries(analytics.gradeDistribution).map(([range, count]) => (
+                {Object.entries(analytics.grade_stats.grade_distribution).map(([range, count]) => (
                   <div key={range} className="grade-bar">
                     <div className="grade-label">{range}</div>
                     <div className="grade-progress">
                       <div 
                         className="grade-fill"
                         style={{ 
-                          width: `${(count / analytics.overview.graded) * 100}%`,
+                          width: `${(count / analytics.submission_stats.graded_count) * 100}%`,
                           backgroundColor: getGradeColor(parseInt(range.split('-')[0]))
                         }}
                       >
@@ -373,27 +368,27 @@ function TeacherAssignmentAnalytics() {
               </div>
             </div>
           )}
-          
+
           {/* Submission Timeline */}
-          {Object.keys(analytics.submissionsByDate).length > 0 && (
+          {analytics.submission_timeline && analytics.submission_timeline.length > 0 && (
             <div className="analytics-section">
               <h3>Графік подачі робіт</h3>
               <div className="submission-timeline">
-                {Object.entries(analytics.submissionsByDate)
-                  .sort(([a], [b]) => new Date(a) - new Date(b))
-                  .map(([date, count]) => (
-                    <div key={date} className="timeline-item">
-                      <div className="timeline-date">{formatDate(date)}</div>
-                      <div className="timeline-bar">
-                        <div 
-                          className="timeline-fill"
-                          style={{ height: `${(count / Math.max(...Object.values(analytics.submissionsByDate))) * 100}%` }}
-                        >
-                          <span className="timeline-count">{count}</span>
-                        </div>
+                {analytics.submission_timeline.map((item, index) => (
+                  <div key={index} className="timeline-item">
+                    <div className="timeline-date">{formatDate(item.date)}</div>
+                    <div className="timeline-bar">
+                      <div 
+                        className="timeline-fill"
+                        style={{ 
+                          height: `${(item.count / Math.max(...analytics.submission_timeline.map(d => d.count))) * 100}%` 
+                        }}
+                      >
+                        <span className="timeline-count">{item.count}</span>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
               </div>
             </div>
           )}

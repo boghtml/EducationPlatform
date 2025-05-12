@@ -28,15 +28,23 @@ function TeacherAssignmentSubmissions() {
   
   const [assignment, setAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    assigned: 0,
+    submitted: 0,
+    graded: 0,
+    returned: 0
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filter, setFilter] = useState('submitted'); // 'all', 'submitted', 'graded', 'returned'
-  const [sortBy, setSortBy] = useState('date'); // 'date', 'name', 'status'
+  const [filter, setFilter] = useState('all'); // 'all', 'submitted', 'graded', 'returned', 'assigned'
+  const [sortBy, setSortBy] = useState('date'); // 'date', 'name', 'status', 'grade'
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchAssignmentData();
   }, [assignmentId]);
+  
   const fetchAssignmentData = async () => {
     try {
       setLoading(true);
@@ -44,7 +52,7 @@ function TeacherAssignmentSubmissions() {
       // Get CSRF token
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Отримуємо дані про завдання
+      // Get basic assignment details
       const assignmentResponse = await axios.get(
         `${API_URL}/assignments/${assignmentId}/`,
         { withCredentials: true }
@@ -52,13 +60,16 @@ function TeacherAssignmentSubmissions() {
       
       setAssignment(assignmentResponse.data);
       
-      // Отримуємо список надісланих робіт
-      const submissionsResponse = await axios.get(
-        `${API_URL}/assignments/${assignmentId}/submissions/`,
+      // Use our enhanced submissions endpoint to get all submissions
+      const enhancedSubmissionsResponse = await axios.get(
+        `${API_URL}/assignments/${assignmentId}/all-submissions/`,
         { withCredentials: true }
       );
       
-      setSubmissions(submissionsResponse.data);
+      // Set the submissions and stats from our enhanced endpoint
+      setSubmissions(enhancedSubmissionsResponse.data.submissions);
+      setStats(enhancedSubmissionsResponse.data.stats);
+      
       setLoading(false);
     } catch (error) {
       console.error("Error fetching assignment submissions:", error);
@@ -98,47 +109,58 @@ function TeacherAssignmentSubmissions() {
     });
   };
 
-  const isSubmissionOnTime = (submissionDate, dueDate) => {
-    if (!submissionDate || !dueDate) return null;
-    return new Date(submissionDate) <= new Date(dueDate);
-  };
-
   const handleViewSubmission = (submissionId) => {
-    navigate(`/teacher/assignments/${assignmentId}/submissions/${submissionId}`);
+    if (submissionId) {
+      navigate(`/teacher/assignments/${assignmentId}/submissions/${submissionId}`);
+    }
   };
 
-  // Фільтрація і сортування
+  // Filter and sort submissions
   const filteredSubmissions = submissions
     .filter(submission => {
+      // Apply status filter
       if (filter !== 'all' && submission.status !== filter) return false;
       
+      // Apply search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        return (
-          submission.username.toLowerCase().includes(query) ||
-          submission.email.toLowerCase().includes(query)
-        );
+        const studentName = `${submission.student.first_name} ${submission.student.last_name}`.toLowerCase();
+        const studentEmail = submission.student.email.toLowerCase();
+        
+        return studentName.includes(query) || studentEmail.includes(query);
       }
       
       return true;
     })
     .sort((a, b) => {
+      // Apply sorting
       switch (sortBy) {
         case 'name':
-          return a.username.localeCompare(b.username);
+          const aName = `${a.student.first_name} ${a.student.last_name}`;
+          const bName = `${b.student.first_name} ${b.student.last_name}`;
+          return aName.localeCompare(bName);
+          
         case 'status': {
           const statusOrder = { assigned: 1, submitted: 2, graded: 3, returned: 4 };
           return (statusOrder[a.status] || 0) - (statusOrder[b.status] || 0);
         }
+        
         case 'grade': {
           if (!a.grade && !b.grade) return 0;
           else if (!a.grade) return 1;
           else if (!b.grade) return -1;
           return b.grade - a.grade;
         }
+        
         case 'date':
-        default:
+        default: {
+          // Handle comparison when one or both dates are missing
+          if (!a.submission_date && !b.submission_date) return 0;
+          if (!a.submission_date) return 1;
+          if (!b.submission_date) return -1;
+          
           return new Date(b.submission_date) - new Date(a.submission_date);
+        }
       }
     });
 
@@ -216,44 +238,37 @@ function TeacherAssignmentSubmissions() {
           
           <div className="submissions-stats">
             <div className="stat-card" onClick={() => setFilter('all')}>
-              <div className="stat-value">{submissions.length || 0}</div>
+              <div className="stat-value">{stats.total || 0}</div>
               <div className="stat-label">Всього робіт</div>
             </div>
             
             <div className="stat-card" onClick={() => setFilter('submitted')}>
               <div className="stat-value">
-                {submissions.filter(s => s.status === 'submitted').length || 0}
+                {stats.submitted || 0}
               </div>
               <div className="stat-label">На перевірці</div>
             </div>
             
             <div className="stat-card" onClick={() => setFilter('graded')}>
               <div className="stat-value">
-                {submissions.filter(s => s.status === 'graded').length || 0}
+                {stats.graded || 0}
               </div>
               <div className="stat-label">Оцінено</div>
             </div>
             
             <div className="stat-card" onClick={() => setFilter('returned')}>
               <div className="stat-value">
-                {submissions.filter(s => s.status === 'returned').length || 0}
+                {stats.returned || 0}
               </div>
               <div className="stat-label">Повернуто</div>
             </div>
-
-            {submissions.length > 0 && submissions.some(s => s.status === 'graded') && (
-              <div className="stat-card">
-                <div className="stat-value">
-                  {Math.round(
-                    submissions
-                      .filter(s => s.status === 'graded')
-                      .reduce((sum, s) => sum + (s.grade || 0), 0) /
-                    submissions.filter(s => s.status === 'graded').length
-                  ) || 0}
-                </div>
-                <div className="stat-label">Середня оцінка</div>
+            
+            <div className="stat-card" onClick={() => setFilter('assigned')}>
+              <div className="stat-value">
+                {stats.assigned || 0}
               </div>
-            )}
+              <div className="stat-label">Призначено</div>
+            </div>
           </div>
           
           <div className="submissions-controls">
@@ -279,6 +294,7 @@ function TeacherAssignmentSubmissions() {
                   <option value="submitted">На перевірці</option>
                   <option value="graded">Оцінено</option>
                   <option value="returned">Повернуто</option>
+                  <option value="assigned">Призначено</option>
                 </select>
               </div>
               
@@ -331,26 +347,23 @@ function TeacherAssignmentSubmissions() {
                 </thead>
                 <tbody>
                   {filteredSubmissions.map(submission => {
-                    const onTime = isSubmissionOnTime(
-                      submission.submission_date, 
-                      assignment?.due_date
-                    );
-                    
                     return (
-                      <tr key={submission.id}>
+                      <tr key={submission.student.id}>
                         <td>
                           <div className="student-info">
                             <FaUser className="student-icon" />
                             <div>
-                              <div className="student-name">{submission.username}</div>
-                              <div className="student-email">{submission.email}</div>
+                              <div className="student-name">
+                                {`${submission.student.first_name} ${submission.student.last_name}`}
+                              </div>
+                              <div className="student-email">{submission.student.email}</div>
                             </div>
                           </div>
                         </td>
                         
                         <td>
                           <span className="submission-date">
-                            {formatDate(submission.submission_date)}
+                            {submission.submission_date ? formatDate(submission.submission_date) : '-'}
                           </span>
                         </td>
                         
@@ -369,9 +382,9 @@ function TeacherAssignmentSubmissions() {
                         </td>
                         
                         <td>
-                          {onTime !== null && (
-                            <span className={`deadline-status ${onTime ? 'on-time' : 'late'}`}>
-                              {onTime ? (
+                          {submission.on_time && (
+                            <span className={`deadline-status ${submission.on_time === 'вчасно' ? 'on-time' : 'late'}`}>
+                              {submission.on_time === 'вчасно' ? (
                                 <>
                                   <FaCheckCircle /> Вчасно
                                 </>
@@ -386,13 +399,17 @@ function TeacherAssignmentSubmissions() {
                         
                         <td>
                           <div className="actions">
-                            <button
-                              className="btn-view"
-                              onClick={() => handleViewSubmission(submission.id)}
-                              title="Переглянути роботу"
-                            >
-                              <FaEye />
-                            </button>
+                            {submission.id ? (
+                              <button
+                                className="btn-view"
+                                onClick={() => handleViewSubmission(submission.id)}
+                                title="Переглянути роботу"
+                              >
+                                <FaEye />
+                              </button>
+                            ) : (
+                              <span className="no-submission-note">Немає</span>
+                            )}
                           </div>
                         </td>
                       </tr>
