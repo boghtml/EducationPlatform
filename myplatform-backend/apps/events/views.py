@@ -30,16 +30,17 @@ class EventViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
     
     def create(self, request, *args, **kwargs):
-        
         print("Request data:", request.data)
         print("User:", request.user.id if request.user.is_authenticated else None)
         
         serializer = self.get_serializer(data=request.data, context={'request': request})
         
         if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            instance = serializer.save(author=request.user)
+            # Use EventSerializer to get full event data including ID
+            response_serializer = EventSerializer(instance, context={'request': request})
+            headers = self.get_success_headers(response_serializer.data)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         
         print("Validation errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -91,6 +92,9 @@ class EventViewSet(viewsets.ModelViewSet):
         if not file:
             return Response({"error": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
         
+        print(f"Received file: {file.name}, size: {file.size}, content type: {file.content_type}")
+
+
         if not file.content_type.startswith('image/'):
             return Response({"error": "File must be an image"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -115,14 +119,22 @@ class EventViewSet(viewsets.ModelViewSet):
             event.image_url = file_url
             event.save()
             
-            return Response({
+            response = Response({
                 'message': 'Image uploaded successfully',
                 'image_url': file_url
             }, status=status.HTTP_200_OK)
+            # Додайте заголовки CORS
+            response["Access-Control-Allow-Origin"] = "*"
+
+            return response
             
         except ClientError as e:
+            print(f"S3 client error: {e}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @action(detail=True, methods=['post'])
     def upload_file(self, request, pk=None):
         event = self.get_object()

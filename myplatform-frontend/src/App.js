@@ -50,7 +50,8 @@ import EditMaterial from './components/teacher/EditMaterial';
 import MaterialDetail from './components/teacher/MaterialDetail';
 
 import TeacherAnnouncements from './components/teacher/TeacherAnnouncements';
-import TeacherAnnouncementForm from './components/teacher/TeacherAnnouncementForm';
+import TeacherAnnouncementCreate from './components/teacher/TeacherAnnouncementCreate';
+import TeacherAnnouncementEdit from './components/teacher/TeacherAnnouncementEdit';
 import TeacherCreateCourse from './components/teacher/TeacherCreateCourse';
 import TeacherCreateModule from './components/teacher/TeacherCreateModule';
 import TeacherCreateLesson from './components/teacher/TeacherCreateLesson';
@@ -341,13 +342,13 @@ function App() {
         } />
         <Route path="/teacher/announcements/create" element={
           <ProtectedRoute 
-            element={<TeacherAnnouncementForm />}
+            element={<TeacherAnnouncementCreate />}
             allowedRoles={['teacher', 'admin']} 
           />
         } />
         <Route path="/teacher/announcements/edit/:eventId" element={
           <ProtectedRoute 
-            element={<TeacherAnnouncementForm />}
+            element={<TeacherAnnouncementEdit  />}
             allowedRoles={['teacher', 'admin']} 
           />
         } />

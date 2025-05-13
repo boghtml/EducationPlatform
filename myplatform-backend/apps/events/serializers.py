@@ -32,7 +32,7 @@ class EventCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = [
-            'title', 'description', 'content', 'event_type', 
+            'id', 'title', 'description', 'content', 'event_type', 
             'status', 'start_date', 'end_date', 'location', 'image_url'
         ]
     
