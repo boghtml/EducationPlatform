@@ -1,0 +1,341 @@
+/* src/css/teacher/TeacherAnnouncements.css */
+.teacher-announcements-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.teacher-announcements-container {
+  display: flex;
+  flex: 1;
+}
+
+.teacher-announcements-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.teacher-announcements-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.teacher-announcements-header h1 {
+  font-size: 1.75rem;
+  margin: 0;
+  color: #343a40;
+}
+
+.teacher-announcement-btn-create {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.teacher-announcement-btn-create svg {
+  margin-right: 0.5rem;
+}
+
+.teacher-announcements-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  flex-wrap: wrap;
+}
+
+.teacher-search-box {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.teacher-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.teacher-filter-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.teacher-filter-group {
+  position: relative;
+  width: 180px;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.teacher-filter-select {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  appearance: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 0.75rem center/1.5rem;
+  font-size: 0.9rem;
+}
+
+.teacher-announcements-loading, .teacher-announcements-error, .teacher-no-announcements {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  font-size: 2rem;
+  color: #007bff;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.teacher-btn-primary {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.teacher-btn-secondary {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.teacher-announcements-table-container {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.teacher-announcements-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.teacher-announcements-table th {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.teacher-announcements-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+.announcement-title {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.type-badge, .status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.type-badge.event {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.type-badge.news {
+  background-color: rgba(23, 162, 184, 0.1);
+  color: #17a2b8;
+}
+
+.type-badge.announcement {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.type-badge svg {
+  margin-right: 0.25rem;
+}
+
+.status-badge.published {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.status-badge.draft {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+
+.status-badge.archived {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
+
+.announcement-date {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.actions-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+.action-btn.edit {
+  background-color: #6c757d;
+}
+
+.action-btn.view {
+  background-color: #007bff;
+}
+
+.action-btn.delete {
+  background-color: #dc3545;
+}
+
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.delete-modal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.delete-modal h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #dc3545;
+}
+
+.delete-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-cancel, .btn-delete {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+@media (max-width: 992px) {
+  .teacher-announcements-filters {
+    flex-direction: column;
+  }
+  
+  .teacher-filter-controls {
+    flex-direction: column;
+  }
+  
+  .teacher-filter-group {
+    width: 100%;
+  }
+  
+  .teacher-announcements-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .teacher-announcements-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .teacher-announcements-container {
+    flex-direction: column;
+  }
+}

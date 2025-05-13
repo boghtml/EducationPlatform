@@ -18,3 +18,4 @@ requests
 PyJWT
 cryptography
 google-auth
+django-filter

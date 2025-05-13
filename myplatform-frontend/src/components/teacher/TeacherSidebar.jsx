@@ -126,9 +126,8 @@ function TeacherSidebar() {
           <Link 
             to="/teacher/announcements" 
             className={`sidebar-item ${isActive('/teacher/announcements') ? 'active' : ''}`}
-          >
-            <FaBullhorn className="sidebar-icon" />
-            {!isCollapsed && <span className="sidebar-label">Оголошення</span>}
+          >            <FaBullhorn className="sidebar-icon" />
+            {!isCollapsed && <span className="sidebar-label">Заходи</span>}
           </Link>
           
           <Link 

@@ -60,6 +60,7 @@ urlpatterns = [
     path('api/categories/', include('apps.categories.urls')),
 
     path('api/analytics/', include('apps.analytics.urls')),
+    path('api/events/', include('apps.events.urls')),
 
     # Документація
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

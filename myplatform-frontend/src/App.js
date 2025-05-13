@@ -32,6 +32,7 @@ import HelpCenter from './components/HelpCenter';
 import Subscription from './components/Subscription';
 import Settings from './components/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
+import EventDetail from './components/EventDetail';
 
 // Teacher components import
 import TeacherDashboard from './components/teacher/TeacherDashboard';
@@ -48,6 +49,8 @@ import CreateMaterial from './components/teacher/CreateMaterial';
 import EditMaterial from './components/teacher/EditMaterial';
 import MaterialDetail from './components/teacher/MaterialDetail';
 
+import TeacherAnnouncements from './components/teacher/TeacherAnnouncements';
+import TeacherAnnouncementForm from './components/teacher/TeacherAnnouncementForm';
 import TeacherCreateCourse from './components/teacher/TeacherCreateCourse';
 import TeacherCreateModule from './components/teacher/TeacherCreateModule';
 import TeacherCreateLesson from './components/teacher/TeacherCreateLesson';
@@ -103,6 +106,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/help" element={<HelpCenter />} />
+        <Route path="/events/:eventId" element={<EventDetail />} />
 
         {/* Protected student routes */}
         <Route path="/dashboard" element={
@@ -329,7 +333,24 @@ function App() {
           />
         } />
        
-       
+       <Route path="/teacher/announcements" element={
+          <ProtectedRoute 
+            element={<TeacherAnnouncements />}
+            allowedRoles={['teacher', 'admin']} 
+          />
+        } />
+        <Route path="/teacher/announcements/create" element={
+          <ProtectedRoute 
+            element={<TeacherAnnouncementForm />}
+            allowedRoles={['teacher', 'admin']} 
+          />
+        } />
+        <Route path="/teacher/announcements/edit/:eventId" element={
+          <ProtectedRoute 
+            element={<TeacherAnnouncementForm />}
+            allowedRoles={['teacher', 'admin']} 
+          />
+        } />
 
         
         {
