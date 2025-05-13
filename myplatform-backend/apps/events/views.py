@@ -12,6 +12,8 @@ import boto3
 from django.conf import settings
 from botocore.exceptions import ClientError
 import urllib.parse
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 s3_client = boto3.client(
     's3',
@@ -186,4 +188,36 @@ class EventViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_201_CREATED)
             
         except ClientError as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    @action(detail=True, methods=['delete'], url_path='files/(?P<file_id>[^/.]+)')
+    def delete_file(self, request, pk=None, file_id=None):
+        """
+        Видалення файлу заходу
+        """
+        try:
+            event = self.get_object()
+            user = request.user
+            
+            if not user.is_authenticated or (user != event.author and user.role != 'admin'):
+                return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+            
+            event_file = get_object_or_404(EventFile, id=file_id, event=event)
+            
+            try:
+                if event_file.file_url:
+                    parsed_url = urllib.parse.urlparse(event_file.file_url)
+                    encoded_file_key = parsed_url.path.lstrip('/')
+                    file_key = urllib.parse.unquote(encoded_file_key)
+                    s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=file_key)
+            except Exception as e:
+                print(f"Error deleting file from S3: {e}")
+
+            event_file.delete()
+            
+            return Response({'message': 'File deleted successfully'}, status=status.HTTP_200_OK)
+            
+        except Http404:
+            return Response({'error': 'File not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

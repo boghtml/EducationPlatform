@@ -16,7 +16,7 @@ import {
   FaInfoCircle,
   FaCheck
 } from 'react-icons/fa';
-import '../../css/teacher/TeacherAnnouncementForm.css';
+import '../../css/teacher/TeacherAnnouncementCreate.css';
 
 // Налаштування axios для CSRF
 axios.defaults.xsrfCookieName = 'csrftoken';
