@@ -14,7 +14,8 @@ import {
   FaPaperclip,
   FaTrash,
   FaExclamationTriangle,
-  FaInfoCircle
+  FaInfoCircle,
+  FaCheck
 } from 'react-icons/fa';
 import '../../css/teacher/TeacherAnnouncementForm.css';
 
@@ -43,12 +44,33 @@ function TeacherAnnouncementForm() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
   
   const imageInputRef = useRef(null);
   const fileInputRef = useRef(null);
   
+  // Функція для перевірки валідності URL
+  const isValidUrl = (url) => {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  
   useEffect(() => {
-    
+    // Очищаємо повідомлення про успіх через 3 секунди
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+  
+  useEffect(() => {
     const userRole = sessionStorage.getItem('userRole');
     if (userRole !== 'teacher' && userRole !== 'admin') {
       navigate('/login');
@@ -65,6 +87,8 @@ function TeacherAnnouncementForm() {
           const response = await axios.get(`${API_URL}/events/events/${eventId}/`, {
             withCredentials: true
           });
+          
+          console.log("Event data:", response.data);
           
           if (response.data) {
             const event = response.data;
@@ -117,17 +141,24 @@ function TeacherAnnouncementForm() {
     
     if (isEditMode) {
       handleImageUpload(file);
+    } else {
+      // Для нового заходу зберігаємо превью, але не завантажуємо на сервер
+      // до моменту збереження всього заходу
+      setFormData(prev => ({ ...prev, image_url: '' }));
     }
   };
   
   const handleImageUpload = async (file) => {
     try {
       setUploadingImage(true);
+      setError(null);
       
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
       const formData = new FormData();
       formData.append('image', file);
+      
+      console.log("Uploading image for event:", eventId);
       
       const response = await axios.post(`${API_URL}/events/events/${eventId}/upload_image/`, formData, {
         withCredentials: true,
@@ -136,8 +167,12 @@ function TeacherAnnouncementForm() {
         }
       });
       
+      console.log("Image upload response:", response.data);
+      
       if (response.data && response.data.image_url) {
         setFormData(prev => ({ ...prev, image_url: response.data.image_url }));
+        setPreview(response.data.image_url);
+        setSuccessMessage("Зображення успішно завантажено");
       }
       
       setUploadingImage(false);
@@ -157,11 +192,14 @@ function TeacherAnnouncementForm() {
     
     try {
       setUploadingFile(true);
+      setError(null);
       
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
       const formData = new FormData();
       formData.append('file', newFile);
+      
+      console.log("Uploading file for event:", eventId, "File:", newFile.name);
       
       const response = await axios.post(`${API_URL}/events/events/${eventId}/upload_file/`, formData, {
         withCredentials: true,
@@ -170,8 +208,11 @@ function TeacherAnnouncementForm() {
         }
       });
       
+      console.log("File upload response:", response.data);
+      
       if (response.data && response.data.file) {
         setFiles(prev => [...prev, response.data.file]);
+        setSuccessMessage("Файл успішно завантажено");
       }
       
       setUploadingFile(false);
@@ -190,24 +231,32 @@ function TeacherAnnouncementForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    
     try {
       setSubmitting(true);
+      setError(null);
       
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
       let response;
       
       if (isEditMode) {
+        // Оновлюємо захід
+        console.log("Updating event with ID:", eventId, "Data:", formData);
         response = await axios.put(`${API_URL}/events/events/${eventId}/`, formData, {
           withCredentials: true
         });
-      } else {
         
+        console.log("Update response:", response.data);
+      } else {
+        // Створюємо новий захід
+        console.log("Creating new event. Data:", formData);
         response = await axios.post(`${API_URL}/events/events/`, formData, {
           withCredentials: true
         });
         
+        console.log("Create response:", response.data);
+        
+        // Якщо зображення було додано локально (preview), завантажуємо його на сервер
         if (response.data && response.data.id && preview && preview.startsWith('data:image')) {
           const newEventId = response.data.id;
           
@@ -224,29 +273,42 @@ function TeacherAnnouncementForm() {
           const imageFormData = new FormData();
           imageFormData.append('image', file);
           
-          await axios.post(`${API_URL}/events/events/${newEventId}/upload_image/`, imageFormData, {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
+          console.log("Uploading image for new event:", newEventId);
+          
+          try {
+            const imageResponse = await axios.post(`${API_URL}/events/events/${newEventId}/upload_image/`, imageFormData, {
+              withCredentials: true,
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            
+            console.log("New event image upload response:", imageResponse.data);
+          } catch (imageError) {
+            console.error("Error uploading image for new event:", imageError);
+          }
         }
       }
       
       setSubmitting(false);
-      navigate('/teacher/announcements');
+      setSuccessMessage(isEditMode ? "Захід успішно оновлено" : "Захід успішно створено");
+      
+      // Затримка перед переходом до списку
+      setTimeout(() => {
+        navigate('/teacher/announcements');
+      }, 1000);
     } catch (error) {
-        console.error("Error saving event:", error);
-        
-        if (error.response && error.response.data) {
+      console.error("Error saving event:", error);
+      
+      if (error.response && error.response.data) {
         console.error("Server error details:", error.response.data);
         setError("Не вдалося зберегти захід: " + JSON.stringify(error.response.data));
-        } else {
+      } else {
         setError("Не вдалося зберегти захід. Будь ласка, перевірте введені дані та спробуйте знову.");
-        }
-        setSubmitting(false);
+      }
+      setSubmitting(false);
     }
-};
+  };
   
   if (loading) {
     return (
@@ -284,6 +346,12 @@ function TeacherAnnouncementForm() {
             </div>
           )}
           
+          {successMessage && (
+            <div className="announcement-form-success">
+              <FaCheck /> {successMessage}
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="announcement-form">
             <div className="announcement-form-grid">
               <div className="announcement-form-main">
@@ -297,6 +365,7 @@ function TeacherAnnouncementForm() {
                     onChange={handleChange}
                     required
                     className="form-control"
+                    placeholder="Введіть назву заходу"
                   />
                 </div>
                 
@@ -310,6 +379,7 @@ function TeacherAnnouncementForm() {
                     required
                     className="form-control"
                     rows="3"
+                    placeholder="Введіть короткий опис заходу"
                   ></textarea>
                 </div>
                 
@@ -322,6 +392,7 @@ function TeacherAnnouncementForm() {
                     onChange={handleChange}
                     className="form-control"
                     rows="10"
+                    placeholder="Детальний опис заходу. Можете використовувати HTML-теги для форматування."
                   ></textarea>
                 </div>
                 
@@ -396,6 +467,7 @@ function TeacherAnnouncementForm() {
                         value={formData.location}
                         onChange={handleChange}
                         className="form-control"
+                        placeholder="Введіть місце проведення заходу"
                       />
                     </div>
                   </>
@@ -412,6 +484,7 @@ function TeacherAnnouncementForm() {
                           src={preview} 
                           alt="Preview" 
                           className="image-preview" 
+                          onError={(e) => {e.target.src = 'https://via.placeholder.com/300x200?text=Попередній+перегляд'}}
                         />
                         <button 
                           type="button" 

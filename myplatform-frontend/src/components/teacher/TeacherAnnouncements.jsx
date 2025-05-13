@@ -6,7 +6,8 @@ import axios from 'axios';
 import API_URL from '../../api';
 import TeacherSidebar from './TeacherSidebar';
 import TeacherHeader from './TeacherHeader';
-import {   FaPlus, 
+import {  
+  FaPlus, 
   FaEdit, 
   FaTrash, 
   FaEye, 
@@ -16,7 +17,10 @@ import {   FaPlus,
   FaFilter,
   FaSearch,
   FaSpinner,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaSync,
+  FaCalendarAlt,
+  FaCheckCircle
 } from 'react-icons/fa';
 import '../../css/teacher/TeacherAnnouncements.css';
 
@@ -30,44 +34,69 @@ function TeacherAnnouncements() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
+  // Функція для перевірки валідності URL
+  const isValidUrl = (url) => {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
   useEffect(() => {
-    
+    // Очищаємо повідомлення про успіх через 3 секунди
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      const response = await axios.get(`${API_URL}/events/events/`, {
+        withCredentials: true
+      });
+      
+      console.log("Events data:", response.data);
+      
+      if (response.data) {
+        setEvents(response.data);
+        setFilteredEvents(response.data);
+      }
+      
+      setLoading(false);
+      setRefreshing(false);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setError("Не вдалося завантажити заходи. Будь ласка, спробуйте пізніше.");
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     const userRole = sessionStorage.getItem('userRole');
     if (userRole !== 'teacher' && userRole !== 'admin') {
       navigate('/login');
       return;
     }
 
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        
-        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-        
-        const response = await axios.get(`${API_URL}/events/events/`, {
-          withCredentials: true
-        });
-        
-        if (response.data) {
-          setEvents(response.data);
-          setFilteredEvents(response.data);
-        }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        setError("Не вдалося завантажити заходи. Будь ласка, спробуйте пізніше.");
-        setLoading(false);
-      }
-    };
-
     fetchEvents();
   }, [navigate]);
 
   useEffect(() => {
-    
     if (!events.length) return;
     
     let filtered = [...events];
@@ -106,7 +135,8 @@ function TeacherAnnouncements() {
       case 'event':
         return <FaRegCalendarCheck className="event-icon event" />;
       case 'news':
-        return <FaNewspaper className="event-icon news" />;      case 'announcement':
+        return <FaNewspaper className="event-icon news" />;
+      case 'announcement':
         return <FaBullhorn className="event-icon announcement" />;
       default:
         return <FaRegCalendarCheck className="event-icon" />;
@@ -148,6 +178,8 @@ function TeacherAnnouncements() {
     if (!eventToDelete) return;
     
     try {
+      setShowDeleteModal(false);
+      
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
       await axios.delete(`${API_URL}/events/events/${eventToDelete.id}/`, {
@@ -155,12 +187,17 @@ function TeacherAnnouncements() {
       });
       
       setEvents(events.filter(event => event.id !== eventToDelete.id));
-      setShowDeleteModal(false);
       setEventToDelete(null);
+      setSuccessMessage(`Захід "${eventToDelete.title}" успішно видалено`);
     } catch (error) {
       console.error("Error deleting event:", error);
       setError("Не вдалося видалити захід. Будь ласка, спробуйте пізніше.");
     }
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchEvents();
   };
 
   const handleSearch = (e) => {
@@ -176,19 +213,41 @@ function TeacherAnnouncements() {
         
         <div className="teacher-announcements-content">
           <div className="teacher-announcements-header">
-            <h1>Управління заходами та оголошеннями</h1>
+            <div className="header-title-section">
+              <h1>Управління заходами та оголошеннями</h1>
+              <button 
+                className="refresh-btn" 
+                onClick={handleRefresh} 
+                disabled={refreshing}
+                title="Оновити список"
+              >
+                <FaSync className={refreshing ? "spinning" : ""} />
+              </button>
+            </div>
             
             <Link to="/teacher/announcements/create" className="teacher-announcement-btn-create">
               <FaPlus /> Створити новий
             </Link>
           </div>
           
+          {successMessage && (
+            <div className="teacher-announcements-success">
+              <FaCheckCircle /> {successMessage}
+            </div>
+          )}
+          
+          {error && (
+            <div className="teacher-announcements-error-message">
+              <FaExclamationTriangle /> {error}
+            </div>
+          )}
+          
           <div className="teacher-announcements-filters">
             <div className="teacher-search-box">
               <FaSearch className="search-icon" />
               <input 
                 type="text" 
-                placeholder="      Пошук за назвою або описом" 
+                placeholder="Пошук за назвою або описом" 
                 value={searchQuery}
                 onChange={handleSearch}
                 className="teacher-search-input"
@@ -268,6 +327,7 @@ function TeacherAnnouncements() {
               <table className="teacher-announcements-table">
                 <thead>
                   <tr>
+                    <th className="column-image">Зображення</th>
                     <th>Назва</th>
                     <th>Тип</th>
                     <th>Статус</th>
@@ -279,6 +339,20 @@ function TeacherAnnouncements() {
                 <tbody>
                  {filteredEvents.map(event => (
                    <tr key={event.id}>
+                     <td className="column-image">
+                       {isValidUrl(event.image_url) ? (
+                         <img 
+                           src={event.image_url} 
+                           alt={event.title} 
+                           className="event-thumbnail"
+                           onError={(e) => {e.target.src = 'https://via.placeholder.com/50x50?text=Захід'}}
+                         />
+                       ) : (
+                         <div className="event-no-image">
+                           <FaCalendarAlt />
+                         </div>
+                       )}
+                     </td>
                      <td className="announcement-title">{event.title}</td>
                      <td className="announcement-type">
                        <span className={`type-badge ${event.event_type}`}>

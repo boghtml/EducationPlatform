@@ -15,9 +15,13 @@ import {
   FaDownload,
   FaPaperclip,
   FaSpinner,
-  FaExclamationTriangle,  FaBullhorn,
+  FaExclamationTriangle,
+  FaBullhorn,
   FaNewspaper,
-  FaRegCalendarCheck
+  FaRegCalendarCheck,
+  FaEdit,
+  FaShare,
+  FaPrint
 } from 'react-icons/fa';
 import '../css/eventDetail.css'; 
 
@@ -29,6 +33,18 @@ function EventDetail() {
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState('');
   const [isAuthor, setIsAuthor] = useState(false);
+  const [showShareTooltip, setShowShareTooltip] = useState(false);
+
+  // Функція для перевірки валідності URL
+  const isValidUrl = (url) => {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
 
   useEffect(() => {
     const userRole = sessionStorage.getItem('userRole') || '';
@@ -44,6 +60,8 @@ function EventDetail() {
         const response = await axios.get(`${API_URL}/events/events/${eventId}/`, {
           withCredentials: true
         });
+        
+        console.log("Event details:", response.data);
         
         if (response.data) {
           setEvent(response.data);
@@ -88,7 +106,8 @@ function EventDetail() {
       case 'event':
         return <FaRegCalendarCheck className="event-detail-icon event" />;
       case 'news':
-        return <FaNewspaper className="event-detail-icon news" />;      case 'announcement':
+        return <FaNewspaper className="event-detail-icon news" />;
+      case 'announcement':
         return <FaBullhorn className="event-detail-icon announcement" />;
       default:
         return <FaRegCalendarCheck className="event-detail-icon" />;
@@ -109,6 +128,27 @@ function EventDetail() {
   };
 
   const canEdit = isAuthor || userRole === 'admin';
+
+  const handleShareClick = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: event.title,
+        text: event.description,
+        url: window.location.href,
+      })
+      .then(() => console.log('Successfully shared'))
+      .catch((error) => console.error('Error sharing:', error));
+    } else {
+      // Fallback for browsers without Web Share API
+      navigator.clipboard.writeText(window.location.href);
+      setShowShareTooltip(true);
+      setTimeout(() => setShowShareTooltip(false), 2000);
+    }
+  };
+
+  const handlePrintClick = () => {
+    window.print();
+  };
 
   if (loading) {
     return (
@@ -180,16 +220,23 @@ function EventDetail() {
             <span>{getEventTypeText(event.event_type)}</span>
           </div>
           
-          {canEdit && (
-            <div className="event-detail-actions">
+          <div className="event-detail-actions">
+            {canEdit && (
               <Link 
                 to={userRole === 'teacher' ? `/teacher/announcements/edit/${event.id}` : `/admin/announcements/edit/${event.id}`} 
                 className="event-detail-btn-edit"
               >
-                Редагувати
+                <FaEdit /> Редагувати
               </Link>
-            </div>
-          )}
+            )}
+            <button className="event-detail-btn-share" onClick={handleShareClick}>
+              <FaShare /> Поділитися
+              {showShareTooltip && <span className="share-tooltip">Посилання скопійовано!</span>}
+            </button>
+            <button className="event-detail-btn-print" onClick={handlePrintClick}>
+              <FaPrint /> Друк
+            </button>
+          </div>
         </div>
         
         <h1 className="event-detail-title">{event.title}</h1>
@@ -209,12 +256,13 @@ function EventDetail() {
           </div>
         </div>
         
-        {event.image_url && (
+        {isValidUrl(event.image_url) && (
           <div className="event-detail-image-container">
             <img 
               src={event.image_url} 
               alt={event.title} 
-              className="event-detail-image" 
+              className="event-detail-image"
+              onError={(e) => {e.target.src = 'https://via.placeholder.com/1200x600?text=Захід'}}
             />
           </div>
         )}

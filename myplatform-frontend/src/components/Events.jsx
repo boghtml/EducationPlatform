@@ -14,9 +14,12 @@ import {
   FaSearch,
   FaFilter,
   FaSpinner,
-  FaExclamationTriangle,  FaBullhorn,
+  FaExclamationTriangle,
+  FaBullhorn,
   FaNewspaper,
-  FaRegCalendarCheck
+  FaRegCalendarCheck,
+  FaAngleRight,
+  FaSync
 } from 'react-icons/fa';
 import '../css/events.css';
 
@@ -27,37 +30,53 @@ function Events() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('-created_at'); 
+  const [sortBy, setSortBy] = useState('-created_at');
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Функція для перевірки валідності URL
+  const isValidUrl = (url) => {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      const response = await axios.get(`${API_URL}/events/events/`, {
+        withCredentials: true,
+        params: {
+          ordering: sortBy,
+          search: searchQuery !== '' ? searchQuery : undefined,
+          event_type: typeFilter !== 'all' ? typeFilter : undefined
+        }
+      });
+      
+      console.log("Events data:", response.data);
+      
+      if (response.data) {
+        setEvents(response.data);
+        setFilteredEvents(response.data);
+      }
+      
+      setLoading(false);
+      setRefreshing(false);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setError("Не вдалося завантажити заходи. Будь ласка, спробуйте пізніше.");
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        
-        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-        
-        const response = await axios.get(`${API_URL}/events/events/`, {
-          withCredentials: true,
-          params: {
-            ordering: sortBy,
-            search: searchQuery !== '' ? searchQuery : undefined,
-            event_type: typeFilter !== 'all' ? typeFilter : undefined
-          }
-        });
-        
-        if (response.data) {
-          setEvents(response.data);
-          setFilteredEvents(response.data);
-        }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        setError("Не вдалося завантажити заходи. Будь ласка, спробуйте пізніше.");
-        setLoading(false);
-      }
-    };
-
     fetchEvents();
   }, [searchQuery, typeFilter, sortBy]);
 
@@ -85,7 +104,8 @@ function Events() {
       case 'event':
         return <FaRegCalendarCheck className="event-icon event" />;
       case 'news':
-        return <FaNewspaper className="event-icon news" />;      case 'announcement':
+        return <FaNewspaper className="event-icon news" />;
+      case 'announcement':
         return <FaBullhorn className="event-icon announcement" />;
       default:
         return <FaRegCalendarCheck className="event-icon" />;
@@ -117,6 +137,11 @@ function Events() {
     setSortBy(e.target.value);
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchEvents();
+  };
+
   return (
     <div className="events-page">
       <Header />
@@ -133,7 +158,7 @@ function Events() {
                 <input
                   type="text"
                   className="events-search-input"
-                  placeholder="      Пошук за назвою або описом..."
+                  placeholder="Пошук за назвою або описом..."
                   value={searchQuery}
                   onChange={handleSearch}
                 />
@@ -167,6 +192,15 @@ function Events() {
                   <option value="-title">За назвою (Я-А)</option>
                 </select>
               </div>
+
+              <button 
+                className="events-refresh-btn" 
+                onClick={handleRefresh} 
+                disabled={refreshing}
+                title="Оновити список"
+              >
+                <FaSync className={refreshing ? "spinning" : ""} />
+              </button>
             </div>
           </div>
         </div>
@@ -224,9 +258,10 @@ function Events() {
                 <div className="event-card" key={event.id}>
                   <div className="event-image-container">
                     <img 
-                      src={event.image_url || 'https://via.placeholder.com/300x200?text=Захід'} 
+                      src={isValidUrl(event.image_url) ? event.image_url : 'https://via.placeholder.com/300x200?text=Захід'} 
                       alt={event.title} 
-                      className="event-image" 
+                      className="event-image"
+                      onError={(e) => {e.target.src = 'https://via.placeholder.com/300x200?text=Захід'}}
                     />
                     <div className={`event-type ${event.event_type}`}>
                       {getEventTypeIcon(event.event_type)}
@@ -280,7 +315,7 @@ function Events() {
                     </div>
                     
                     <Link to={`/events/${event.id}`} className="event-read-more">
-                      Детальніше
+                      Детальніше <FaAngleRight className="read-more-icon" />
                     </Link>
                   </div>
                 </div>
