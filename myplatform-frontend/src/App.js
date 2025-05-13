@@ -64,17 +64,17 @@ import TeacherLessonDetail from './components/teacher/TeacherLessonDetail';
 import TeacherLessonFiles from './components/teacher/TeacherLessonFiles';
 import TeacherLessonLinks from './components/teacher/TeacherLessonLinks';
 import StudentAssignmentDetail from './components/teacher/StudentAssignmentDetail';
+import TeacherHelp from './components/teacher/TeacherHelp';
+import TeacherAnalytics from './components/teacher/TeacherAnalytics';
 
 /*
 import TeacherQA from './components/teacher/TeacherQA';
-import TeacherAnalytics from './components/teacher/TeacherAnalytics';
 import TeacherLessons from './components/teacher/TeacherLessons';
 import TeacherSettings from './components/teacher/TeacherSettings';
 import TeacherNotifications from './components/teacher/TeacherNotifications';
 import TeacherAnnouncements from './components/teacher/TeacherAnnouncements';
 import TeacherSchedule from './components/teacher/TeacherSchedule';
 import TeacherDiscussions from './components/teacher/TeacherDiscussions';
-import TeacherHelp from './components/teacher/TeacherHelp';
 */
 
 // Import CSS files
@@ -352,17 +352,21 @@ function App() {
             allowedRoles={['teacher', 'admin']} 
           />
         } />
-
-        
-        {
-          /*
-           <Route path="/teacher/analytics" element={
+        <Route path="/teacher/help" element={
+          <ProtectedRoute 
+            element={<TeacherHelp />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+         <Route path="/teacher/analytics" element={
           <ProtectedRoute 
             element={<TeacherAnalytics />}
             allowedRoles={['teacher']} 
           />
         } />
-      
+        {
+          /*
+                
               <Route path="/teacher/lessons" element={
           <ProtectedRoute 
             element={<TeacherLessons />}
@@ -406,12 +410,7 @@ function App() {
             allowedRoles={['teacher']} 
           />
         } />
-        <Route path="/teacher/help" element={
-          <ProtectedRoute 
-            element={<TeacherHelp />}
-            allowedRoles={['teacher']} 
-          />
-        } />
+        
           */
         }
       </Routes>

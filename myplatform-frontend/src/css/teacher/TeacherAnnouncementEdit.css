@@ -456,23 +456,6 @@ textarea.text-input {
   background-color: #fee2e2;
 }
 
-/* Progress Bar */
-.progress-bar-container {
-  width: 100%;
-  height: 6px;
-  background-color: #e5e7eb;
-  border-radius: 3px;
-  overflow: hidden;
-  margin: 0.75rem 0;
-}
-
-.progress-bar {
-  height: 100%;
-  background-color: #3b82f6;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
 .progress-info {
   display: flex;
   justify-content: space-between;

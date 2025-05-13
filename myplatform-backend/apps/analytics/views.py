@@ -317,8 +317,8 @@ class AdminAnalyticsView(APIView):
             return []
 
     def get(self, request):
-        if request.user.role != 'admin':
-            return Response({"error": "Only admin can access analytics"}, status=403)
+        if request.user.role not in ['admin', 'teacher']:
+            return Response({"error": "Only admin or teacher can access analytics"}, status=403)
 
         analytics_data = {
             'timestamp': timezone.now(),
@@ -488,7 +488,7 @@ class CourseAnalyticsView(APIView):
         return timeline
 
     def get(self, request, course_id):
-        if request.user.role != 'admin':
+        if request.user.role not in ['admin', 'teacher']:
             return Response({"error": "Only admin can access analytics"}, status=403)
 
         try:
@@ -528,7 +528,7 @@ class AnalyticsDataView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if request.user.role != 'admin':
+        if request.user.role not in ['admin', 'teacher']:
             return Response({"error": "Only admin can access analytics"}, status=403)
 
         chart_type = request.query_params.get('type', 'enrollment_trends')
