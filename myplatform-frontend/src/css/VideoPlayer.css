@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #000;
+  background-color: #ffffff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -26,14 +26,6 @@
 }
 
 /* Custom video controls */
-.video-container video::-webkit-media-controls {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.video-container video::-webkit-media-controls-panel {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
 .video-container video::-webkit-media-controls-play-button,
 .video-container video::-webkit-media-controls-timeline,
 .video-container video::-webkit-media-controls-current-time-display,

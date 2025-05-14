@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import CourseCategory
 from .serializers import CourseCategorySerializer
-from apps.assignments.mixins import CsrfExemptSessionAuthentication
+from .mixins import CsrfExemptSessionAuthentication
 from rest_framework.exceptions import PermissionDenied
 
 class CategoryListCreateView(generics.ListCreateAPIView):

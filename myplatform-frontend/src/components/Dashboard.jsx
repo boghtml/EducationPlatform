@@ -348,7 +348,7 @@ function Dashboard() {
                   <FaSearch className="search-icon" />
                   <input 
                     type="text" 
-                    placeholder="Пошук курсів..."
+                    placeholder="      Пошук курсів..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />

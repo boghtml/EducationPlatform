@@ -18,12 +18,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import get_token
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from rest_framework.renderers import JSONRenderer
+import yaml
 
 
 def get_csrf_token(request):
@@ -31,6 +33,28 @@ def get_csrf_token(request):
     response['Access-Control-Allow-Origin'] = 'http://localhost:3000'
     response['Access-Control-Allow-Credentials'] = 'true'
     return response
+
+def get_schema_json(request):
+    """Повертає схему API у форматі JSON"""
+    schema = schema_view.without_ui(cache_timeout=0)
+    response = schema(request)
+    response.accepted_renderer = JSONRenderer()
+    response.accepted_media_type = "application/json"
+    response.renderer_context = {}
+    response.render()
+    return HttpResponse(response.content, content_type="application/json")
+
+def get_schema_yaml(request):
+    """Повертає схему API у форматі YAML"""
+    schema = schema_view.without_ui(cache_timeout=0)
+    response = schema(request)
+    response.accepted_renderer = JSONRenderer()
+    response.accepted_media_type = "application/json"
+    response.renderer_context = {}
+    response.render()
+    
+    yaml_content = yaml.dump(yaml.safe_load(response.content), allow_unicode=True)
+    return HttpResponse(yaml_content, content_type="application/yaml")
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -63,6 +87,8 @@ urlpatterns = [
     path('api/events/', include('apps.events.urls')),
 
     # Документація
+    path('swagger.json', get_schema_json, name='schema-json'),
+    path('swagger.yaml', get_schema_yaml, name='schema-yaml'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc-ui'),
 ]

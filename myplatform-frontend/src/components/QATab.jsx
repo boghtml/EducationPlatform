@@ -313,7 +313,7 @@ function QATab() {
               <input 
                 type="text" 
                 className="course-wc-qa-search" 
-                placeholder="Пошук питань..." 
+                placeholder="    Пошук питань..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
