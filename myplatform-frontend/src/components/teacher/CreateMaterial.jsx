@@ -218,8 +218,8 @@ function CreateMaterial() {
                 <CheckCircle className="create-material__success-icon" />
                 <div className="create-material__success-ripple" />
               </div>
-              <h2>Material Created Successfully!</h2>
-              <p>Your material has been created and files uploaded.</p>
+              <h2>Матеріал успішно створено!</h2>
+              <p>Ваш матеріал було створено та файли завантажено.</p>
               {files.length > 0 && (
                 <div className="create-material__success-files">
                   {files.map((file, index) => (
@@ -250,16 +250,16 @@ function CreateMaterial() {
                 className="create-material__btn-back"
               >
                 <ChevronLeft size={20} />
-                Back to Materials
+                Назад до матеріалів
               </button>
-              <h1>Create New Material</h1>
+              <h1>Створити новий матеріал</h1>
               <button
                 onClick={saveDraft}
                 className="create-material__btn-save-draft"
                 disabled={isSubmitting}
               >
                 <Save size={16} />
-                Save Draft
+                Зберегти чернетку
               </button>
             </div>
           </div>
@@ -279,11 +279,11 @@ function CreateMaterial() {
 
           <form onSubmit={handleSubmit} className="create-material__form">
             <div className="create-material__form-section">
-              <h3>Basic Information</h3>
+              <h3>Основна інформація</h3>
               
               <div className="create-material__form-group">
                 <label htmlFor="title">
-                  Material Title <span className="create-material__required">*</span>
+                  Назва матеріалу <span className="create-material__required">*</span>
                 </label>
                 <input
                   type="text"
@@ -291,7 +291,7 @@ function CreateMaterial() {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="Enter material title..."
+                  placeholder="Введіть назву матеріалу..."
                   maxLength={100}
                   required
                 />
@@ -302,7 +302,7 @@ function CreateMaterial() {
 
               <div className="create-material__form-group">
                 <label htmlFor="course">
-                  Course <span className="create-material__required">*</span>
+                  Курс <span className="create-material__required">*</span>
                 </label>
                 <select
                   id="course"
@@ -311,7 +311,7 @@ function CreateMaterial() {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Select a course</option>
+                  <option value="">Виберіть курс</option>
                   {courses.map(course => (
                     <option key={course.id} value={course.id}>
                       {course.title}
@@ -321,13 +321,13 @@ function CreateMaterial() {
               </div>
 
               <div className="create-material__form-group">
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">Опис</label>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Add a detailed description of the material..."
+                  placeholder="Додайте детальний опис матеріалу..."
                   maxLength={500}
                 />
                 <span className="create-material__char-count">
@@ -337,7 +337,7 @@ function CreateMaterial() {
             </div>
 
             <div className="create-material__form-section">
-              <h3>Upload Files</h3>
+              <h3>Завантаження файлів</h3>
               
               <div
                 className={`create-material__file-upload-zone ${isDragging ? 'create-material__drag-active' : ''}`}
@@ -349,9 +349,9 @@ function CreateMaterial() {
                 <div className="create-material__upload-icon">
                   <Upload size={48} />
                 </div>
-                <h4>Drag and drop files here or click to browse</h4>
-                <p>Supports documents, images, videos, and archives</p>
-                <p className="create-material__upload-limits">Max file size: 50MB</p>
+                <h4>Перетягніть файли сюди або натисніть для вибору</h4>
+                <p>Підтримуються документи, зображення, відео та архіви</p>
+                <p className="create-material__upload-limits">Максимальний розмір файлу: 50МБ</p>
                 <input
                   id="file-input"
                   type="file"
@@ -369,13 +369,13 @@ function CreateMaterial() {
                   }}
                 >
                   <FolderOpen size={16} />
-                  Select Files
+                  Вибрати файли
                 </button>
               </div>
 
               {files.length > 0 && (
                 <div className="create-material__files-preview">
-                  <h4>Selected Files ({files.length})</h4>
+                  <h4>Вибрані файли ({files.length})</h4>
                   <div className="create-material__files-list">
                     {files.map((fileObj, index) => (
                       <div key={index} className="create-material__file-preview-item">
@@ -392,7 +392,7 @@ function CreateMaterial() {
                           <div className="create-material__file-preview-details">
                             <span className="create-material__file-name">{fileObj.file.name}</span>
                             <span className="create-material__file-size">
-                              {(fileObj.file.size / 1024 / 1024).toFixed(2)} MB
+                              {(fileObj.file.size / 1024 / 1024).toFixed(2)} МБ
                             </span>
                             {(fileObj.status === 'uploading' || fileObj.status === 'uploaded') && (
                               <div className="create-material__file-upload-progress">
@@ -421,9 +421,9 @@ function CreateMaterial() {
                     ))}
                   </div>
                   <div className="create-material__files-summary">
-                    <span>Total files: {files.length}</span>
+                    <span>Всього файлів: {files.length}</span>
                     <span>
-                      Total size: {(files.reduce((acc, f) => acc + f.file.size, 0) / 1024 / 1024).toFixed(2)} MB
+                      Загальний розмір: {(files.reduce((acc, f) => acc + f.file.size, 0) / 1024 / 1024).toFixed(2)} МБ
                     </span>
                   </div>
                 </div>
@@ -438,7 +438,7 @@ function CreateMaterial() {
                 disabled={isSubmitting}
               >
                 <X size={16} />
-                Cancel
+                Скасувати
               </button>
               <button
                 type="submit"
@@ -448,12 +448,12 @@ function CreateMaterial() {
                 {isSubmitting ? (
                   <>
                     <Loader className="create-material__loading-spinner" size={16} />
-                    Creating...
+                    Створення...
                   </>
                 ) : (
                   <>
                     <CheckCircle size={16} />
-                    Create Material
+                    Створити матеріал
                   </>
                 )}
               </button>

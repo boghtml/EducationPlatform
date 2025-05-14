@@ -151,7 +151,7 @@ function MaterialDetail() {
           <div className="material-detail__content">
             <div className="material-detail__loading">
               <Loader className="material-detail__loading-spinner" size={40} />
-              <p>Loading material details...</p>
+              <p>Завантаження деталей матеріалу...</p>
             </div>
           </div>
         </div>
@@ -168,14 +168,14 @@ function MaterialDetail() {
           <div className="material-detail__content">
             <div className="material-detail__error">
               <AlertCircle size={48} />
-              <h3>Error Loading Material</h3>
-              <p>{error || 'Material not found'}</p>
+              <h3>Помилка завантаження матеріалу</h3>
+              <p>{error || 'Матеріал не знайдено'}</p>
               <button 
                 onClick={() => navigate('/teacher/materials')} 
                 className="material-detail__btn-back"
               >
                 <ChevronLeft size={20} />
-                Back to Materials
+                Назад до матеріалів
               </button>
             </div>
           </div>
@@ -196,7 +196,7 @@ function MaterialDetail() {
               className="material-detail__btn-back"
             >
               <ChevronLeft size={20} />
-              Back to Materials
+              Назад до матеріалів
             </button>
 
             <div className="material-detail__title-section">
@@ -204,7 +204,7 @@ function MaterialDetail() {
                 <h1>{material.title}</h1>
                 <div className="material-detail__tags">
                   <span className="material-detail__tag">
-                    {material.files?.length || 0} files
+                    {material.files?.length || 0} файлів
                   </span>
                   <span className="material-detail__tag">
                     {formatFileSize(material.files?.reduce((acc, file) => acc + (file.file_size || 0), 0) || 0)}
@@ -218,14 +218,14 @@ function MaterialDetail() {
                   className="material-detail__btn-edit"
                 >
                   <Edit size={16} />
-                  Edit
+                  Редагувати
                 </button>
                 <button
                   onClick={handleShare}
                   className="material-detail__btn-share"
                 >
                   <Share2 size={16} />
-                  Share
+                  Поділитися
                 </button>
                 <button
                   onClick={handleDownloadAll}
@@ -237,14 +237,14 @@ function MaterialDetail() {
                   ) : (
                     <Download size={16} />
                   )}
-                  Download All
+                  Завантажити все
                 </button>
                 <button
                   onClick={handleDelete}
                   className="material-detail__btn-delete"
                 >
                   <Trash2 size={16} />
-                  Delete
+                  Видалити
                 </button>
               </div>
             </div>
@@ -252,12 +252,12 @@ function MaterialDetail() {
             <div className="material-detail__meta">
               <div className="material-detail__meta-item">
                 <Calendar size={16} />
-                <span>Created {formatDate(material.created_at)}</span>
+                <span>Створено {formatDate(material.created_at)}</span>
               </div>
               {material.updated_at !== material.created_at && (
                 <div className="material-detail__meta-item">
                   <Clock size={16} />
-                  <span>Updated {formatDate(material.updated_at)}</span>
+                  <span>Оновлено {formatDate(material.updated_at)}</span>
                 </div>
               )}
               <div className="material-detail__meta-item">
@@ -273,21 +273,21 @@ function MaterialDetail() {
               className={`material-detail__tab-button ${activeTab === 'files' ? 'material-detail__active' : ''}`}
             >
               <FolderOpen size={16} />
-              Files
+              Файли
             </button>
             <button
               onClick={() => setActiveTab('info')}
               className={`material-detail__tab-button ${activeTab === 'info' ? 'material-detail__active' : ''}`}
             >
               <Info size={16} />
-              Information
+              Інформація
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
               className={`material-detail__tab-button ${activeTab === 'analytics' ? 'material-detail__active' : ''}`}
             >
               <BarChart size={16} />
-              Analytics
+              Аналітика
             </button>
           </div>
 
@@ -305,7 +305,7 @@ function MaterialDetail() {
                               href={file.file_url}
                               download={file.file_name}
                               className="material-detail__file-action"
-                              title="Download"
+                              title="Завантажити"
                             >
                               <Download size={16} />
                             </a>
@@ -316,7 +316,7 @@ function MaterialDetail() {
                             {file.file_name}
                           </span>
                           <div className="material-detail__file-details">
-                            <span>{file.file_type?.toUpperCase() || 'FILE'}</span>
+                            <span>{file.file_type?.toUpperCase() || 'ФАЙЛ'}</span>
                             <span>{formatFileSize(file.file_size)}</span>
                           </div>
                         </div>
@@ -326,8 +326,8 @@ function MaterialDetail() {
                 ) : (
                   <div className="material-detail__no-files">
                     <Package size={48} />
-                    <h3>No Files Attached</h3>
-                    <p>This material doesn't have any files attached yet.</p>
+                    <h3>Немає прикріплених файлів</h3>
+                    <p>До цього матеріалу ще не додано жодного файлу.</p>
                   </div>
                 )}
               </div>
@@ -336,16 +336,16 @@ function MaterialDetail() {
             {activeTab === 'info' && (
               <div className="material-detail__info-tab">
                 <div className="material-detail__info-section">
-                  <h3>Description</h3>
+                  <h3>Опис</h3>
                   {material.description ? (
                     <p className="material-detail__description">{material.description}</p>
                   ) : (
-                    <p className="material-detail__no-description">No description provided.</p>
+                    <p className="material-detail__no-description">Опис відсутній.</p>
                   )}
                 </div>
 
                 <div className="material-detail__info-section">
-                  <h3>Course Information</h3>
+                  <h3>Інформація про курс</h3>
                   <div className="material-detail__course-info">
                     <GraduationCap size={16} />
                     <span>{material.course}</span>
@@ -353,17 +353,17 @@ function MaterialDetail() {
                 </div>
 
                 <div className="material-detail__info-section">
-                  <h3>File Statistics</h3>
+                  <h3>Статистика файлів</h3>
                   <div className="material-detail__file-stats">
                     <div className="material-detail__stat-item">
                       <div className="material-detail__stat-value">{material.files?.length || 0}</div>
-                      <div className="material-detail__stat-label">Total Files</div>
+                      <div className="material-detail__stat-label">Всього файлів</div>
                     </div>
                     <div className="material-detail__stat-item">
                       <div className="material-detail__stat-value">
                         {formatFileSize(material.files?.reduce((acc, file) => acc + (file.file_size || 0), 0) || 0)}
                       </div>
-                      <div className="material-detail__stat-label">Total Size</div>
+                      <div className="material-detail__stat-label">Загальний розмір</div>
                     </div>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ function MaterialDetail() {
             {activeTab === 'analytics' && (
               <div className="material-detail__analytics-tab">
                 <div className="material-detail__analytics-section">
-                  <h3>Usage Statistics</h3>
+                  <h3>Статистика використання</h3>
                   <div className="material-detail__analytics-grid">
                     <div className="material-detail__analytics-card">
                       <div className="material-detail__analytics-icon">
@@ -381,7 +381,7 @@ function MaterialDetail() {
                       </div>
                       <div className="material-detail__analytics-data">
                         <div className="material-detail__analytics-value">{analytics.views}</div>
-                        <div className="material-detail__analytics-label">Views</div>
+                        <div className="material-detail__analytics-label">Переглядів</div>
                       </div>
                     </div>
 
@@ -391,7 +391,7 @@ function MaterialDetail() {
                       </div>
                       <div className="material-detail__analytics-data">
                         <div className="material-detail__analytics-value">{analytics.downloads}</div>
-                        <div className="material-detail__analytics-label">Downloads</div>
+                        <div className="material-detail__analytics-label">Завантажень</div>
                       </div>
                     </div>
 
@@ -401,7 +401,7 @@ function MaterialDetail() {
                       </div>
                       <div className="material-detail__analytics-data">
                         <div className="material-detail__analytics-value">{analytics.shares}</div>
-                        <div className="material-detail__analytics-label">Shares</div>
+                        <div className="material-detail__analytics-label">Поширень</div>
                       </div>
                     </div>
                   </div>

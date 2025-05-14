@@ -281,7 +281,7 @@ function EditMaterial() {
           <div className="edit-material__content">
             <div className="edit-material__loading">
               <Loader className="edit-material__loading-spinner" size={40} />
-              <p>Loading material details...</p>
+              <p>Завантаження деталей матеріалу...</p>
             </div>
           </div>
         </div>
@@ -298,14 +298,14 @@ function EditMaterial() {
           <div className="edit-material__content">
             <div className="edit-material__error">
               <AlertCircle size={48} />
-              <h3>Error Loading Material</h3>
+              <h3>Помилка завантаження матеріалу</h3>
               <p>{error}</p>
               <button
                 onClick={() => navigate('/teacher/materials')}
                 className="edit-material__btn-back"
               >
                 <ChevronLeft size={20} />
-                Back to Materials
+                Назад до матеріалів
               </button>
             </div>
           </div>
@@ -326,8 +326,8 @@ function EditMaterial() {
                 <CheckCircle className="edit-material__success-icon" />
                 <div className="edit-material__success-ripple" />
               </div>
-              <h2>Material Updated Successfully!</h2>
-              <p>Your changes have been saved and are now live.</p>
+              <h2>Матеріал успішно оновлено!</h2>
+              <p>Ваші зміни збережено і опубліковано.</p>
             </div>
           </div>
         </div>
@@ -348,16 +348,16 @@ function EditMaterial() {
                 className="edit-material__btn-back"
               >
                 <ChevronLeft size={20} />
-                Back to Materials
+                Назад до матеріалів
               </button>
-              <h1>Edit Material</h1>
+              <h1>Редагування матеріалу</h1>
               <button
                 onClick={saveDraft}
                 className="edit-material__btn-save-draft"
                 disabled={isSubmitting}
               >
                 <Save size={16} />
-                Save Draft
+                Зберегти чернетку
               </button>
             </div>
           </div>
@@ -377,11 +377,11 @@ function EditMaterial() {
 
           <form onSubmit={handleSubmit} className="edit-material__form">
             <div className="edit-material__form-section">
-              <h3>Basic Information</h3>
+              <h3>Основна інформація</h3>
 
               <div className="edit-material__form-group">
                 <label htmlFor="title">
-                  Material Title <span className="edit-material__required">*</span>
+                  Назва матеріалу <span className="edit-material__required">*</span>
                 </label>
                 <input
                   type="text"
@@ -389,7 +389,7 @@ function EditMaterial() {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="Enter material title..."
+                  placeholder="Введіть назву матеріалу..."
                   maxLength={100}
                   required
                 />
@@ -397,7 +397,7 @@ function EditMaterial() {
               </div>
 
               <div className="edit-material__form-group">
-                <label htmlFor="course">Course</label>
+                <label htmlFor="course">Курс</label>
                 <div className="edit-material__course-info">
                   <BookOpen size={16} />
                   <span>{material?.course}</span>
@@ -405,13 +405,13 @@ function EditMaterial() {
               </div>
 
               <div className="edit-material__form-group">
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">Опис</label>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Add a detailed description of the material..."
+                  placeholder="Додайте детальний опис матеріалу..."
                   maxLength={500}
                 />
                 <span className="edit-material__char-count">{formData.description.length}/500</span>
@@ -419,7 +419,7 @@ function EditMaterial() {
             </div>
 
             <div className="edit-material__form-section">
-              <h3>Existing Files</h3>
+              <h3>Наявні файли</h3>
 
               {existingFiles.length > 0 ? (
                 <div className="edit-material__existing-files-section">
@@ -433,7 +433,7 @@ function EditMaterial() {
                               type="button"
                               className="edit-material__file-action"
                               onClick={() => window.open(file.url, '_blank')}
-                              title="View File"
+                              title="Переглянути файл"
                             >
                               <Eye size={16} />
                             </button>
@@ -441,7 +441,7 @@ function EditMaterial() {
                               type="button"
                               className="edit-material__file-action"
                               onClick={() => downloadFile(file.url, file.name)}
-                              title="Download File"
+                              title="Завантажити файл"
                             >
                               <Download size={16} />
                             </button>
@@ -449,7 +449,7 @@ function EditMaterial() {
                               type="button"
                               className="edit-material__file-action"
                               onClick={() => removeExistingFile(file.id)}
-                              title="Remove File"
+                              title="Видалити файл"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -458,7 +458,7 @@ function EditMaterial() {
                         <div className="edit-material__file-info">
                           <span className="edit-material__file-name">{file.name}</span>
                           <div className="edit-material__file-details">
-                            <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                            <span>{(file.size / 1024 / 1024).toFixed(2)} МБ</span>
                             <span>{new Date(file.uploaded_at).toLocaleDateString()}</span>
                           </div>
                         </div>
@@ -468,17 +468,17 @@ function EditMaterial() {
                   {removedFiles.length > 0 && (
                     <div className="edit-material__removed-files-info">
                       <AlertTriangle size={16} />
-                      <span>{removedFiles.length} file(s) marked for removal</span>
+                      <span>{removedFiles.length} файл(ів) позначено для видалення</span>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="edit-material__no-files">No files uploaded yet.</div>
+                <div className="edit-material__no-files">Ще не завантажено жодного файлу.</div>
               )}
             </div>
 
             <div className="edit-material__form-section">
-              <h3>Add New Files</h3>
+              <h3>Додати нові файли</h3>
               <div
                 className={`edit-material__file-upload-zone ${isDragging ? 'edit-material__drag-active' : ''}`}
                 onDragOver={handleDragOver}
@@ -486,11 +486,11 @@ function EditMaterial() {
                 onDrop={handleDrop}
               >
                 <Upload className="edit-material__upload-icon" size={48} />
-                <h4>Drag & Drop Files Here</h4>
-                <p>or</p>
+                <h4>Перетягніть файли сюди</h4>
+                <p>або</p>
                 <label htmlFor="file-upload" className="edit-material__btn-select-files">
                   <Upload size={16} />
-                  Select Files
+                  Вибрати файли
                 </label>
                 <input
                   id="file-upload"
@@ -499,42 +499,41 @@ function EditMaterial() {
                   onChange={handleFileSelect}
                   className="edit-material__file-input"
                   disabled={isUploading}
+                  accept=".pdf,.doc,.docx,.txt,.md,.html,.css,.js,.jpg,.jpeg,.png,.gif,.svg,.webp,.mp4,.webm,.avi,.mov,.mp3,.wav,.zip,.rar,.7z,.tar,.gz"
                 />
                 <p className="edit-material__upload-limits">
-                  Supported formats: PDF, DOC, images, videos, audio, archives (max 100MB each)
+                  Підтримувані формати: PDF, DOC, зображення, відео, аудіо, архіви (макс. 100МБ кожен)
                 </p>
               </div>
 
               {newFiles.length > 0 && (
-                <div className="edit-material__new-files-preview">
-                  <h4>New Files ({newFiles.length})</h4>
-                  <div className="edit-material__new-files-list">
+                <div className="edit-material__files-preview">
+                  <h4>Нові файли ({newFiles.length})</h4>
+                  <div className="edit-material__files-list">
                     {newFiles.map((fileObj, index) => (
                       <div key={index} className="edit-material__file-preview-item">
                         <div className="edit-material__file-preview-info">
                           <div className="edit-material__file-icon-container">
                             <File size={20} />
                             {fileObj.status === 'uploaded' && (
-                              <CheckCircle className="edit-material__upload-success-badge" size={16} />
+                              <CheckCircle className="edit-material__upload-success-badge" size={12} />
                             )}
                             {fileObj.status === 'error' && (
-                              <AlertCircle className="edit-material__upload-error-badge" size={16} />
+                              <AlertTriangle className="edit-material__upload-error-badge" size={12} />
                             )}
                           </div>
                           <div className="edit-material__file-preview-details">
-                            <span className="edit-material__file-preview-name">{fileObj.file.name}</span>
-                            <span className="edit-material__file-preview-size">
-                              {(fileObj.file.size / 1024 / 1024).toFixed(2)} MB
+                            <span className="edit-material__file-name">{fileObj.file.name}</span>
+                            <span className="edit-material__file-size">
+                              {(fileObj.file.size / 1024 / 1024).toFixed(2)} МБ
                             </span>
-                            {fileObj.status !== 'ready' && (
+                            {(fileObj.status === 'uploading' || fileObj.status === 'uploaded') && (
                               <div className="edit-material__file-upload-progress">
                                 <div
                                   className={`edit-material__progress-bar ${
-                                    fileObj.status === 'uploaded'
-                                      ? 'edit-material__success'
-                                      : fileObj.status === 'error'
-                                      ? 'edit-material__error'
-                                      : ''
+                                    fileObj.status === 'uploaded' ? 'edit-material__success' : ''
+                                  } ${
+                                    fileObj.status === 'error' ? 'edit-material__error' : ''
                                   }`}
                                   style={{ width: `${fileObj.progress}%` }}
                                 />
@@ -545,11 +544,11 @@ function EditMaterial() {
                         </div>
                         <button
                           type="button"
-                          className="edit-material__btn-remove-file"
                           onClick={() => removeNewFile(index)}
+                          className="edit-material__btn-remove-file"
                           disabled={isUploading}
                         >
-                          <Trash2 size={16} />
+                          <X size={16} />
                         </button>
                       </div>
                     ))}
@@ -563,7 +562,7 @@ function EditMaterial() {
                 {hasChanges && (
                   <>
                     <AlertTriangle size={16} />
-                    <span>Unsaved changes</span>
+                    <span>Незбережені зміни</span>
                   </>
                 )}
               </div>
@@ -574,7 +573,7 @@ function EditMaterial() {
                   onClick={() => navigate('/teacher/materials')}
                   disabled={isSubmitting || isUploading}
                 >
-                  Cancel
+                  Скасувати
                 </button>
                 <button
                   type="submit"
@@ -584,12 +583,12 @@ function EditMaterial() {
                   {isSubmitting ? (
                     <>
                       <Loader className="edit-material__loading-spinner-small" size={16} />
-                      Saving...
+                      Збереження...
                     </>
                   ) : (
                     <>
                       <Save size={16} />
-                      Save Changes
+                      Зберегти зміни
                     </>
                   )}
                 </button>
