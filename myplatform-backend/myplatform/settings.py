@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'apps.events',
     'apps.categories',
     'apps.chats', 
-    
+    'apps.zoom',
+
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -226,3 +227,6 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
 }
+
+ZOOM_CLIENT_ID = 'N7IghX4oRlmxBUalSDf9Lw'
+ZOOM_CLIENT_SECRET = 'famk0fy3jeass7iwtGo7OrPBjk844VGs'

@@ -1,0 +1,55 @@
+/* Додаткові стилі для DiscussionsTab з інтеграцією Zoom */
+
+/* Вкладки для перемикання між чатом і Zoom */
+.discussions-tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.discussions-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.discussions-tab-btn:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.discussions-tab-btn.active {
+  background-color: #fff3e6;
+  border-color: #ff6600;
+  color: #ff6600;
+}
+
+/* Контейнер для Zoom компонента */
+.course-wc-zoom-container {
+  margin-top: 10px;
+  min-height: 400px;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .discussions-tabs {
+    justify-content: center;
+  }
+  
+  .discussions-tab-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}

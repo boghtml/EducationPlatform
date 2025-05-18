@@ -1,0 +1,117 @@
+/* src/components/zoom/ZoomModal.css */
+.zoom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+.zoom-modal-container {
+  width: 90%;
+  height: 90%;
+  max-width: 1200px;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: scaleIn 0.3s ease;
+}
+
+.zoom-modal-container.closing {
+  animation: scaleOut 0.3s ease;
+  opacity: 0;
+}
+
+.zoom-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.zoom-modal-close:hover {
+  background-color: #f3f4f6;
+  transform: scale(1.1);
+}
+
+.zoom-modal-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.zoom-modal-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { 
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  from { 
+    transform: scale(1);
+    opacity: 1;
+  }
+  to { 
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .zoom-modal-container {
+    width: 95%;
+    height: 95%;
+  }
+  
+  .zoom-modal-loading {
+    padding: 20px;
+  }
+  
+}

@@ -1,0 +1,51 @@
+/* src/css/teacher/TeacherDiscussionsTab.css */
+.teacher-discussions-tab {
+  margin-bottom: 30px;
+}
+
+.discussions-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.create-meeting-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-meeting-btn:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(45, 140, 255, 0.2);
+}
+
+.create-meeting-container {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .discussions-header-top {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .create-meeting-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

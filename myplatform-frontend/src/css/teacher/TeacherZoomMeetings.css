@@ -1,0 +1,463 @@
+/* src/css/teacher/TeacherZoomMeetings.css */
+.teacher-zoom-page {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.teacher-zoom-container {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.teacher-zoom-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 250px;
+}
+
+.teacher-sidebar.collapsed + .teacher-zoom-content {
+  margin-left: 70px;
+}
+
+.teacher-zoom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.teacher-zoom-title h1 {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.title-icon {
+  color: #2d8cff;
+  margin-right: 10px;
+}
+
+.teacher-zoom-title p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 15px;
+}
+
+.create-meeting-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-meeting-button:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(45, 140, 255, 0.2);
+}
+
+/* Filters */
+.teacher-zoom-filters {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.course-filter,
+.status-filter,
+.search-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-filter label,
+.status-filter label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.course-filter select,
+.status-filter select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: white;
+  min-width: 200px;
+}
+
+.search-filter {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-filter svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-filter input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.search-filter input:focus,
+.course-filter select:focus,
+.status-filter select:focus {
+  outline: none;
+  border-color: #2d8cff;
+  box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.2);
+}
+
+/* Meeting cards grid */
+.meetings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.meeting-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.meeting-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+.meeting-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  border-radius: 0 12px 0 8px;
+}
+
+.meeting-status.scheduled {
+  background-color: #10b981;
+}
+
+.meeting-status.live {
+  background-color: #2d8cff;
+}
+
+.meeting-status.ended {
+  background-color: #6b7280;
+}
+
+.meeting-status.canceled {
+  background-color: #ef4444;
+}
+
+.meeting-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 15px 0;
+  padding-right: 80px; /* Space for status */
+}
+
+.meeting-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-bottom: 15px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.meeting-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 20px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.meeting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.meeting-actions button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-view {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.btn-edit {
+  background-color: #dbeafe;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.btn-delete {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.btn-join {
+  background-color: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  margin-left: auto;
+}
+
+.btn-view:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-edit:hover {
+  background-color: #bfdbfe;
+}
+
+.btn-delete:hover {
+  background-color: #fecaca;
+}
+
+.btn-join:hover {
+  background-color: #bbf7d0;
+}
+
+/* Empty state */
+.no-meetings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  text-align: center;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.no-meetings svg {
+  color: #9ca3af;
+  margin-bottom: 15px;
+}
+
+.no-meetings h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.no-meetings p {
+  color: #6b7280;
+  margin: 0 0 20px 0;
+  max-width: 400px;
+}
+
+.create-first-meeting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-first-meeting:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(45, 140, 255, 0.2);
+}
+
+.teacher-zoom-create-form {
+  margin-top: 20px;
+}
+
+/* Loading and error states */
+.zoom-loading,
+.zoom-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2d8cff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.zoom-error svg {
+  color: #ef4444;
+  margin-bottom: 15px;
+}
+
+.zoom-error h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.zoom-error p {
+  color: #6b7280;
+  margin: 0 0 20px 0;
+  max-width: 400px;
+}
+
+.retry-button {
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  .teacher-zoom-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+  
+  .teacher-sidebar.collapsed + .teacher-zoom-content {
+    margin-left: 70px;
+  }
+  
+  .teacher-zoom-header {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .filters-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .course-filter,
+  .status-filter,
+  .search-filter {
+    width: 100%;
+  }
+  
+  .course-filter select,
+  .status-filter select {
+    flex: 1;
+  }
+  
+  .meetings-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .meeting-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .btn-join {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-meeting-button {
+    width: 100%;
+  }
+}
