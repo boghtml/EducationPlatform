@@ -1,0 +1,526 @@
+/* Grades.css */
+
+/* Tabs Navigation */
+.grades-tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.grades-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.grades-tab-btn:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.grades-tab-btn.active {
+  background-color: #ff6600;
+  color: white;
+}
+
+/* Overview Tab */
+.grades-overview-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.grades-summary-cards {
+  display: flex;
+  gap: 30px;
+}
+
+.grades-summary-card {
+  flex: 0 0 200px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.grades-summary-card:hover {
+  transform: translateY(-5px);
+}
+
+.grades-summary-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  position: relative;
+  color: white;
+  font-weight: 700;
+}
+
+.grades-summary-circle::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background-color: white;
+  z-index: 0;
+}
+
+.grades-summary-circle.excellent {
+  background: conic-gradient(#4CAF50 0% 100%, #f0f0f0 100% 100%);
+}
+
+.grades-summary-circle.good {
+  background: conic-gradient(#2196F3 0% 100%, #f0f0f0 100% 100%);
+}
+
+.grades-summary-circle.average {
+  background: conic-gradient(#FF9800 0% 100%, #f0f0f0 100% 100%);
+}
+
+.grades-summary-circle.poor {
+  background: conic-gradient(#F44336 0% 100%, #f0f0f0 100% 100%);
+}
+
+.grades-summary-value {
+  position: relative;
+  font-size: 36px;
+  color: #333;
+  line-height: 1;
+  z-index: 1;
+}
+
+.grades-summary-label {
+  position: relative;
+  font-size: 16px;
+  color: #666;
+  z-index: 1;
+}
+
+.grades-summary-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.grades-summary-status {
+  font-weight: 500;
+}
+
+.grades-summary-status.excellent {
+  color: #4CAF50;
+}
+
+.grades-summary-status.good {
+  color: #2196F3;
+}
+
+.grades-summary-status.average {
+  color: #FF9800;
+}
+
+.grades-summary-status.poor {
+  color: #F44336;
+}
+
+.grades-stats-card {
+  flex: 1;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+}
+
+.grades-stats-item {
+  margin-bottom: 25px;
+}
+
+.grades-stats-item:last-child {
+  margin-bottom: 0;
+}
+
+.grades-stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.grades-stats-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.grades-stats-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.grades-progress-bar {
+  height: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.grades-progress-fill {
+  height: 100%;
+  background-color: #ff6600;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+/* Chart Sections */
+.grades-chart-section {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.grades-chart-section h3,
+.grades-status-section h3,
+.grades-progress-chart h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-icon {
+  color: #ff6600;
+}
+
+.grades-chart-container {
+  margin: 0 -15px;
+}
+
+.grades-status-section {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+}
+
+.grades-no-data {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+/* Assignments Tab */
+.grades-assignments-tab {
+  margin-top: 20px;
+}
+
+.grades-assignments-tab h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  color: #ff6600;
+}
+
+.grades-assignment-filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.grades-search-container {
+  flex: 1;
+  position: relative;
+}
+
+.grades-search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.grades-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grades-filter-group label {
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.grades-filter-select {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.grades-table-container {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.grades-table th,
+.grades-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.grades-table th {
+  background-color: #f9f9f9;
+  font-weight: 600;
+  color: #333;
+}
+
+.grades-table tr:last-child td {
+  border-bottom: none;
+}
+
+.grades-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.assignment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.assignment-status.not_submitted {
+  background-color: #ffebee;
+  color: #F44336;
+}
+
+.assignment-status.submitted {
+  background-color: #e3f2fd;
+  color: #2196F3;
+}
+
+.assignment-status.graded {
+  background-color: #e8f5e9;
+  color: #4CAF50;
+}
+
+.assignment-status.returned {
+  background-color: #fff3e0;
+  color: #FF9800;
+}
+
+.grade-cell {
+  font-weight: 600;
+  color: #333;
+}
+
+.no-data-cell {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+}
+
+/* Progress Tab */
+.grades-progress-tab {
+  margin-top: 20px;
+}
+
+.grades-stats-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.grades-progress-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  transition: transform 0.3s ease;
+}
+
+.grades-progress-card:hover {
+  transform: translateY(-5px);
+}
+
+.progress-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.progress-card-icon.module-icon {
+  background-color: #2196F3;
+}
+
+.progress-card-icon.lesson-icon {
+  background-color: #4CAF50;
+}
+
+.progress-card-icon.assignment-icon {
+  background-color: #FF9800;
+}
+
+.progress-card-content {
+  flex: 1;
+}
+
+.progress-card-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.progress-card-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.progress-card-percentage {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.grades-progress-chart {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+}
+
+/* Charts Tab */
+.grades-charts-tab {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .grades-summary-cards {
+    flex-direction: column;
+  }
+  
+  .grades-summary-card {
+    flex: auto;
+  }
+  
+  .grades-stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grades-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .grades-tab-btn {
+    flex: 1 1 calc(50% - 5px);
+    justify-content: center;
+  }
+  
+  .grades-assignment-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .grades-stats-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .grades-table th,
+  .grades-table td {
+    padding: 10px;
+  }
+  
+  .assignment-status {
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .grades-tab-btn {
+    flex: 1 1 100%;
+  }
+  
+  .grades-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .grades-progress-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

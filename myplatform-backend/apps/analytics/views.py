@@ -813,3 +813,138 @@ class AnalyticsDataView(APIView):
                 }]
             }
         }
+    
+class StudentGradeReportView(APIView):
+    authentication_classes = [CsrfExemptSessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, course_id):
+        user = request.user
+        
+        if not Enrollment.objects.filter(course_id=course_id, student=user).exists():
+            return Response({"error": "You are not enrolled in this course"}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+        assignments = Assignment.objects.filter(course_id=course_id)
+        
+        modules = Module.objects.filter(course_id=course_id)
+        
+        total_modules = modules.count()
+        completed_modules = ModuleProgress.objects.filter(
+            student=user,
+            module__course_id=course_id
+        ).exclude(completed_at=None).count()
+        
+        total_lessons = Lesson.objects.filter(module__course_id=course_id).count()
+        completed_lessons = LessonProgress.objects.filter(
+            student=user,
+            lesson__module__course_id=course_id
+        ).exclude(completed_at=None).count()
+        
+        assignment_data = []
+        overall_grade = 0
+        graded_assignments_count = 0
+        
+        for assignment in assignments:
+            try:
+                submission = Submission.objects.get(assignment=assignment, student=user)
+                status = submission.status
+                grade = submission.grade if submission.status == 'graded' else None
+                
+                if grade is not None:
+                    overall_grade += grade
+                    graded_assignments_count += 1
+                    
+                feedback = submission.feedback
+                submission_date = submission.submission_date
+            except Submission.DoesNotExist:
+                status = 'not_submitted'
+                grade = None
+                feedback = None
+                submission_date = None
+            
+            assignment_data.append({
+                'id': assignment.id,
+                'title': assignment.title,
+                'category': 'Assignment',  # Using a constant value since we don't have assignment types
+                'due_date': assignment.due_date,
+                'status': status,
+                'grade': grade,
+                'feedback': feedback,
+                'submission_date': submission_date,
+                'max_points': 100  # Using a constant value since max points is not defined in the model
+            })
+        
+        average_grade = round(overall_grade / graded_assignments_count, 1) if graded_assignments_count > 0 else 0
+        
+        grades_by_category = {}
+        for assignment in assignment_data:
+            if assignment['grade'] is not None:
+                category = assignment['category']
+                if category not in grades_by_category:
+                    grades_by_category[category] = {'total': 0, 'count': 0, 'sum': 0}
+                
+                grades_by_category[category]['sum'] += assignment['grade']
+                grades_by_category[category]['count'] += 1
+        
+        for category in grades_by_category:
+            if grades_by_category[category]['count'] > 0:
+                grades_by_category[category]['average'] = round(
+                    grades_by_category[category]['sum'] / grades_by_category[category]['count'], 
+                    1
+                )
+            else:
+                grades_by_category[category]['average'] = 0
+                
+        progress_over_time = []
+        lesson_progresses = LessonProgress.objects.filter(
+            student=user, 
+            lesson__module__course_id=course_id
+        ).exclude(completed_at=None).order_by('completed_at')
+        
+        if lesson_progresses.exists():
+            first_completion = lesson_progresses.first().completed_at
+            last_completion = lesson_progresses.last().completed_at
+            
+            current_date = first_completion
+            while current_date <= last_completion:
+                completed_count = lesson_progresses.filter(completed_at__lte=current_date).count()
+                completion_percent = round((completed_count / total_lessons) * 100, 1) if total_lessons > 0 else 0
+                
+                progress_over_time.append({
+                    'date': current_date.strftime('%Y-%m-%d'),
+                    'completed_count': completed_count,
+                    'completion_percent': completion_percent
+                })
+                
+                current_date += timedelta(days=7)  
+        
+        response_data = {
+            'course': {
+                'id': course.id,
+                'title': course.title,
+                'teacher': {
+                    'name': course.teacher.get_full_name() if course.teacher else 'Unknown'
+                }
+            },
+            'overall_statistics': {
+                'average_grade': average_grade,
+                'completed_assignments': graded_assignments_count,
+                'total_assignments': assignments.count(),
+                'completed_modules': completed_modules,
+                'total_modules': total_modules,
+                'completed_lessons': completed_lessons,
+                'total_lessons': total_lessons,
+                'module_completion_percent': round((completed_modules / total_modules) * 100, 1) if total_modules > 0 else 0,
+                'lesson_completion_percent': round((completed_lessons / total_lessons) * 100, 1) if total_lessons > 0 else 0,
+            },
+            'grades_by_category': grades_by_category,
+            'assignments': assignment_data,
+            'progress_over_time': progress_over_time
+        }
+        
+        return Response(response_data)

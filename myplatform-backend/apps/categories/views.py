@@ -9,7 +9,11 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = CourseCategory.objects.all()
     serializer_class = CourseCategorySerializer
     authentication_classes = [CsrfExemptSessionAuthentication]
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return []
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
         user = self.request.user
