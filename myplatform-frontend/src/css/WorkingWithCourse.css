@@ -3210,3 +3210,29 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Додаткові стилі для компонента чату в WorkingWithCourse.css */
+
+/* Контейнер чату в курсі */
+.course-wc-chat-container {
+  margin-top: 20px;
+  height: calc(100vh - 240px);
+  min-height: 600px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Заголовок вкладки обговорень */
+.course-wc-discussions-tab .course-wc-content-header p {
+  color: #666;
+  margin: 8px 0 20px;
+  max-width: 600px;
+}
+
+/* Адаптивна верстка для чату в курсі */
+@media (max-width: 768px) {
+  .course-wc-chat-container {
+    height: calc(100vh - 180px);
+  }
+}

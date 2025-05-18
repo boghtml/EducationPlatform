@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'apps.analytics',
     'apps.events',
     'apps.categories',
+    'apps.chats', 
+    
     'django.contrib.sites',
     'allauth',
     'allauth.account',
