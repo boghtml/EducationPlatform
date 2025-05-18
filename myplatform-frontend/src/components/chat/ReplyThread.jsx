@@ -18,15 +18,13 @@ const ReplyThread = ({ parentMessage, onReply, onCancel }) => {
     setReplyContent('');
   };
   
-  // Обробник натискання клавіш
   const handleKeyDown = (e) => {
-    // Відправка відповіді при натисканні Ctrl+Enter або Enter
+    
     if ((e.key === 'Enter' && e.ctrlKey) || (e.key === 'Enter' && !e.shiftKey)) {
       e.preventDefault();
       handleSubmit(e);
     }
     
-    // Скасування відповіді при натисканні Escape
     if (e.key === 'Escape') {
       onCancel();
     }

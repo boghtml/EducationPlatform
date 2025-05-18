@@ -59,14 +59,14 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     
     def get_replies(self, obj):
         """Отримання останніх відповідей на повідомлення"""
-        # Перевіряємо, чи є атрибут recent_replies, доданий через Prefetch
+        
         if hasattr(obj, 'recent_replies'):
-            # Обмежуємо кількість відповідей до 3 для відображення
+            
             replies = obj.recent_replies[:3]
             return ReplyMessageSerializer(replies, many=True).data
-        # Якщо немає prefetch_related або батьківське повідомлення
+        
         elif obj.parent_message is None:
-            # Отримуємо останні 3 відповіді безпосередньо
+            
             replies = obj.replies.select_related('user').order_by('-created_at')[:3]
             return ReplyMessageSerializer(replies, many=True).data
         return []
@@ -75,7 +75,6 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         """Додаткові методи обробки перед відправкою даних"""
         representation = super().to_representation(instance)
         
-        # Показувати відповіді лише для батьківських повідомлень
         if instance.parent_message is not None:
             representation.pop('replies', None)
         

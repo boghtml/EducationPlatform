@@ -11,7 +11,6 @@ const PinnedMessages = ({ pinnedMessages, unpinMessage }) => {
     return null;
   }
   
-  // Форматування дати
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -24,7 +23,6 @@ const PinnedMessages = ({ pinnedMessages, unpinMessage }) => {
     }
   };
   
-  // Обробник відкріплення повідомлення
   const handleUnpin = (messageId) => {
     if (unpinMessage) {
       unpinMessage(messageId);

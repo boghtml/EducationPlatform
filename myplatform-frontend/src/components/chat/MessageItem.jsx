@@ -1,9 +1,9 @@
 // src/components/chat/MessageItem.jsx
 
-import React, { useState } from 'react';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import React, { useState, useEffect } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 import uk from 'date-fns/locale/uk';
-import { Edit, Trash2, MessageSquare, ThumbsUp, Heart, Smile, Pin, MoreHorizontal } from 'lucide-react';
+import { Edit, Trash2, Reply, ThumbsUp, Heart, Smile, Pin, MoreHorizontal, Save, X, CheckCircle } from 'lucide-react';
 import MessageAttachments from './MessageAttachments';
 import ReactionDisplay from './ReactionDisplay';
 import './ChatStyles.css';
@@ -27,6 +27,36 @@ const MessageItem = ({
   const [editedContent, setEditedContent] = useState(message.content);
   const [showActions, setShowActions] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Закрити меню дій при кліку поза його межами
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showActions && !event.target.closest('.message-actions')) {
+        setShowActions(false);
+      }
+      if (showReactions && !event.target.closest('.message-reactions-buttons')) {
+        setShowReactions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showActions, showReactions]);
+  
+  // Додаємо анімацію для нових повідомлень
+  useEffect(() => {
+    if (message.isNew) {
+      const timer = setTimeout(() => {
+        message.isNew = false;
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
   
   // Визначення, чи може користувач редагувати це повідомлення
   const canEdit = isCurrentUser;
@@ -52,6 +82,7 @@ const MessageItem = ({
   const handleEditClick = () => {
     setIsEditing(true);
     setEditedContent(message.content);
+    setShowActions(false);
   };
   
   // Обробник для збереження змін при редагуванні
@@ -72,6 +103,7 @@ const MessageItem = ({
   const handleReplyClick = () => {
     if (onReply) {
       onReply();
+      setShowActions(false);
     }
   };
   
@@ -79,6 +111,21 @@ const MessageItem = ({
   const handleAddReaction = (type) => {
     onAddReaction(type);
     setShowReactions(false);
+  };
+
+  // Обробник для видалення повідомлення
+  const handleDeleteClick = () => {
+    if (window.confirm('Ви впевнені, що хочете видалити це повідомлення?')) {
+      setIsDeleting(true);
+      setShowActions(false);
+      onDelete();
+    }
+  };
+  
+  // Обробник для закріплення/відкріплення повідомлення
+  const handlePinClick = () => {
+    onPin();
+    setShowActions(false);
   };
   
   // Перевірка, чи встановив поточний користувач певну реакцію
@@ -113,18 +160,28 @@ const MessageItem = ({
     return form5;
   };
 
-  // Реакції для швидкого додавання
+  // Швидкі реакції
   const quickReactions = [
     { type: 'like', icon: <ThumbsUp size={18} /> },
     { type: 'heart', icon: <Heart size={18} /> },
     { type: 'smile', icon: <Smile size={18} /> }
   ];
+  
+  // Додаємо класи залежно від стану повідомлення
+  const messageClasses = [
+    'message-item',
+    isReply ? 'message-reply' : '',
+    isCurrentUser ? 'message-own' : '',
+    message.isNew ? 'new-message' : '',
+    message.isEdited ? 'edited-message' : '',
+    isDeleting || message.isDeleting ? 'deleting-message' : ''
+  ].filter(Boolean).join(' ');
 
   return (
-    <div className={`message-item ${isReply ? 'message-reply' : ''} ${isCurrentUser ? 'message-own' : ''}`}>
+    <div className={messageClasses}>
       <div className="message-avatar">
         <img 
-          src={message.user.profile_image_url || 'https://via.placeholder.com/40'} 
+          src={message.user.profile_image_url || "https://via.placeholder.com/40"} 
           alt={message.user.username} 
           className="avatar-img"
         />
@@ -152,16 +209,16 @@ const MessageItem = ({
               <div className="message-actions-dropdown">
                 {!isReply && onReply && (
                   <button 
-                    className="action-btn" 
+                    className="action-btn action-btn-reply" 
                     onClick={handleReplyClick}
                   >
-                    <MessageSquare size={16} /> Відповісти
+                    <Reply size={16} /> Відповісти
                   </button>
                 )}
                 
                 {canEdit && (
                   <button 
-                    className="action-btn" 
+                    className="action-btn action-btn-edit" 
                     onClick={handleEditClick}
                   >
                     <Edit size={16} /> Редагувати
@@ -170,8 +227,8 @@ const MessageItem = ({
                 
                 {canDelete && (
                   <button 
-                    className="action-btn action-delete" 
-                    onClick={onDelete}
+                    className="action-btn action-btn-delete" 
+                    onClick={handleDeleteClick}
                   >
                     <Trash2 size={16} /> Видалити
                   </button>
@@ -179,8 +236,8 @@ const MessageItem = ({
                 
                 {canPin && (
                   <button 
-                    className="action-btn" 
-                    onClick={onPin}
+                    className="action-btn action-btn-pin" 
+                    onClick={handlePinClick}
                   >
                     <Pin size={16} /> {message.is_pinned ? 'Відкріпити' : 'Закріпити'}
                   </button>
@@ -204,13 +261,13 @@ const MessageItem = ({
                   className="message-edit-cancel" 
                   onClick={handleCancelEdit}
                 >
-                  Скасувати
+                  <X size={16} /> Скасувати
                 </button>
                 <button 
                   className="message-edit-save" 
                   onClick={handleSaveEdit}
                 >
-                  Зберегти
+                  <Save size={16} /> Зберегти
                 </button>
               </div>
             </div>
@@ -230,6 +287,7 @@ const MessageItem = ({
             reactions={message.reactions} 
             onRemoveReaction={onRemoveReaction} 
             currentUserId={sessionStorage.getItem('userId')}
+            messageId={message.id}
           />
         )}
         
@@ -241,9 +299,11 @@ const MessageItem = ({
                 key={reaction.type}
                 className={`reaction-btn ${hasUserReaction(reaction.type) ? 'active' : ''}`} 
                 onClick={() => hasUserReaction(reaction.type) 
-                  ? onRemoveReaction(reaction.type) 
+                  ? onRemoveReaction(message.id, reaction.type) 
                   : handleAddReaction(reaction.type)
                 }
+                title={reaction.type === 'like' ? 'Подобається' : 
+                      reaction.type === 'heart' ? 'Супер' : 'Посмішка'}
               >
                 {reaction.icon}
               </button>
@@ -251,6 +311,7 @@ const MessageItem = ({
             <button 
               className="reaction-btn reaction-more" 
               onClick={() => setShowReactions(!showReactions)}
+              title="Більше реакцій"
             >
               <Smile size={18} />
             </button>
@@ -264,6 +325,7 @@ const MessageItem = ({
                       key={type} 
                       className={`reaction-emoji-btn ${hasUserReaction(type) ? 'active' : ''}`}
                       onClick={() => handleAddReaction(type)}
+                      title={getEmojiTitle(type)}
                     >
                       {getEmojiByType(type)}
                     </button>
@@ -279,7 +341,7 @@ const MessageItem = ({
               className="toggle-replies-btn"
               onClick={onToggleThread}
             >
-              <MessageSquare size={16} />
+              <Reply size={16} />
               <span>{getToggleRepliesButtonText()}</span>
             </button>
           )}
@@ -293,6 +355,7 @@ const MessageItem = ({
 const getEmojiByType = (type) => {
   const emojiMap = {
     'thumbsup': '👍',
+    'like': '👍',
     'heart': '❤️',
     'smile': '😊',
     'tada': '🎉',
@@ -304,6 +367,24 @@ const getEmojiByType = (type) => {
   };
   
   return emojiMap[type] || '👍';
+};
+
+// Функція для отримання назви emoji
+const getEmojiTitle = (type) => {
+  const titleMap = {
+    'thumbsup': 'Подобається',
+    'like': 'Подобається',
+    'heart': 'Супер',
+    'smile': 'Посмішка',
+    'tada': 'Ура',
+    'thinking': 'Думаю',
+    'clap': 'Аплодую',
+    'fire': 'Вогонь',
+    'eyes': 'Цікаво',
+    'rocket': 'Ракета'
+  };
+  
+  return titleMap[type] || type;
 };
 
 export default MessageItem;

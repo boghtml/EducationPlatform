@@ -8,7 +8,6 @@ const ReactionDisplay = ({ reactions, onRemoveReaction, currentUserId }) => {
     return null;
   }
   
-  // Групуємо реакції за типом
   const groupedReactions = reactions.reduce((acc, reaction) => {
     if (!acc[reaction.reaction_type]) {
       acc[reaction.reaction_type] = [];
@@ -17,14 +16,13 @@ const ReactionDisplay = ({ reactions, onRemoveReaction, currentUserId }) => {
     return acc;
   }, {});
   
-  // Перевірка, чи поставив поточний користувач цю реакцію
   const hasUserReacted = (reactions) => {
     return reactions.some(reaction => 
       reaction.user.id === parseInt(currentUserId)
     );
   };
   
-  // Отримання emoji за типом реакції
+  
   const getEmojiByType = (type) => {
     const emojiMap = {
       'thumbsup': '👍',
@@ -42,7 +40,6 @@ const ReactionDisplay = ({ reactions, onRemoveReaction, currentUserId }) => {
     return emojiMap[type] || '👍';
   };
   
-  // Обробник видалення реакції
   const handleRemoveReaction = (type) => {
     if (onRemoveReaction) {
       onRemoveReaction(type);

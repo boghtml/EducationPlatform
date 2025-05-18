@@ -20,7 +20,6 @@ const MessageList = ({
   const [expandedThreads, setExpandedThreads] = useState({});
   const [replyingTo, setReplyingTo] = useState(null);
   
-  // Функція для перемикання відображення відповідей (треду) для повідомлення
   const toggleThread = (messageId) => {
     setExpandedThreads(prev => ({
       ...prev,
@@ -28,17 +27,14 @@ const MessageList = ({
     }));
   };
   
-  // Обробник для початку відповіді на повідомлення
   const handleReply = (messageId) => {
     setReplyingTo(messageId);
   };
   
-  // Обробник для завершення відповіді
   const handleReplyComplete = () => {
     setReplyingTo(null);
   };
   
-  // Обробник відміни відповіді
   const handleReplyCancel = () => {
     setReplyingTo(null);
   };

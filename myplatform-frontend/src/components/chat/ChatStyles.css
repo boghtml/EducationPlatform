@@ -1,42 +1,37 @@
-/* src/components/chat/ChatStyles.css */
 
-/* ===== Основні стилі контейнера чату ===== */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 600px;
   background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* ===== Заголовок чату ===== */
+/* Покращення заголовка чату */
 .chat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background-color: #f9f9fa;
+  padding: 16px 24px;
+  background-color: #f8f9fa;
   border-bottom: 1px solid #eaeaea;
 }
 
-.chat-header-info {
-  flex: 1;
-}
-
 .chat-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #333;
-  margin: 0 0 4px;
+  margin: 0;
 }
 
 .chat-description {
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
-  margin: 0;
+  margin: 4px 0 0;
 }
 
 .chat-header-actions {
@@ -44,78 +39,85 @@
   align-items: center;
 }
 
+/* Покращена кнопка закріплених повідомлень */
 .chat-pinned-button {
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 12px;
+  background-color: #fff3e6;
+  border: 1px solid #ffcb8c;
+  border-radius: 8px;
+  padding: 8px 14px;
   font-size: 14px;
-  color: #666;
+  color: #ff6600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .chat-pinned-button:hover {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: #ffead1;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 102, 0, 0.1);
 }
 
-/* ===== Контейнер повідомлень ===== */
+.chat-pinned-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===== ПОКРАЩЕННЯ СТИЛІВ ПОВІДОМЛЕНЬ ===== */
+
+/* Контейнер повідомлень з плавним скролом */
 .chat-messages-container {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   background-color: #f5f8fa;
+  scrollbar-width: thin;
+  scrollbar-color: #cfd8dc #f5f8fa;
 }
 
-/* ===== Стилі для списку повідомлень ===== */
+.chat-messages-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages-container::-webkit-scrollbar-track {
+  background: #f5f8fa;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb {
+  background-color: #cfd8dc;
+  border-radius: 10px;
+}
+
+/* Список повідомлень */
 .message-list {
   display: flex;
-  flex-direction: column-reverse; /* Найновіші повідомлення знизу */
-  gap: 16px;
+  flex-direction: column-reverse;
+  gap: 18px;
 }
 
-.message-thread-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* ===== Повідомлення без повідомлень ===== */
-.chat-no-messages {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 20px;
-}
-
-/* ===== Стилі для окремого повідомлення ===== */
+/* Контейнер окремого повідомлення */
 .message-item {
   display: flex;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 14px;
+  margin-bottom: 10px;
   position: relative;
 }
 
-.message-reply {
-  margin-left: 40px;
-  padding-left: 10px;
-  border-left: 2px solid #e0e0e0;
-  margin-top: 4px;
-}
-
 .message-own {
-  /* Стилі для власних повідомлень */
+  justify-content: flex-end;
 }
 
 .message-avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
+}
+
+.message-own .message-avatar {
+  order: 2;
 }
 
 .avatar-img {
@@ -123,99 +125,132 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #eaeaea;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+/* Стиль контейнера контенту повідомлення */
 .message-content {
   flex: 1;
+  max-width: 80%;
   background-color: #fff;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   position: relative;
-}
-
-.message-reply .message-content {
-  background-color: #f9f9f9;
+  transition: transform 0.2s ease;
 }
 
 .message-own .message-content {
-  background-color: #e3f2fd;
+  background-color: #e7f2ff;
+  border-bottom-right-radius: 4px;
 }
 
+.message-reply .message-content {
+  background-color: #f8f9fa;
+  border-bottom-left-radius: 4px;
+}
+
+.message-item:hover .message-content {
+  transform: translateY(-2px);
+}
+
+/* Заголовок повідомлення */
 .message-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .message-user-info {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .message-username {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   color: #333;
 }
 
 .message-time {
-  font-size: 12px;
-  color: #666;
+  font-size: 13px;
+  color: #6c757d;
 }
 
 .message-edited {
   font-size: 12px;
-  color: #666;
+  color: #6c757d;
   font-style: italic;
 }
 
-.message-pinned-icon {
-  color: #f57c00;
-}
+/* ===== ПОКРАЩЕННЯ ДЛЯ КНОПОК ДІЙ ПОВІДОМЛЕННЯ ===== */
 
+/* Контейнер для кнопок дій */
 .message-actions {
   position: relative;
 }
 
+/* Основна кнопка "ще" */
 .message-more-btn {
   background: none;
   border: none;
-  padding: 4px;
+  padding: 6px;
   cursor: pointer;
-  color: #999;
-  border-radius: 4px;
+  color: #6c757d;
+  border-radius: 8px;
   transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+.message-content:hover .message-more-btn {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .message-more-btn:hover {
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #495057;
 }
 
+/* Випадаюче меню з діями */
 .message-actions-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 180px;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
   z-index: 10;
   overflow: hidden;
   border: 1px solid #e0e0e0;
-  margin-top: 4px;
+  margin-top: 8px;
+  animation: fadeInScale 0.2s ease;
+  transform-origin: top right;
 }
 
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Кнопки дій в меню */
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 12px 18px;
   width: 100%;
   text-align: left;
   background: none;
@@ -229,159 +264,187 @@
 
 .action-btn:hover {
   background-color: #f5f5f5;
-  color: #2196f3;
 }
 
 .action-btn svg {
   font-size: 18px;
-  color: #666;
+  color: #6c757d;
 }
 
-.action-btn:hover svg {
-  color: #2196f3;
+/* Стилі для кнопок на дії */
+.action-btn-reply:hover {
+  background-color: #e7f5ff;
+  color: #0d6efd;
 }
 
-.action-delete {
-  color: #e53935;
+.action-btn-reply:hover svg {
+  color: #0d6efd;
 }
 
-.action-delete:hover {
+.action-btn-edit:hover {
+  background-color: #e7f5fe;
+  color: #0dcaf0;
+}
+
+.action-btn-edit:hover svg {
+  color: #0dcaf0;
+}
+
+.action-btn-delete {
+  color: #dc3545;
+}
+
+.action-btn-delete:hover {
   background-color: #ffebee;
-  color: #d32f2f;
+  color: #b91c1c;
 }
 
-.action-delete svg {
-  color: #e53935;
+.action-btn-delete svg {
+  color: #dc3545;
 }
 
-.action-delete:hover svg {
-  color: #d32f2f;
+.action-btn-delete:hover svg {
+  color: #b91c1c;
 }
 
-.message-body {
-  margin-bottom: 8px;
+.action-btn-pin:hover {
+  background-color: #fff8e1;
+  color: #ff6600;
 }
 
-.message-text {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
-  white-space: pre-wrap;
-  word-break: break-word;
+.action-btn-pin:hover svg {
+  color: #ff6600;
 }
+
+/* ===== ПОКРАЩЕННЯ ДЛЯ ФОРМИ РЕДАГУВАННЯ ПОВІДОМЛЕННЯ ===== */
 
 .message-edit-form {
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .message-edit-input {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
   resize: vertical;
   min-height: 80px;
   font-size: 14px;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-edit-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+  outline: none;
 }
 
 .message-edit-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .message-edit-cancel,
 .message-edit-save {
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 8px;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .message-edit-cancel {
-  background-color: #f0f0f0;
-  border: none;
-  color: #666;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
 }
 
 .message-edit-save {
-  background-color: #4caf50;
-  border: none;
+  background-color: #0d6efd;
+  border: 1px solid #0d6efd;
   color: #fff;
 }
 
 .message-edit-cancel:hover {
-  background-color: #e0e0e0;
+  background-color: #e9ecef;
 }
 
 .message-edit-save:hover {
-  background-color: #43a047;
+  background-color: #0b5ed7;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.25);
 }
 
-.message-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* ===== ПОКРАЩЕННЯ ДЛЯ РЕАКЦІЙ НА ПОВІДОМЛЕННЯ ===== */
 
-/* ===== Стилі для реакцій ===== */
+/* Контейнер для кнопок реакцій */
 .message-reactions-buttons {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   position: relative;
+  margin-top: 8px;
 }
 
+/* Кнопка реакції */
 .reaction-btn {
   background: none;
   border: none;
-  padding: 4px;
-  color: #999;
-  border-radius: 4px;
+  padding: 6px;
+  color: #6c757d;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  opacity: 0.7;
+  transform: translateY(5px);
+}
+
+.message-content:hover .reaction-btn {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .reaction-btn:hover {
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #495057;
 }
 
 .reaction-btn.active {
-  color: #f57c00;
+  color: #ff6600;
 }
 
-.reaction-more {
-  color: #999;
-}
-
+/* Випадаюче меню емодзі */
 .reactions-dropdown {
   position: absolute;
   bottom: 100%;
   left: 0;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  padding: 12px;
   z-index: 10;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  animation: fadeInScale 0.2s ease;
+  transform-origin: bottom left;
+  border: 1px solid #e0e0e0;
 }
 
 .reactions-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
 }
 
 .reaction-emoji-btn {
-  width: 36px;
-  height: 36px;
-  background-color: #f9f9f9;
+  width: 40px;
+  height: 40px;
+  background-color: #f8f9fa;
   border: none;
-  border-radius: 6px;
-  font-size: 18px;
+  border-radius: 8px;
+  font-size: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -390,184 +453,207 @@
 }
 
 .reaction-emoji-btn:hover {
-  background-color: #f0f0f0;
-  transform: scale(1.1);
+  background-color: #e9ecef;
+  transform: scale(1.15);
 }
 
 .reaction-emoji-btn.active {
-  background-color: #fff3e0;
-  border: 1px solid #ffb74d;
+  background-color: #fff3e6;
+  border: 1px solid #ffcb8c;
 }
 
-.toggle-replies-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: #2196f3;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.toggle-replies-btn:hover {
-  background-color: #e3f2fd;
-}
-
-/* ===== Стилі для відображення реакцій на повідомлення ===== */
+/* Відображення реакцій */
 .reactions-display {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .reaction-bubble {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background-color: #f0f0f0;
-  border: 1px solid #e0e0e0;
-  border-radius: 16px;
-  padding: 2px 8px;
-  font-size: 13px;
+  gap: 6px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .reaction-bubble:hover {
-  background-color: #e6e6e6;
+  background-color: #e9ecef;
+  transform: translateY(-2px);
 }
 
 .reaction-bubble.user-reacted {
-  background-color: #e3f2fd;
-  border-color: #bbdefb;
+  background-color: #e7f2ff;
+  border-color: #bedcff;
 }
 
 .reaction-emoji {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .reaction-count {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: #6c757d;
 }
 
-/* ===== Стилі для розгорнутого треду з відповідями ===== */
-.message-replies {
-  margin-left: 40px;
-  padding-left: 10px;
-  border-left: 2px solid #e0e0e0;
-}
+/* ===== ПОКРАЩЕННЯ ДЛЯ ВІДПОВІДЕЙ НА ПОВІДОМЛЕННЯ ===== */
 
-.load-more-replies {
-  padding: 8px 0;
-  text-align: center;
-}
-
-.load-more-button {
+/* Кнопка переключення відповідей */
+.toggle-replies-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: none;
   border: none;
-  color: #2196f3;
-  font-size: 13px;
+  color: #0d6efd;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 4px;
   transition: all 0.2s ease;
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-top: 8px;
 }
 
-.load-more-button:hover {
-  background-color: #e3f2fd;
+.toggle-replies-btn:hover {
+  background-color: #e7f5ff;
+  transform: translateY(-2px);
 }
 
-/* ===== Стилі для форми відповіді на повідомлення ===== */
+.toggle-replies-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Контейнер відповідей */
+.message-replies {
+  margin-left: 42px;
+  margin-top: 12px;
+  padding-left: 14px;
+  border-left: 2px solid #dee2e6;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Форма відповіді */
 .reply-thread {
-  margin-left: 40px;
-  padding-left: 10px;
-  border-left: 2px solid #e0e0e0;
-  margin-bottom: 16px;
+  margin-left: 42px;
+  margin-top: 12px;
+  padding-left: 14px;
+  border-left: 2px solid #bedcff;
+  margin-bottom: 20px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .reply-to-info {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  background-color: #f5f5f5;
-  border-radius: 8px 8px 0 0;
-  padding: 10px 12px;
-  border: 1px solid #e0e0e0;
+  background-color: #e7f5ff;
+  border-radius: 12px 12px 0 0;
+  padding: 12px 16px;
+  border: 1px solid #bedcff;
   border-bottom: none;
 }
 
 .reply-parent-message {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .reply-to-label {
-  font-size: 13px;
-  color: #666;
+  font-size: 14px;
+  color: #495057;
 }
 
 .reply-parent-content {
-  font-size: 13px;
-  color: #333;
+  font-size: 14px;
+  color: #212529;
   font-style: italic;
 }
 
 .reply-cancel-btn {
   background: none;
   border: none;
-  color: #999;
+  color: #6c757d;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
 .reply-cancel-btn:hover {
-  background-color: #e8e8e8;
-  color: #666;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #495057;
 }
 
 .reply-form {
-  padding: 12px;
+  padding: 16px;
   background-color: #fff;
-  border-radius: 0 0 8px 8px;
-  border: 1px solid #e0e0e0;
+  border-radius: 0 0 12px 12px;
+  border: 1px solid #bedcff;
 }
 
 .reply-input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
   font-size: 14px;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reply-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+  outline: none;
 }
 
 .reply-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .reply-cancel-button {
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 10px 16px;
   font-size: 14px;
-  color: #666;
+  font-weight: 500;
+  color: #495057;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -575,34 +661,40 @@
 .reply-submit-button {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background-color: #2196f3;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
+  gap: 8px;
+  background-color: #0d6efd;
+  border: 1px solid #0d6efd;
+  border-radius: 8px;
+  padding: 10px 16px;
   font-size: 14px;
-  color: #fff;
   font-weight: 500;
+  color: #fff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .reply-cancel-button:hover {
-  background-color: #e0e0e0;
+  background-color: #e9ecef;
 }
 
 .reply-submit-button:hover {
-  background-color: #1976d2;
+  background-color: #0b5ed7;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.25);
 }
 
 .reply-submit-button:disabled {
-  background-color: #bbdefb;
+  background-color: #bedcff;
+  border-color: #bedcff;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* ===== Стилі для вхідного поля повідомлення ===== */
+/* ===== ПОКРАЩЕННЯ ДЛЯ ПОЛЯ ВВЕДЕННЯ ПОВІДОМЛЕННЯ ===== */
+
 .message-input-container {
-  padding: 16px;
+  padding: 20px;
   border-top: 1px solid #eaeaea;
   background-color: #fff;
 }
@@ -610,23 +702,24 @@
 .message-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .message-input {
   width: 100%;
-  min-height: 80px;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  min-height: 100px;
+  padding: 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
   resize: vertical;
   font-size: 14px;
   font-family: inherit;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .message-input:focus {
-  border-color: #2196f3;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
   outline: none;
 }
 
@@ -637,13 +730,13 @@
 }
 
 .message-input-hints {
-  font-size: 12px;
-  color: #999;
+  font-size: 13px;
+  color: #6c757d;
 }
 
 .message-input-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .attachment-button,
@@ -651,123 +744,170 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .attachment-button {
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
 }
 
 .send-button {
   background-color: #ff6600;
   color: #fff;
+  position: relative;
+  overflow: hidden;
 }
 
 .attachment-button:hover {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: #e9ecef;
+  transform: translateY(-2px);
 }
 
 .send-button:hover {
   background-color: #e65c00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
 }
 
 .send-button:disabled {
-  background-color: #ffccbc;
+  background-color: #ffcb8c;
+  transform: none;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-/* ===== Стилі для вкладень ===== */
+/* Ефект пульсації для кнопки відправлення */
+.send-button:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: -100%;
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.3) 50%, 
+    rgba(255,255,255,0) 100%
+  );
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    left: -100%;
+  }
+  60%, 100% {
+    left: 100%;
+  }
+}
+
+/* ===== ПОКРАЩЕННЯ ДЛЯ ВКЛАДЕНЬ ===== */
+
+/* Попередній перегляд вкладень */
 .attachments-preview {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  border: 1px solid #dee2e6;
+  animation: fadeIn 0.3s ease;
 }
 
 .attachment-preview-item {
   display: flex;
   align-items: center;
-  padding: 8px 10px;
+  padding: 10px 12px;
   background-color: #fff;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.attachment-preview-item:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .attachment-preview-item.invalid-size {
-  border-color: #f44336;
-  background-color: #ffebee;
+  border-color: #dc3545;
+  background-color: #f8d7da;
 }
 
 .attachment-preview-icon {
-  font-size: 24px;
-  margin-right: 10px;
+  font-size: 28px;
+  margin-right: 12px;
 }
 
 .attachment-preview-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .attachment-preview-name {
   font-size: 14px;
-  color: #333;
-  margin-bottom: 2px;
-  word-break: break-all;
+  color: #212529;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .attachment-preview-size {
   font-size: 12px;
-  color: #666;
+  color: #6c757d;
 }
 
 .size-limit-warning {
-  color: #f44336;
+  color: #dc3545;
   font-weight: 500;
 }
 
 .attachment-remove-btn {
   background: none;
   border: none;
-  color: #999;
-  padding: 6px;
-  border-radius: 4px;
+  color: #6c757d;
+  padding: 8px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .attachment-remove-btn:hover {
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: #f8d7da;
+  color: #dc3545;
 }
 
 .uploading-indicator {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #e3f2fd;
-  border-radius: 6px;
-  color: #1976d2;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #e7f5ff;
+  border-radius: 8px;
+  color: #0d6efd;
   font-size: 14px;
+  border: 1px solid #bedcff;
 }
 
 .uploading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #bbdefb;
-  border-top: 2px solid #1976d2;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bedcff;
+  border-top: 2px solid #0d6efd;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -777,234 +917,262 @@
   100% { transform: rotate(360deg); }
 }
 
-/* ===== Стилі для вкладень у повідомленнях ===== */
+/* Вкладення у повідомленнях */
 .message-attachments {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .attachment-item {
   border-radius: 8px;
   overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.attachment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .attachment-image-container {
-  max-width: 300px;
-  max-height: 200px;
+  max-width: 320px;
+  max-height: 220px;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  border: 1px solid #dee2e6;
 }
 
 .attachment-image {
   width: 100%;
   height: auto;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
 .attachment-image:hover {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
-.attachment-pdf-preview {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-.pdf-icon {
-  font-size: 24px;
-  margin-right: 12px;
-  color: #f44336;
-}
-
-.pdf-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pdf-name {
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-}
-
-.pdf-size {
-  font-size: 12px;
-  color: #666;
-}
-
-.pdf-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.pdf-view-link,
-.pdf-download-link {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  transition: all 0.2s ease;
-}
-
-.pdf-view-link {
-  background-color: #f5f5f5;
-  color: #333;
-}
-
-.pdf-download-link {
-  background-color: #e3f2fd;
-  color: #1976d2;
-}
-
-.pdf-view-link:hover {
-  background-color: #e0e0e0;
-}
-
-.pdf-download-link:hover {
-  background-color: #bbdefb;
-}
-
+.attachment-pdf-preview,
 .attachment-file {
   display: flex;
   align-items: center;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
+  padding: 14px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
 }
 
+.attachment-pdf-preview:hover,
+.attachment-file:hover {
+  background-color: #e9ecef;
+}
+
+.pdf-icon,
 .file-icon {
   font-size: 24px;
-  margin-right: 12px;
+  margin-right: 14px;
 }
 
+.pdf-icon {
+  color: #dc3545;
+}
+
+.pdf-info,
 .file-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  min-width: 0;
 }
 
+.pdf-name,
 .file-name {
   font-size: 14px;
-  color: #333;
+  color: #212529;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.pdf-size,
 .file-size {
   font-size: 12px;
-  color: #666;
+  color: #6c757d;
+}
+
+.pdf-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pdf-view-link,
+.pdf-download-link,
+.file-download-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pdf-view-link,
+.pdf-download-link {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.pdf-view-link {
+  background-color: #f8f9fa;
+  color: #212529;
+  border: 1px solid #dee2e6;
+}
+
+.pdf-download-link {
+  background-color: #e7f5ff;
+  color: #0d6efd;
+  border: 1px solid #bedcff;
+}
+
+.pdf-view-link:hover {
+  background-color: #e9ecef;
+}
+
+.pdf-download-link:hover {
+  background-color: #daeaff;
+  transform: translateY(-2px);
 }
 
 .file-download-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background-color: #e3f2fd;
-  color: #1976d2;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: #e7f5ff;
+  color: #0d6efd;
+  border-radius: 8px;
   text-decoration: none;
+  border: 1px solid #bedcff;
   transition: all 0.2s ease;
 }
 
 .file-download-link:hover {
-  background-color: #bbdefb;
+  background-color: #daeaff;
   transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
 }
 
-/* ===== Стилі для закріплених повідомлень ===== */
+/* ===== ПОКРАЩЕННЯ ДЛЯ ЗАКРІПЛЕНИХ ПОВІДОМЛЕНЬ ===== */
+
 .pinned-messages-container {
-  background-color: #fff3e0;
+  background-color: #fff8e1;
   border-bottom: 1px solid #ffe0b2;
-  padding: 12px 16px;
+  padding: 16px 20px;
+  animation: slideDown 0.3s ease;
 }
 
 .pinned-messages-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .pinned-messages-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: #f57c00;
+  color: #ff6600;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .pinned-messages-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 200px;
+  gap: 10px;
+  max-height: 230px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ffcc80 #fff8e1;
+}
+
+.pinned-messages-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pinned-messages-list::-webkit-scrollbar-track {
+  background: #fff8e1;
+}
+
+.pinned-messages-list::-webkit-scrollbar-thumb {
+  background-color: #ffcc80;
+  border-radius: 10px;
 }
 
 .pinned-message-item {
   display: flex;
   justify-content: space-between;
   background-color: #fff;
-  border-radius: 6px;
-  padding: 10px 12px;
-  border-left: 3px solid #f57c00;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 12px 16px;
+  border-left: 3px solid #ff6600;
+  box-shadow: 0 2px 6px rgba(255, 102, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.pinned-message-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.15);
 }
 
 .pinned-message-info {
   flex: 1;
+  min-width: 0;
 }
 
 .pinned-message-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
 .pinned-message-author {
-  font-weight: 500;
-  font-size: 13px;
-  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+  color: #212529;
 }
 
 .pinned-message-date {
   font-size: 12px;
-  color: #666;
+  color: #6c757d;
 }
 
 .pinned-message-content {
-  font-size: 13px;
-  color: #333;
-  margin-bottom: 6px;
-  white-space: nowrap;
+  font-size: 14px;
+  color: #212529;
+  margin-bottom: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 500px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .pinned-message-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  color: #999;
+  font-size: 12px;
+  color: #6c757d;
 }
 
 .pinned-by {
@@ -1019,19 +1187,21 @@
 .unpin-button {
   background: none;
   border: none;
-  color: #999;
-  padding: 4px;
-  border-radius: 4px;
+  color: #6c757d;
+  padding: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  margin-left: 8px;
 }
 
 .unpin-button:hover {
-  background-color: #f0f0f0;
-  color: #e53935;
+  background-color: #ffebee;
+  color: #dc3545;
 }
 
-/* ===== Стилі для станів завантаження та помилок ===== */
+/* ===== СТАНИ ЗАВАНТАЖЕННЯ ТА ПОМИЛОК ===== */
+
 .chat-loading,
 .chat-error {
   display: flex;
@@ -1044,41 +1214,74 @@
 }
 
 .chat-loading-spinner {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border: 4px solid #f3f3f3;
   border-top: 4px solid #ff6600;
   border-radius: 50%;
   margin-bottom: 20px;
-  animation: spin 1s linear infinite;
+  animation: spin 1.5s linear infinite;
 }
 
 .chat-error h3 {
   margin: 15px 0 10px;
-  color: #333;
+  color: #212529;
+  font-weight: 600;
 }
 
 .chat-error p {
-  color: #666;
+  color: #6c757d;
   margin-bottom: 20px;
+  max-width: 500px;
 }
 
 .chat-retry-button {
   background-color: #ff6600;
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
+  border-radius: 8px;
+  padding: 10px 20px;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .chat-retry-button:hover {
   background-color: #e65c00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
 }
 
-/* ===== Адаптивна верстка ===== */
+.chat-no-messages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 200px;
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 30px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+/* ===== АДАПТИВНА ВЕРСТКА ===== */
+
+@media (max-width: 992px) {
+  .pdf-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .pdf-view-link,
+  .pdf-download-link {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .chat-header {
     flex-direction: column;
@@ -1094,7 +1297,7 @@
   .message-input-actions {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
   
   .message-input-buttons {
@@ -1102,11 +1305,229 @@
     justify-content: flex-end;
   }
   
-  .pdf-actions {
-    flex-direction: column;
+  .message-content {
+    max-width: 90%;
+  }
+  
+  .reactions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .message-avatar {
+    width: 36px;
+    height: 36px;
   }
   
   .pinned-message-content {
-    max-width: 200px;
+    max-width: 220px;
   }
+}
+
+@media (max-width: 576px) {
+  .chat-messages-container {
+    padding: 16px;
+  }
+  
+  .message-content {
+    max-width: 95%;
+    padding: 12px 14px;
+  }
+  
+  .attachment-image-container {
+    max-width: 260px;
+  }
+  
+  .message-input {
+    min-height: 80px;
+  }
+  
+  .reactions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .message-item {
+    gap: 10px;
+  }
+  
+  .message-replies,
+  .reply-thread {
+    margin-left: 30px;
+  }
+  
+  .reply-actions,
+  .message-edit-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .reply-cancel-button,
+  .reply-submit-button,
+  .message-edit-cancel,
+  .message-edit-save {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ===== ДОДАТКОВІ ВІЗУАЛЬНІ ПОКРАЩЕННЯ ===== */
+
+/* Анімація для повідомлень при появі */
+.message-item {
+  animation: slideInUp 0.3s ease;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Фон для виділення нових повідомлень */
+.message-item.new-message .message-content {
+  animation: highlightNew 2s ease;
+}
+
+@keyframes highlightNew {
+  0%, 70% {
+    background-color: #fff8e1;
+  }
+  100% {
+    background-color: #fff;
+  }
+}
+
+/* Візуальні індикатори для стану повідомлення */
+.message-status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 6px;
+}
+
+.message-status-sent {
+  background-color: #4caf50;
+}
+
+.message-status-sending {
+  background-color: #ff9800;
+}
+
+.message-status-error {
+  background-color: #f44336;
+}
+
+/* Покращення виділення при наведенні */
+.message-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.message-content:hover::after {
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+/* Додаткові коди емодзі */
+.emoji-options {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.emoji-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.emoji-option:hover {
+  transform: scale(1.1);
+  background-color: #e9ecef;
+}
+
+/* Покращення для кнопки завантаження додатків */
+.attachment-button.drag-over {
+  background-color: #fff3e6;
+  border-color: #ff6600;
+  color: #ff6600;
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 102, 0, 0);
+  }
+}
+
+.file-upload-zone {
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  background-color: #f8f9fa;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.file-upload-zone.drag-over {
+  background-color: #fff3e6;
+  border-color: #ff6600;
+}
+
+.file-upload-icon {
+  font-size: 36px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.file-upload-text {
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-upload-button:hover {
+  background-color: #e65c00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
 }

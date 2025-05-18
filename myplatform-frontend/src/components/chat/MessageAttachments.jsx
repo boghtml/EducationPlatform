@@ -9,7 +9,6 @@ const MessageAttachments = ({ attachments }) => {
     return null;
   }
   
-  // Форматування розміру файлу
   const formatFileSize = (size) => {
     if (size < 1024) {
       return `${size} B`;
@@ -20,7 +19,6 @@ const MessageAttachments = ({ attachments }) => {
     }
   };
   
-  // Перевірка, чи файл є зображенням
   const isImage = (attachment) => {
     if (attachment.file_type === 'image') return true;
     
@@ -30,12 +28,10 @@ const MessageAttachments = ({ attachments }) => {
     return imageExtensions.some(ext => filename.endsWith(ext));
   };
   
-  // Перевірка, чи файл є PDF
   const isPDF = (attachment) => {
     return attachment.file_type === 'pdf' || attachment.file_name.toLowerCase().endsWith('.pdf');
   };
   
-  // Отримання іконки для типу файлу
   const getFileIcon = (attachment) => {
     if (isImage(attachment)) return '🖼️';
     if (isPDF(attachment)) return '📄';

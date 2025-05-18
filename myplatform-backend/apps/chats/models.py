@@ -63,7 +63,7 @@ class MessageReaction(models.Model):
     """Модель для реакцій на повідомлення"""
     message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name='reactions')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='message_reactions')
-    reaction_type = models.CharField(max_length=50)  # emoji код або ідентифікатор
+    reaction_type = models.CharField(max_length=50) 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -74,7 +74,7 @@ class MessageReaction(models.Model):
             models.Index(fields=['message']),
             models.Index(fields=['user']),
         ]
-        # Один користувач може залишити лише одну реакцію конкретного типу на повідомлення
+        
         unique_together = ('message', 'user', 'reaction_type')
 
 class PinnedMessage(models.Model):

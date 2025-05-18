@@ -1,15 +1,15 @@
 // src/components/chat/MessageInput.jsx
 
-import React, { useState, useRef } from 'react';
-import { Paperclip, Send, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Paperclip, Send, X, Image, FileText, Film, Music, File, Upload } from 'lucide-react';
 import './ChatStyles.css';
 
-const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
+const MessageInput = ({ sendMessage, uploadAttachment, courseId, fileInputRef }) => {
   const [content, setContent] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [attachments, setAttachments] = useState([]);
   const [pendingAttachments, setPendingAttachments] = useState([]);
-  const fileInputRef = useRef(null);
+  const [showFileUploadZone, setShowFileUploadZone] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   
   // Обробник відправки повідомлення
   const handleSubmit = async (e) => {
@@ -39,6 +39,7 @@ const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
     } catch (error) {
       console.error('Error sending message:', error);
       setIsUploading(false);
+      alert('Не вдалося відправити повідомлення. Спробуйте ще раз.');
     }
   };
   
@@ -64,11 +65,40 @@ const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    
+    // Ховаємо зону завантаження файлів
+    setShowFileUploadZone(false);
   };
   
   // Обробник видалення файлу зі списку очікуваних вкладень
   const handleRemoveAttachment = (index) => {
     setPendingAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+  
+  // Обробники для drag-and-drop
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+  
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+  
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      setPendingAttachments(prev => [...prev, ...files]);
+    }
+  };
+  
+  // Функція для переключення режиму завантаження файлів
+  const toggleFileUploadZone = () => {
+    setShowFileUploadZone(!showFileUploadZone);
   };
   
   // Максимальний розмір файлу в байтах (15 МБ)
@@ -94,25 +124,83 @@ const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
   const getFileTypeIcon = (fileName) => {
     const extension = fileName.split('.').pop().toLowerCase();
     
-    const iconMap = {
-      'pdf': '📄',
-      'doc': '📄', 'docx': '📄',
-      'xls': '📊', 'xlsx': '📊',
-      'ppt': '📊', 'pptx': '📊',
-      'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
-      'mp4': '🎬', 'avi': '🎬', 'mov': '🎬',
-      'mp3': '🎵', 'wav': '🎵',
-      'zip': '📦', 'rar': '📦'
-    };
+    // Зображення
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) {
+      return <Image size={20} />;
+    }
     
-    return iconMap[extension] || '📎';
+    // Документи
+    if (['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt'].includes(extension)) {
+      return <FileText size={20} />;
+    }
+    
+    // Відео
+    if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'].includes(extension)) {
+      return <Film size={20} />;
+    }
+    
+    // Аудіо
+    if (['mp3', 'wav', 'ogg', 'flac', 'm4a'].includes(extension)) {
+      return <Music size={20} />;
+    }
+    
+    // Інші типи файлів
+    return <File size={20} />;
   };
 
+  // Перевірка, чи можна відправити повідомлення
+  const canSendMessage = (content.trim().length > 0 || pendingAttachments.length > 0) && !isUploading;
+  
   return (
     <div className="message-input-container">
+      {/* Зона для завантаження файлів через drag-and-drop */}
+      {showFileUploadZone && (
+        <div 
+          className={`file-upload-zone ${isDragOver ? 'drag-over' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="file-upload-icon">
+            <Upload size={36} />
+          </div>
+          <p className="file-upload-text">
+            Перетягніть файли сюди або натисніть, щоб обрати
+          </p>
+          <input
+            type="file"
+            id="attachment-input"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+            multiple
+            disabled={isUploading}
+          />
+          <button
+            type="button"
+            className="file-upload-button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            <Paperclip size={18} /> Обрати файли
+          </button>
+        </div>
+      )}
+      
       {/* Відображення списку обраних файлів */}
       {pendingAttachments.length > 0 && (
         <div className="attachments-preview">
+          <div className="attachments-preview-header">
+            <h4>Вкладення ({pendingAttachments.length})</h4>
+            <button
+              className="attachment-clear-all-btn"
+              onClick={() => setPendingAttachments([])}
+              disabled={isUploading}
+            >
+              Очистити все
+            </button>
+          </div>
+          
           {pendingAttachments.map((file, index) => (
             <div 
               key={index} 
@@ -125,7 +213,7 @@ const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
                 <span className="attachment-preview-name">{file.name}</span>
                 <span className="attachment-preview-size">
                   {formatFileSize(file.size)}
-                  {!isFileSizeValid(file) && <span className="size-limit-warning"> (перевищення ліміту)</span>}
+                  {!isFileSizeValid(file) && <span className="size-limit-warning"> (перевищення ліміту в 15 MB)</span>}
                 </span>
               </div>
               <button
@@ -157,31 +245,23 @@ const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
           </div>
           
           <div className="message-input-buttons">
-            <input
-              type="file"
-              id="attachment-input"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-              multiple
-              disabled={isUploading}
-            />
-            
             <button
               type="button"
-              className="attachment-button"
-              onClick={() => fileInputRef.current?.click()}
+              className={`attachment-button ${isDragOver ? 'drag-over' : ''}`}
+              onClick={toggleFileUploadZone}
               disabled={isUploading}
+              title="Додати вкладення"
             >
-              <Paperclip size={18} />
+              <Paperclip size={20} />
             </button>
             
             <button
               type="submit"
               className="send-button"
-              disabled={(!content.trim() && pendingAttachments.length === 0) || isUploading}
+              disabled={!canSendMessage}
+              title="Відправити повідомлення"
             >
-              <Send size={18} />
+              <Send size={20} />
             </button>
           </div>
         </div>
@@ -191,7 +271,7 @@ const MessageInput = ({ sendMessage, uploadAttachment, courseId }) => {
       {isUploading && (
         <div className="uploading-indicator">
           <div className="uploading-spinner"></div>
-          <span>Завантаження файлів...</span>
+          <span>Завантаження файлів... Зачекайте, будь ласка.</span>
         </div>
       )}
     </div>

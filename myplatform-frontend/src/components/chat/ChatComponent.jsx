@@ -8,7 +8,7 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import PinnedMessages from './PinnedMessages';
 import './ChatStyles.css';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Pin, AlertCircle, Loader, Users, X } from 'lucide-react';
 
 const ChatComponent = () => {
   const { courseId } = useParams();
@@ -18,13 +18,15 @@ const ChatComponent = () => {
   const [error, setError] = useState(null);
   const [pinnedMessages, setPinnedMessages] = useState([]);
   const [showPinnedMessages, setShowPinnedMessages] = useState(false);
+  const [participants, setParticipants] = useState([]);
+  const [showParticipants, setShowParticipants] = useState(false);
   const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const fileInputRef = useRef(null);
   
-  // Отримуємо інформацію про поточного користувача з сесії
   const userId = sessionStorage.getItem('userId');
   const userRole = sessionStorage.getItem('userRole');
   
-  // Функція для отримання CSRF токену
   const getCsrfToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
@@ -38,7 +40,6 @@ const ChatComponent = () => {
     return null;
   };
 
-  // Отримання чату курсу
   const fetchCourseChat = async () => {
     try {
       setLoading(true);
@@ -62,7 +63,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Отримання повідомлень чату
   const fetchChatMessages = async () => {
     try {
       if (!chat) return;
@@ -72,12 +72,36 @@ const ChatComponent = () => {
       });
       
       setMessages(response.data);
+      
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } catch (error) {
       console.error('Error fetching chat messages:', error);
     }
   };
 
-  // Відправка нового повідомлення
+  const fetchChatParticipants = async () => {
+    try {
+      if (!courseId) return;
+      
+      await getCsrfToken();
+      
+      const response = await axios.get(`${API_URL}/course/${courseId}/participants/`, {
+        withCredentials: true
+      });
+      
+      const allParticipants = [
+        ...response.data.students,
+        ...response.data.teachers
+      ];
+      
+      setParticipants(allParticipants);
+    } catch (error) {
+      console.error('Error fetching chat participants:', error);
+    }
+  };
+
   const sendMessage = async (content, mentions = []) => {
     try {
       if (!chat) return;
@@ -94,10 +118,13 @@ const ChatComponent = () => {
         withCredentials: true
       });
       
-      // Додаємо нове повідомлення до списку
-      setMessages(prevMessages => [response.data, ...prevMessages]);
+      const newMessage = {
+        ...response.data,
+        isNew: true 
+      };
       
-      // Прокрутка до нового повідомлення
+      setMessages(prevMessages => [newMessage, ...prevMessages]);
+      
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -109,7 +136,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Відповідь на повідомлення
   const replyToMessage = async (parentId, content, mentions = []) => {
     try {
       if (!chat) return;
@@ -127,7 +153,6 @@ const ChatComponent = () => {
         withCredentials: true
       });
       
-      // Оновлюємо список повідомлень після відповіді
       await fetchChatMessages();
       
       return response.data;
@@ -137,7 +162,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Редагування повідомлення
   const editMessage = async (messageId, content) => {
     try {
       await getCsrfToken();
@@ -147,10 +171,12 @@ const ChatComponent = () => {
         { withCredentials: true }
       );
       
-      // Оновлюємо повідомлення в списку
       setMessages(prevMessages => 
         prevMessages.map(msg => 
-          msg.id === messageId ? response.data : msg
+          msg.id === messageId ? {
+            ...response.data,
+            isEdited: true 
+          } : msg
         )
       );
       
@@ -161,16 +187,22 @@ const ChatComponent = () => {
     }
   };
 
-  // Видалення повідомлення
   const deleteMessage = async (messageId) => {
     try {
       await getCsrfToken();
+      
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === messageId ? { ...msg, isDeleting: true } : msg
+        )
+      );
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       await axios.delete(`${API_URL}/chats/messages/${messageId}/`, {
         withCredentials: true
       });
       
-      // Видаляємо повідомлення зі списку
       setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
       
     } catch (error) {
@@ -179,7 +211,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Додавання реакції до повідомлення
   const addReaction = async (messageId, reactionType) => {
     try {
       await getCsrfToken();
@@ -189,7 +220,6 @@ const ChatComponent = () => {
         { withCredentials: true }
       );
       
-      // Оновлюємо список повідомлень після додавання реакції
       await fetchChatMessages();
       
     } catch (error) {
@@ -198,7 +228,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Видалення реакції з повідомлення
   const removeReaction = async (messageId, reactionType) => {
     try {
       await getCsrfToken();
@@ -208,7 +237,6 @@ const ChatComponent = () => {
         withCredentials: true
       });
       
-      // Оновлюємо список повідомлень після видалення реакції
       await fetchChatMessages();
       
     } catch (error) {
@@ -217,7 +245,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Закріплення повідомлення
   const pinMessage = async (messageId) => {
     try {
       await getCsrfToken();
@@ -226,8 +253,9 @@ const ChatComponent = () => {
         withCredentials: true
       });
       
-      // Оновлюємо список закріплених повідомлень
       await fetchCourseChat();
+      
+      setShowPinnedMessages(true);
       
     } catch (error) {
       console.error('Error pinning message:', error);
@@ -235,16 +263,22 @@ const ChatComponent = () => {
     }
   };
 
-  // Відкріплення повідомлення
   const unpinMessage = async (messageId) => {
     try {
       await getCsrfToken();
+      
+      setPinnedMessages(prev => 
+        prev.map(pinned => 
+          pinned.message.id === messageId ? { ...pinned, isRemoving: true } : pinned
+        )
+      );
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       await axios.delete(`${API_URL}/chats/messages/${messageId}/pin/`, {
         withCredentials: true
       });
       
-      // Оновлюємо список закріплених повідомлень
       await fetchCourseChat();
       
     } catch (error) {
@@ -253,7 +287,6 @@ const ChatComponent = () => {
     }
   };
 
-  // Завантаження прикріплень до повідомлення
   const uploadAttachment = async (messageId, file) => {
     try {
       await getCsrfToken();
@@ -271,7 +304,6 @@ const ChatComponent = () => {
         }
       );
       
-      // Оновлюємо список повідомлень після додавання вкладення
       await fetchChatMessages();
       
       return response.data;
@@ -281,19 +313,46 @@ const ChatComponent = () => {
     }
   };
 
-  // Ініціалізація чату при завантаженні компонента
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (chatContainerRef.current) {
+      chatContainerRef.current.classList.add('drag-over');
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    if (chatContainerRef.current) {
+      chatContainerRef.current.classList.remove('drag-over');
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    if (chatContainerRef.current) {
+      chatContainerRef.current.classList.remove('drag-over');
+    }
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      if (fileInputRef.current) {
+        fileInputRef.current.files = e.dataTransfer.files;
+        const event = new Event('change', { bubbles: true });
+        fileInputRef.current.dispatchEvent(event);
+      }
+    }
+  };
+
   useEffect(() => {
     fetchCourseChat();
+    fetchChatParticipants();
   }, [courseId]);
   
-  // Завантаження повідомлень, коли отримано чат
   useEffect(() => {
     if (chat) {
       fetchChatMessages();
     }
   }, [chat]);
   
-  // Автоматичне оновлення повідомлень кожні 10 секунд
   useEffect(() => {
     if (!chat) return;
     
@@ -303,6 +362,24 @@ const ChatComponent = () => {
     
     return () => clearInterval(interval);
   }, [chat]);
+
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    
+    if (chatContainer) {
+      chatContainer.addEventListener('dragover', handleDragOver);
+      chatContainer.addEventListener('dragleave', handleDragLeave);
+      chatContainer.addEventListener('drop', handleDrop);
+    }
+    
+    return () => {
+      if (chatContainer) {
+        chatContainer.removeEventListener('dragover', handleDragOver);
+        chatContainer.removeEventListener('dragleave', handleDragLeave);
+        chatContainer.removeEventListener('drop', handleDrop);
+      }
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -316,7 +393,7 @@ const ChatComponent = () => {
   if (error) {
     return (
       <div className="chat-error">
-        <MessageCircle size={40} />
+        <AlertCircle size={48} color="#dc3545" />
         <h3>Помилка завантаження чату</h3>
         <p>{error}</p>
         <button className="chat-retry-button" onClick={fetchCourseChat}>
@@ -329,7 +406,7 @@ const ChatComponent = () => {
   if (!chat) {
     return (
       <div className="chat-error">
-        <MessageCircle size={40} />
+        <MessageCircle size={48} color="#6c757d" />
         <h3>Чат не знайдено</h3>
         <p>Неможливо завантажити чат для цього курсу.</p>
       </div>
@@ -337,7 +414,7 @@ const ChatComponent = () => {
   }
 
   return (
-    <div className="chat-container">
+    <div className="chat-container" ref={chatContainerRef}>
       <div className="chat-header">
         <div className="chat-header-info">
           <h2 className="chat-title">{chat.name}</h2>
@@ -347,8 +424,19 @@ const ChatComponent = () => {
           <button 
             className="chat-pinned-button"
             onClick={() => setShowPinnedMessages(!showPinnedMessages)}
+            title={showPinnedMessages ? "Сховати закріплені повідомлення" : "Показати закріплені повідомлення"}
           >
+            <Pin size={16} />
             {pinnedMessages.length > 0 ? `Закріплені (${pinnedMessages.length})` : 'Закріплені'}
+          </button>
+          <button 
+            className="chat-pinned-button"
+            onClick={() => setShowParticipants(!showParticipants)}
+            style={{ marginLeft: '10px' }}
+            title={showParticipants ? "Сховати учасників" : "Показати учасників"}
+          >
+            <Users size={16} />
+            Учасники ({participants.length})
           </button>
         </div>
       </div>
@@ -360,26 +448,76 @@ const ChatComponent = () => {
         />
       )}
       
+      {showParticipants && (
+        <div className="participants-container">
+          <div className="participants-header">
+            <h3 className="participants-title">
+              <Users size={16} /> Учасники чату
+            </h3>
+            <button 
+              className="participants-close-btn"
+              onClick={() => setShowParticipants(false)}
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="participants-list">
+            {participants.map((participant) => (
+              <div key={participant.id} className="participant-item">
+                <img 
+                  src={participant.profile_image_url || "https://via.placeholder.com/40"} 
+                  alt={participant.username} 
+                  className="participant-avatar"
+                />
+                <div className="participant-info">
+                  <span className="participant-name">
+                    {participant.first_name} {participant.last_name}
+                  </span>
+                  <span className="participant-role">
+                    {participant.role === 'teacher' ? 'Викладач' : 
+                     participant.role === 'admin' ? 'Адміністратор' : 'Студент'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
       <div className="chat-messages-container">
-        <MessageList 
-          messages={messages} 
-          currentUserId={userId}
-          currentUserRole={userRole}
-          replyToMessage={replyToMessage}
-          editMessage={editMessage}
-          deleteMessage={deleteMessage}
-          addReaction={addReaction}
-          removeReaction={removeReaction}
-          pinMessage={userRole === 'teacher' || userRole === 'admin' ? pinMessage : undefined}
-          messagesEndRef={messagesEndRef}
-        />
+        {messages.length === 0 ? (
+          <div className="chat-no-messages">
+            <p>
+              Немає повідомлень у цьому чаті. Будьте першим, хто напише!
+              <br />
+              <small>Ви також можете перетягнути файли сюди для завантаження</small>
+            </p>
+          </div>
+        ) : (
+          <MessageList 
+            messages={messages} 
+            currentUserId={userId}
+            currentUserRole={userRole}
+            replyToMessage={replyToMessage}
+            editMessage={editMessage}
+            deleteMessage={deleteMessage}
+            addReaction={addReaction}
+            removeReaction={removeReaction}
+            pinMessage={userRole === 'teacher' || userRole === 'admin' ? pinMessage : undefined}
+            messagesEndRef={messagesEndRef}
+          />
+        )}
       </div>
       
       <MessageInput 
         sendMessage={sendMessage} 
         uploadAttachment={uploadAttachment} 
         courseId={courseId}
+        fileInputRef={fileInputRef}
       />
+      
+      {/* Прихований елемент для прокрутки до останнього повідомлення */}
+      <div ref={messagesEndRef} />
     </div>
   );
 };
