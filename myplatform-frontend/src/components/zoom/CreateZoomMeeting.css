@@ -227,3 +227,136 @@
     justify-content: center;
   }
 }
+
+/* Додаткові стилі для CreateZoomMeeting.css */
+.course-loading {
+  padding: 10px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  color: #4b5563;
+  text-align: center;
+  font-style: italic;
+}
+
+.no-courses-warning {
+  padding: 12px 15px;
+  background-color: #fff8e6;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  color: #856404;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Покращення доступності форми */
+select:required:invalid {
+  color: #6b7280;
+}
+
+option {
+  color: #1f2937;
+}
+
+option:first-child {
+  color: #6b7280;
+}
+
+/* Стилі для відображення помилок в консолі в UI */
+.debug-console {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: monospace;
+  padding: 10px;
+  font-size: 12px;
+  z-index: 9999;
+  border-top: 2px solid #ff6600;
+}
+
+.debug-console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.debug-console-title {
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.debug-console-toggle {
+  cursor: pointer;
+  padding: 2px 5px;
+  background-color: #ff6600;
+  border-radius: 3px;
+  color: #000;
+}
+
+.debug-console-message {
+  margin: 3px 0;
+  word-break: break-word;
+}
+
+.debug-console-message:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.debug-console-message.error {
+  color: #ff6666;
+}
+
+.debug-console-message.warning {
+  color: #ffcc00;
+}
+
+.debug-console-message.info {
+  color: #66ccff;
+}
+
+/* Покращення чекбоксів */
+.form-checkbox-item input[type="checkbox"] {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  position: relative;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-checkbox-item input[type="checkbox"]:checked {
+  border-color: #2d8cff;
+  background-color: #2d8cff;
+}
+
+.form-checkbox-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.form-checkbox-item input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.2);
+}
+
+.form-checkbox-item label {
+  user-select: none;
+}

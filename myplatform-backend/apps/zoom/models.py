@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from apps.courses.models import Course
-from datetime import datetime, timedelta
+from datetime import timedelta
 import uuid
 
 class ZoomMeeting(models.Model):
@@ -65,12 +66,12 @@ class ZoomMeeting(models.Model):
     
     @property
     def is_active(self):
-        now = datetime.now()
+        now = timezone.now()
         return self.start_time <= now <= self.end_time and self.status == 'live'
     
     @property
     def can_join(self):
-        now = datetime.now()
+        now = timezone.now()
         # Можливість приєднатися за 15 хв до початку і протягом всієї тривалості
         return (self.start_time - timedelta(minutes=15)) <= now <= self.end_time and self.status in ['scheduled', 'live']
     

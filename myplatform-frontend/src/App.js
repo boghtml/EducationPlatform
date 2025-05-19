@@ -67,7 +67,7 @@ import StudentAssignmentDetail from './components/teacher/StudentAssignmentDetai
 import TeacherHelp from './components/teacher/TeacherHelp';
 import TeacherAnalytics from './components/teacher/TeacherAnalytics';
 import TeacherDiscussionsTab from './components/teacher/TeacherDiscussionsTab';
-
+import TeacherZoomMeetings from './components/teacher/TeacherZoomMeetings';
 /*
 import TeacherQA from './components/teacher/TeacherQA';
 import TeacherLessons from './components/teacher/TeacherLessons';
@@ -370,6 +370,20 @@ function App() {
          <Route path="/teacher/analytics" element={
           <ProtectedRoute 
             element={<TeacherAnalytics />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+
+        <Route path="/teacher/zoom-meetings" element={
+          <ProtectedRoute 
+            element={<TeacherZoomMeetings />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        
+        <Route path="/teacher/zoom/edit/:meetingId" element={
+          <ProtectedRoute 
+            element={<TeacherZoomMeetings />}
             allowedRoles={['teacher']} 
           />
         } />

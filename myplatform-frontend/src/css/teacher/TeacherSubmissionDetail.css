@@ -433,13 +433,6 @@
   padding: 24px;
 }
 
-.loading-spinner {
-  animation: spin 1s linear infinite;
-  font-size: 32px;
-  color: #4a6cf7;
-  margin-bottom: 16px;
-}
-
 .submission-detail-error svg {
   font-size: 48px;
   color: #ef4444;

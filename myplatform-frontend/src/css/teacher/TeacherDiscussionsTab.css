@@ -1,20 +1,58 @@
 /* src/css/teacher/TeacherDiscussionsTab.css */
-.teacher-discussions-tab {
-  margin-bottom: 30px;
+.teacher-page {
+  min-height: 100vh;
+  background-color: #f5f7fa;
 }
 
-.discussions-header-top {
+.teacher-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  min-height: calc(100vh - 60px);
+}
+
+.teacher-discussions-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 250px; /* Враховуючи ширину сайдбару */
+}
+
+.teacher-sidebar.collapsed + .teacher-discussions-content {
+  margin-left: 70px;
+}
+
+.teacher-discussions-header {
+  background-color: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.discussions-header-content {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.teacher-discussions-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.teacher-discussions-header p {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
 }
 
 .create-meeting-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 8px 16px;
   background-color: #2d8cff;
   color: white;
   border: none;
@@ -31,20 +69,140 @@
   box-shadow: 0 4px 8px rgba(45, 140, 255, 0.2);
 }
 
-.create-meeting-container {
-  margin-top: 20px;
-  margin-bottom: 30px;
+/* Вкладки для перемикання */
+.discussions-tabs {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+.discussions-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.discussions-tab-btn:hover {
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.discussions-tab-btn.active {
+  color: #2d8cff;
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+}
+
+/* Контейнери для контенту */
+.discussions-chat-container,
+.discussions-zoom-container,
+.discussions-create-meeting-container {
+  padding: 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  min-height: 400px;
+}
+
+/* Стани завантаження та помилки */
+.teacher-content-loading,
+.teacher-content-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  flex: 1;
+  margin-left: 250px;
+  text-align: center;
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.teacher-content-error {
+  color: #ef4444;
+}
+
+.teacher-content-error h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 10px 0;
+  color: #1f2937;
+}
+
+.teacher-content-error p {
+  color: #6b7280;
+  margin: 0 0 15px 0;
+}
+
+.retry-button {
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #e5e7eb;
 }
 
 /* Адаптивність для мобільних пристроїв */
-@media (max-width: 768px) {
-  .discussions-header-top {
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 15px;
+@media (max-width: 992px) {
+  .teacher-discussions-content {
+    margin-left: 0;
+    padding: 15px;
+  }
+  
+  .teacher-sidebar.collapsed + .teacher-discussions-content {
+    margin-left: 70px;
+  }
+  
+  .teacher-discussions-header {
+    padding: 15px;
+  }
+  
+  .discussions-header-content {
+    padding-bottom: 50px; /* Місце для кнопки */
   }
   
   .create-meeting-btn {
+    top: auto;
+    bottom: 0;
+    right: 0;
+  }
+  
+  .teacher-content-loading,
+  .teacher-content-error {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .discussions-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .discussions-tab-btn {
     width: 100%;
     justify-content: center;
   }

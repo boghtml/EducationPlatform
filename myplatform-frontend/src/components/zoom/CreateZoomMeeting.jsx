@@ -1,12 +1,14 @@
-// src/components/zoom/CreateZoomMeeting.jsx
-import React, { useState } from 'react';
+// src/components/zoom/CreateZoomMeeting.jsx - Виправлений
+import React, { useState, useEffect } from 'react';
 import './CreateZoomMeeting.css';
-import zoomApi from '../api/zoomApi';
+import axios from 'axios';
+import API_URL from '../../api'; // Виправлений шлях імпорту
 import { Calendar, Clock, Users, Video, Info } from 'lucide-react';
 
 const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
+  const [courses, setCourses] = useState([]);
   const [formData, setFormData] = useState({
-    course: courseId,
+    course: courseId || '',
     topic: '',
     description: '',
     start_time: formatDateTimeForInput(new Date(Date.now() + 30 * 60000)), // зустріч через 30 хв за замовчуванням
@@ -20,6 +22,53 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  
+  useEffect(() => {
+    console.log("CreateZoomMeeting component mounted. courseId:", courseId);
+    
+    // Завантаження списку курсів, якщо вони потрібні для вибору
+    const fetchCourses = async () => {
+      setCoursesLoading(true);
+      try {
+        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+        const userId = sessionStorage.getItem('userId');
+        console.log("Fetching courses for teacher ID:", userId);
+        
+        const response = await axios.get(`${API_URL}/courses/`, {
+          withCredentials: true,
+          params: { teacher_id: userId }
+        });
+        
+        console.log("Courses received:", response.data);
+        setCourses(response.data || []);
+        
+        // Якщо courseId не передано, а є курси - встановлюємо перший курс за замовчуванням
+        if (!courseId && response.data && response.data.length > 0) {
+          console.log("Setting default course:", response.data[0].id);
+          setFormData(prev => ({
+            ...prev,
+            course: response.data[0].id
+          }));
+        }
+        setCoursesLoading(false);
+      } catch (err) {
+        console.error('Error fetching courses:', err);
+        setError('Не вдалося завантажити список курсів. Будь ласка, спробуйте пізніше.');
+        setCoursesLoading(false);
+      }
+    };
+    
+    if (!courseId) {
+      fetchCourses();
+    } else {
+      console.log("Using provided courseId:", courseId);
+      setFormData(prev => ({
+        ...prev,
+        course: courseId
+      }));
+    }
+  }, [courseId]);
   
   // Форматування дати і часу для input[type="datetime-local"]
   function formatDateTimeForInput(date) {
@@ -35,6 +84,7 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
   // Обробник зміни полів форми
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    console.log(`Field changed: ${name}, value: ${type === 'checkbox' ? checked : value}`);
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -54,6 +104,10 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         throw new Error('Тема зустрічі обов\'язкова');
       }
       
+      if (!formData.course) {
+        throw new Error('Виберіть курс для зустрічі');
+      }
+      
       // Перевірка дати
       const startTime = new Date(formData.start_time);
       if (isNaN(startTime.getTime())) {
@@ -69,18 +123,46 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         throw new Error('Тривалість має бути від 15 до 300 хвилин');
       }
       
-      // Відправка даних на сервер
-      const response = await zoomApi.createZoomMeeting(formData);
+      // Отримуємо CSRF токен
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
+      // Підготовка даних для запиту - важливо передати дані в правильному форматі
+      const requestData = {
+        course: parseInt(formData.course),
+        topic: formData.topic,
+        description: formData.description,
+        start_time: (new Date(formData.start_time)).toISOString(), // ISO формат для бекенду
+        duration: parseInt(formData.duration),
+        host_video: formData.host_video,
+        participant_video: formData.participant_video,
+        join_before_host: formData.join_before_host,
+        mute_upon_entry: formData.mute_upon_entry,
+        auto_recording: formData.auto_recording
+      };
+      
+      console.log('Sending data to backend:', requestData);
+      
+      // Відправка даних на сервер
+      const response = await axios.post(`${API_URL}/zoom/meetings/`, requestData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Meeting created successfully:', response.data);
       setIsSubmitting(false);
       
       // Виклик функції зворотного виклику після успішного створення
       if (onCreated) {
-        onCreated(response);
+        onCreated(response.data);
       }
       
     } catch (err) {
       setIsSubmitting(false);
+      if (err.response && err.response.data) {
+        console.error('Server error details:', err.response.data);
+      }
       setError(err.response?.data?.error || err.message || 'Не вдалося створити Zoom зустріч');
       console.error('Error creating Zoom meeting:', err);
     }
@@ -101,6 +183,33 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
       )}
       
       <form onSubmit={handleSubmit} className="zoom-form">
+        {/* Відображаємо вибір курсу, якщо courseId не передано */}
+        {!courseId && (
+          <div className="form-group">
+            <label htmlFor="course">Виберіть курс*</label>
+            {coursesLoading ? (
+              <div className="course-loading">Завантаження курсів...</div>
+            ) : courses.length > 0 ? (
+              <select
+                id="course"
+                name="course"
+                value={formData.course}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Виберіть курс --</option>
+                {courses.map(course => (
+                  <option key={course.id} value={course.id}>{course.title}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="no-courses-warning">
+                Курси не знайдені. Перш ніж створювати зустріч, створіть хоча б один курс.
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="form-group">
           <label htmlFor="topic">Тема зустрічі*</label>
           <input
@@ -237,7 +346,7 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
           <button 
             type="submit" 
             className="btn-create"
-            disabled={isSubmitting}
+            disabled={isSubmitting || (!courseId && courses.length === 0)}
           >
             {isSubmitting ? (
               <>

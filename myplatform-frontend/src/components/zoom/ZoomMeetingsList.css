@@ -27,16 +27,16 @@
   position: relative;
 }
 
-.tab-button:hover {
+.zoom-list-tab-button:hover {
   color: #2d8cff;
 }
 
-.tab-button.active {
+.zoom-list-tab-button.active {
   color: #2d8cff;
   font-weight: 600;
 }
 
-.tab-button.active::after {
+.zoom-list-tab-button.active::after {
   content: '';
   position: absolute;
   bottom: 0;

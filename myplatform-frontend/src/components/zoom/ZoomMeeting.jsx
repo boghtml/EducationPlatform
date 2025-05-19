@@ -1,4 +1,4 @@
-// src/components/zoom/ZoomMeeting.jsx
+// src/components/zoom/ZoomMeeting.jsx - Оновлений з новою автентифікацією
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ZoomMeeting.css';
@@ -17,6 +17,7 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
     // Додавання скрипту Zoom SDK
     const addZoomScripts = async () => {
       try {
+        console.log('Loading Zoom SDK scripts...');
         // Додаємо Zoom Web Meeting SDK через CDN
         const zoomScript = document.createElement('script');
         zoomScript.src = 'https://source.zoom.us/3.13.2/lib/vendor/react.min.js';
@@ -82,8 +83,16 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
       const joinData = await zoomApi.joinZoomMeeting(meetingId);
       setMeetingData(joinData);
 
-      const { meeting, sdk_data, is_host } = joinData;
-      const { signature, apiKey, meetingNumber, timestamp } = sdk_data;
+      const { meeting, sdk_data } = joinData;
+      const { signature, sdkKey, meetingNumber, passWord, userName, userEmail, role } = sdk_data;
+
+      console.log('Meeting data received:', {
+        meeting,
+        sdkData: {
+          ...sdk_data,
+          signature: signature.substring(0, 10) + '...' // Для безпеки показуємо частково
+        }
+      });
 
       // Ініціалізація клієнта Zoom SDK
       zoomClient.current = window.ZoomMtg;
@@ -93,25 +102,27 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
       zoomClient.current.preLoadWasm();
       zoomClient.current.prepareWebSDK();
 
-      // Налаштування мови інтерфейсу (за замовчуванням - англійська)
-      zoomClient.current.i18n.load('uk-UA');
-      zoomClient.current.i18n.reload('uk-UA');
+      // Налаштування мови інтерфейсу
+      zoomClient.current.i18n.load('en-US');
+      zoomClient.current.i18n.reload('en-US');
 
-      // Ініціалізація клієнта
+      // Ініціалізація клієнта з використанням SDK Auth
       zoomClient.current.init({
-        leaveUrl: window.location.href, // URL для переадресації після виходу
+        leaveUrl: window.location.origin + '/teacher/zoom-meetings', // URL для переадресації після виходу
         disableCORP: true,
         success: () => {
           console.log('Zoom Meeting SDK initialized');
 
-          // Приєднання до зустрічі
+          // Приєднання до зустрічі з використанням SDK Auth
           zoomClient.current.join({
-            apiKey: apiKey,
+            sdkKey: sdkKey,
             signature: signature,
             meetingNumber: meetingNumber,
-            password: meeting.meeting_password || '', // Пароль зустрічі
-            userName: sessionStorage.getItem('userName') || 'User', // Ім'я користувача
-            userEmail: sessionStorage.getItem('userEmail') || '', // Email користувача
+            password: passWord || meeting.meeting_password || '', // Пароль зустрічі
+            userName: userName || sessionStorage.getItem('userName') || 'User', // Ім'я користувача
+            userEmail: userEmail || sessionStorage.getItem('userEmail') || '', // Email користувача
+            tk: '',
+            zak: '',
             success: () => {
               console.log('Joined Zoom meeting successfully');
               setIsJoined(true);
@@ -119,14 +130,14 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
             },
             error: (error) => {
               console.error('Failed to join Zoom meeting', error);
-              setError('Помилка приєднання до зустрічі. ' + error.errorMessage);
+              setError('Помилка приєднання до зустрічі: ' + (error.errorMessage || error.reason || 'Невідома помилка'));
               setLoading(false);
             }
           });
         },
         error: (error) => {
           console.error('Failed to initialize Zoom SDK', error);
-          setError('Помилка ініціалізації Zoom SDK. Будь ласка, спробуйте пізніше.');
+          setError('Помилка ініціалізації Zoom SDK: ' + (error.errorMessage || error.reason || 'Будь ласка, спробуйте пізніше.'));
           setLoading(false);
         }
       });

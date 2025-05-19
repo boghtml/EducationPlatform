@@ -1,14 +1,15 @@
-// src/components/teacher/TeacherZoomMeetings.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TeacherSidebar from './TeacherSidebar';
 import TeacherHeader from './TeacherHeader';
 import '../../css/teacher/TeacherZoomMeetings.css';
-import zoomApi from '../../api/zoomApi';
+import zoomApi from '../api/zoomApi';
 import ZoomMeetingsList from '../zoom/ZoomMeetingsList';
 import ZoomModal from '../zoom/ZoomModal';
 import CreateZoomMeeting from '../zoom/CreateZoomMeeting';
-import { Video, Plus, Filter, Search, Calendar } from 'lucide-react';
+import { Video, Plus, Filter, Search, Calendar, Clock, Book, Eye, Edit, Trash, AlertTriangle } from 'lucide-react';
+import axios from 'axios';
+import API_URL from '../../api'; // Правильний шлях до API_URL
 
 function TeacherZoomMeetings() {
   const [meetings, setMeetings] = useState([]);
@@ -22,45 +23,76 @@ function TeacherZoomMeetings() {
   const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'past', 'active'
   const navigate = useNavigate();
 
+  // Отримання списку курсів викладача
+  const fetchTeacherCourses = async () => {
+    try {
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      const userId = sessionStorage.getItem('userId');
+      console.log("Fetching teacher courses, user ID:", userId);
+      
+      if (!userId) {
+        console.error("User ID is missing from sessionStorage");
+        setError('Не вдалося визначити ID викладача. Спробуйте вийти і увійти знову.');
+        return;
+      }
+      
+      const response = await axios.get(`${API_URL}/courses/`, {
+        withCredentials: true,
+        params: { teacher_id: userId }
+      });
+      
+      console.log("Courses response:", response.data);
+      
+      setCourses(response.data || []);
+      
+      if (response.data && response.data.length > 0) {
+        console.log("First course found:", response.data[0]);
+      } else {
+        console.log("No courses found for this teacher");
+      }
+    } catch (err) {
+      console.error('Error fetching teacher courses:', err);
+      setError('Не вдалося завантажити курси. Будь ласка, спробуйте пізніше.');
+    }
+  };
+
+  // Отримання всіх Zoom зустрічей
+  const fetchAllMeetings = async () => {
+    try {
+      setLoading(true);
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      const response = await axios.get(`${API_URL}/zoom/meetings/`, {
+        withCredentials: true
+      });
+      
+      console.log("Zoom meetings response:", response.data);
+      setMeetings(response.data || []);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching zoom meetings:', err);
+      setError('Не вдалося завантажити Zoom зустрічі. Будь ласка, спробуйте пізніше.');
+      setLoading(false);
+    }
+  };
+
+  // Початкове завантаження даних
   useEffect(() => {
-    // Отримання списку курсів викладача
-    const fetchTeacherCourses = async () => {
-      try {
-        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-        const userId = sessionStorage.getItem('userId');
-        const response = await axios.get(`${API_URL}/teacher/${userId}/courses/`, {
-          withCredentials: true
-        });
-        setCourses(response.data || []);
-      } catch (err) {
-        console.error('Error fetching teacher courses:', err);
-        setError('Не вдалося завантажити курси. Будь ласка, спробуйте пізніше.');
-      }
+    console.log("TeacherZoomMeetings component mounted");
+    
+    const initData = async () => {
+      await fetchTeacherCourses();
+      await fetchAllMeetings();
     };
-
-    // Отримання всіх Zoom зустрічей
-    const fetchAllMeetings = async () => {
-      try {
-        setLoading(true);
-        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-        const response = await axios.get(`${API_URL}/zoom/meetings/`, {
-          withCredentials: true
-        });
-        setMeetings(response.data || []);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching zoom meetings:', err);
-        setError('Не вдалося завантажити Zoom зустрічі. Будь ласка, спробуйте пізніше.');
-        setLoading(false);
-      }
-    };
-
-    fetchTeacherCourses();
-    fetchAllMeetings();
+    
+    initData();
   }, []);
 
   // Оновлення списку зустрічей при зміні фільтра курсу
   useEffect(() => {
+    if (!selectedCourseId) return;
+    
+    console.log("Course filter changed to:", selectedCourseId);
+    
     const fetchMeetings = async () => {
       try {
         setLoading(true);
@@ -71,10 +103,13 @@ function TeacherZoomMeetings() {
           url = `${API_URL}/zoom/course/${selectedCourseId}/meetings/`;
         }
         
+        console.log("Fetching meetings from URL:", url);
+        
         const response = await axios.get(url, {
           withCredentials: true
         });
         
+        console.log("Filtered meetings response:", response.data);
         setMeetings(response.data || []);
         setLoading(false);
       } catch (err) {
@@ -84,9 +119,7 @@ function TeacherZoomMeetings() {
       }
     };
 
-    if (selectedCourseId) {
-      fetchMeetings();
-    }
+    fetchMeetings();
   }, [selectedCourseId]);
 
   // Фільтрування зустрічей за пошуком та типом
@@ -142,13 +175,23 @@ function TeacherZoomMeetings() {
 
   // Обробник створення нової зустрічі
   const handleCreateMeeting = () => {
+    if (courses.length === 0) {
+      if (window.confirm('У вас немає жодного курсу. Спочатку створіть курс, щоб мати можливість створювати зустрічі. Перейти до створення курсу?')) {
+        navigate('/teacher/courses/create');
+      }
+      return;
+    }
+    
     setShowCreateForm(true);
   };
 
   // Обробник успішного створення зустрічі
   const handleMeetingCreated = (newMeeting) => {
+    console.log("Meeting created successfully:", newMeeting);
     setShowCreateForm(false);
-    setMeetings(prev => [newMeeting, ...prev]);
+    
+    // Оновлюємо список зустрічей з сервера
+    fetchAllMeetings();
   };
 
   // Обробник скасування створення зустрічі
@@ -160,13 +203,34 @@ function TeacherZoomMeetings() {
   const handleDeleteMeeting = async (meetingId) => {
     if (window.confirm('Ви дійсно хочете видалити цю Zoom зустріч?')) {
       try {
+        console.log("Deleting meeting with ID:", meetingId);
         await zoomApi.deleteZoomMeeting(meetingId);
+        console.log("Meeting deleted successfully");
         setMeetings(prev => prev.filter(meeting => meeting.id !== meetingId));
       } catch (err) {
         console.error('Error deleting meeting:', err);
         alert('Не вдалося видалити зустріч. Будь ласка, спробуйте пізніше.');
       }
     }
+  };
+  
+  // Форматування дати
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Невідомо';
+    return new Date(dateString).toLocaleDateString('uk-UA', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+  
+  // Форматування часу
+  const formatTime = (dateString) => {
+    if (!dateString) return 'Невідомо';
+    return new Date(dateString).toLocaleTimeString('uk-UA', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -194,7 +258,7 @@ function TeacherZoomMeetings() {
           {showCreateForm ? (
             <div className="teacher-zoom-create-form">
               <CreateZoomMeeting
-                courseId={selectedCourseId === 'all' ? (courses.length > 0 ? courses[0].id : null) : selectedCourseId}
+                courseId={selectedCourseId !== 'all' ? parseInt(selectedCourseId) : null}
                 onCreated={handleMeetingCreated}
                 onCancel={handleCancelCreate}
               />
@@ -247,31 +311,55 @@ function TeacherZoomMeetings() {
                 </div>
               </div>
               
-              <div className="teacher-zoom-meetings-list">
-                {getFilteredMeetings().length === 0 ? (
-                  <div className="no-meetings">
-                    <Calendar size={48} />
-                    <h3>Немає зустрічей</h3>
-                    <p>
-                      {searchQuery ? 
-                        'Немає зустрічей, що відповідають пошуковому запиту.' : 
-                        'У вас ще немає створених Zoom зустрічей. Створіть свою першу зустріч!'
-                      }
-                    </p>
-                    <button className="create-first-meeting" onClick={handleCreateMeeting}>
-                      <Plus size={16} />
-                      Створити зустріч
-                    </button>
-                  </div>
-                ) : (
-                  <div className="meetings-grid">
-                    {getFilteredMeetings().map(meeting => (
+              {loading ? (
+                <div className="zoom-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Завантаження Zoom зустрічей...</p>
+                </div>
+              ) : error ? (
+                <div className="zoom-error">
+                  <AlertTriangle size={40} />
+                  <h3>Помилка</h3>
+                  <p>{error}</p>
+                  <button 
+                    className="retry-button"
+                    onClick={() => window.location.reload()}
+                  >
+                    Спробувати знову
+                  </button>
+                </div>
+              ) : getFilteredMeetings().length === 0 ? (
+                <div className="no-meetings">
+                  <Calendar size={48} />
+                  <h3>Немає зустрічей</h3>
+                  <p>
+                    {searchQuery ? 
+                      'Немає зустрічей, що відповідають пошуковому запиту.' : 
+                      'У вас ще немає створених Zoom зустрічей. Створіть свою першу зустріч!'
+                    }
+                  </p>
+                  <button className="create-first-meeting" onClick={handleCreateMeeting}>
+                    <Plus size={16} />
+                    Створити зустріч
+                  </button>
+                </div>
+              ) : (
+                <div className="meetings-grid">
+                  {getFilteredMeetings().map(meeting => {
+                    // Визначення статусу для відображення
+                    let statusText;
+                    switch(meeting.status) {
+                      case 'scheduled': statusText = 'Заплановано'; break;
+                      case 'live': statusText = 'В процесі'; break;
+                      case 'ended': statusText = 'Завершено'; break;
+                      case 'canceled': statusText = 'Скасовано'; break;
+                      default: statusText = 'Заплановано';
+                    }
+                    
+                    return (
                       <div key={meeting.id} className="meeting-card">
                         <div className={`meeting-status ${meeting.status}`}>
-                          {meeting.status === 'scheduled' && 'Заплановано'}
-                          {meeting.status === 'live' && 'В процесі'}
-                          {meeting.status === 'ended' && 'Завершено'}
-                          {meeting.status === 'canceled' && 'Скасовано'}
+                          {statusText}
                         </div>
                         
                         <h3 className="meeting-title">{meeting.topic}</h3>
@@ -279,21 +367,18 @@ function TeacherZoomMeetings() {
                         <div className="meeting-info">
                           <div className="info-item">
                             <Calendar size={14} />
-                            <span>{new Date(meeting.start_time).toLocaleDateString('uk-UA')}</span>
+                            <span>{formatDate(meeting.start_time)}</span>
                           </div>
                           <div className="info-item">
                             <Clock size={14} />
-                            <span>
-                              {new Date(meeting.start_time).toLocaleTimeString('uk-UA', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
+                            <span>{formatTime(meeting.start_time)}</span>
                           </div>
-                          <div className="info-item">
-                            <Book size={14} />
-                            <span>{meeting.course_data?.title}</span>
-                          </div>
+                          {meeting.course_data && (
+                            <div className="info-item">
+                              <Book size={14} />
+                              <span>{meeting.course_data.title}</span>
+                            </div>
+                          )}
                         </div>
                         
                         {meeting.description && (
@@ -336,10 +421,10 @@ function TeacherZoomMeetings() {
                           )}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </>
           )}
         </div>
