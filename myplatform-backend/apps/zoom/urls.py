@@ -4,7 +4,8 @@ from .views import (
     ZoomMeetingViewSet,
     ZoomSDKAuthView,
     CourseZoomMeetingsView,
-    test_zoom_token
+    test_zoom_token,
+    test_zoom_api
 )
 
 router = DefaultRouter()
@@ -21,4 +22,6 @@ urlpatterns = [
     path('course/<int:course_id>/meetings/', CourseZoomMeetingsView.as_view(), name='course-zoom-meetings'),
 
     path('test-token/', test_zoom_token, name='test-zoom-token'),
+    path('test-api/', test_zoom_api, name='test-zoom-api'),  # Додано новий тестовий endpoint
+
 ]

@@ -113,45 +113,26 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 "auto_recording": serializer.validated_data.get('auto_recording', 'none')
             }
             
-            try:
-                # Створюємо зустріч через Zoom API
-                print(f"Attempting to create real Zoom meeting via API for course {course.id}: {topic}")
-                
-                zoom_response = create_zoom_meeting(
-                    topic=topic,
-                    description=description,
-                    start_time=start_time,
-                    duration=duration,
-                    settings=api_settings
-                )
-                 
-                print(f"Zoom API response received for meeting '{topic}'")
-                
-                
-                zoom_data = {
-                    "meeting_id": str(zoom_response['id']),
-                    "meeting_password": zoom_response['password'],
-                    "join_url": zoom_response['join_url']
-                }
-                
-                print(f"Extracted meeting data: ID={zoom_data['meeting_id']}, Password={zoom_data['meeting_password']}")
-                
-                
-            except Exception as api_error:
-                print(f"Error calling Zoom API: {str(api_error)}")
-                
-                # Fallback до фейкових даних у випадку помилки
-                import random
-                fake_meeting_id = str(random.randint(100000000, 999999999))
-                fake_meeting_password = "".join([str(random.randint(0, 9)) for _ in range(6)])
-                
-                zoom_data = {
-                    "meeting_id": fake_meeting_id,
-                    "meeting_password": fake_meeting_password,
-                    "join_url": f"https://zoom.us/j/{fake_meeting_id}?pwd={fake_meeting_password}"
-                }
-                
-                print(f"Error occurred, using fallback meeting data: {zoom_data}")
+            # Створюємо зустріч через Zoom API
+            print(f"Creating real Zoom meeting via API for course {course.id}: {topic}")
+            
+            zoom_response = create_zoom_meeting(
+                topic=topic,
+                description=description,
+                start_time=start_time,
+                duration=duration,
+                settings=api_settings
+            )
+            
+            print(f"Zoom API response received for meeting '{topic}'")
+            print(f"Meeting ID: {zoom_response['id']}, Password: {zoom_response.get('password', 'None')}")
+            
+            # Extract meeting data from the standardized response
+            zoom_data = {
+                "meeting_id": zoom_response['id'],
+                "meeting_password": zoom_response.get('password', ''),
+                "join_url": zoom_response.get('join_url', '')
+            }
             
             # Зберігаємо зустріч в базу даних
             from django.db import transaction
@@ -170,8 +151,20 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
             return meeting
                 
         except Exception as e:
+            import traceback
+            error_traceback = traceback.format_exc()
             print(f"ERROR: Error in Zoom meeting creation: {str(e)}")
-            raise
+            print(f"Traceback: {error_traceback}")
+            
+            # Повертаємо JSON-відповідь з детальною інформацією про помилку
+            return Response(
+                {
+                    "error": f"Не вдалося створити Zoom зустріч: {str(e)}",
+                    "error_type": type(e).__name__,
+                    "traceback": error_traceback
+                }, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def perform_update(self, serializer):
         
@@ -230,39 +223,39 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Ensure we have a valid password
-        if meeting.meeting_password is None or meeting.meeting_password == '':
+        # Ensure we have a valid meeting ID and password
+        if not meeting.meeting_id or not meeting.meeting_id.strip():
             return Response(
-                {"error": "Пароль зустрічі не знайдено"}, 
+                {"error": "ID зустрічі Zoom не знайдено"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+            
+        if not meeting.meeting_password or not meeting.meeting_password.strip():
+            print(f"Warning: Meeting {meeting.id} has no password")
         
-        # Get the actual Zoom meeting ID (should be saved from API response)
-        meeting_id = meeting.meeting_id
-        if not meeting_id or not meeting_id.isdigit():
-            return Response(
-                {"error": "Недійсний ID зустрічі Zoom"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # Get the actual Zoom meeting ID
+        meeting_id = meeting.meeting_id.strip()
         
+        # Determine if user is host
         is_host = user.role in ['teacher', 'admin'] and (user.id == meeting.created_by.id or user.id == meeting.course.teacher.id)
         role = 1 if is_host else 0
         
-        # Generate SDK auth data using the actual meeting ID
+        # Generate SDK auth data
         sdk_auth_data = generate_sdk_signature(
             meeting_number=meeting_id, 
             role=role
         )
         
-        # Add meeting details to response
+        # Add meeting details to the SDK data
         sdk_auth_data.update({
-            'password': meeting.meeting_password,
+            'passWord': meeting.meeting_password,
             'userName': f"{user.first_name} {user.last_name}".strip() or user.username,
             'userEmail': user.email,
-            'meetingNumber': meeting_id
+            'meetingNumber': meeting_id,
+            'leaveUrl': f"/courses/{meeting.course.id}/discussions" if meeting.course else "/dashboard"
         })
         
-        # Record participant
+        # Record participant joining
         participant, created = ZoomMeetingParticipant.objects.update_or_create(
             meeting=meeting,
             user=user,
@@ -339,15 +332,27 @@ class ZoomSDKAuthView(generics.GenericAPIView):
             role=role
         )
         
-        if user_name:
-            sdk_auth_data['userName'] = user_name
-        else:
+        # Ensure the password isn't empty
+        if not user_name:
             sdk_auth_data['userName'] = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
-            
-        if user_email:
-            sdk_auth_data['userEmail'] = user_email
         else:
+            sdk_auth_data['userName'] = user_name
+            
+        if not user_email:
             sdk_auth_data['userEmail'] = request.user.email
+        else:
+            sdk_auth_data['userEmail'] = user_email
+        
+        # Try to get the meeting password if available
+        try:
+            meeting = ZoomMeeting.objects.get(meeting_id=meeting_id)
+            if meeting.meeting_password:
+                sdk_auth_data['passWord'] = meeting.meeting_password
+        except ZoomMeeting.DoesNotExist:
+            pass
+        
+        # Set a default leave URL
+        sdk_auth_data['leaveUrl'] = request.data.get('leave_url', '/dashboard')
         
         return Response(sdk_auth_data)
 
@@ -377,7 +382,9 @@ class CourseZoomMeetingsView(generics.ListAPIView):
                 return ZoomMeeting.objects.none()
         
         return ZoomMeeting.objects.filter(course_id=course_id)
-    
+
+
+
 from rest_framework.decorators import api_view
 from .utils import get_zoom_access_token
 
@@ -395,4 +402,59 @@ def test_zoom_token(request):
         return Response({
             'success': False,
             'error': str(e)
+        }, status=500)
+    
+
+import traceback
+from django.utils import timezone
+from datetime import timedelta
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .utils import get_zoom_access_token, create_zoom_meeting
+
+@api_view(['GET', 'POST'])
+def test_zoom_api(request):
+    """Тестовий endpoint для перевірки Zoom API інтеграції"""
+    try:
+        # Отримуємо токен
+        token = get_zoom_access_token()
+        
+        if request.method == 'POST':
+            # Якщо це POST запит, спробуємо створити тестову зустріч
+            test_data = {
+                'topic': 'Test Meeting API',
+                'description': 'This is a test meeting created via API',
+                'start_time': (timezone.now() + timedelta(hours=1)).isoformat(),
+                'duration': 30,
+                'settings': {
+                    'host_video': True,
+                    'participant_video': True
+                }
+            }
+            
+            meeting = create_zoom_meeting(**test_data)
+            
+            return Response({
+                'success': True,
+                'message': 'Successfully created a test Zoom meeting',
+                'token_preview': token[:10] + '...' if token else 'None',
+                'meeting_data': meeting
+            })
+        else:
+            # Якщо GET запит, просто повертаємо статус токена
+            return Response({
+                'success': True,
+                'message': 'Successfully obtained Zoom access token',
+                'token_preview': token[:10] + '...' if token else 'None',
+                'token_full': token,  # Додаємо повний токен для діагностики
+                'account_id': getattr(request, 'ACCOUNT_ID', 'Not defined in settings'),
+                'client_id': getattr(request, 'CLIENT_ID', 'Not defined in settings')
+            })
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        return Response({
+            'success': False,
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'traceback': error_traceback
         }, status=500)

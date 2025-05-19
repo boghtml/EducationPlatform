@@ -1,10 +1,10 @@
-// src/components/api/zoomApi.js - Оновлений для кращої обробки пароля
+// src/components/api/zoomApi.js
 import axios from 'axios';
-import API_URL from '../../api'; // Правильний шлях до API_URL
+import API_URL from '../../api'; // Base API URL
 
-// API методи для роботи з Zoom зустрічами
+// API methods for Zoom meetings
 const zoomApi = {
-  // Отримання списку зустрічей для курсу
+  // Get meeting list for a course
   getCourseZoomMeetings: async (courseId) => {
     try {
       console.log(`Getting Zoom meetings for course ID: ${courseId}`);
@@ -19,7 +19,7 @@ const zoomApi = {
     }
   },
 
-  // Отримання даних про конкретну зустріч
+  // Get data for a specific meeting
   getZoomMeeting: async (meetingId) => {
     try {
       console.log(`Getting Zoom meeting details for ID: ${meetingId}`);
@@ -34,13 +34,13 @@ const zoomApi = {
     }
   },
 
-  // Створення нової Zoom зустрічі
+  // Create a new Zoom meeting
   createZoomMeeting: async (meetingData) => {
     try {
       console.log('Creating new Zoom meeting with data:', meetingData);
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Перевірка і форматування даних перед відправкою
+      // Format data before sending
       const formattedData = {
         course: parseInt(meetingData.course),
         topic: meetingData.topic,
@@ -73,23 +73,24 @@ const zoomApi = {
     }
   },
 
-  // Оновлення існуючої Zoom зустрічі
+  // Update an existing Zoom meeting
   updateZoomMeeting: async (meetingId, meetingData) => {
     try {
       console.log(`Updating Zoom meeting ID: ${meetingId}`, meetingData);
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Форматуємо дату і час, якщо вони передані
+      // Format data
       const formattedData = { ...meetingData };
       if (formattedData.start_time) {
         formattedData.start_time = (new Date(formattedData.start_time)).toISOString();
       }
       
-      // Перетворюємо логічні значення
-      if (formattedData.host_video !== undefined) formattedData.host_video = Boolean(formattedData.host_video);
-      if (formattedData.participant_video !== undefined) formattedData.participant_video = Boolean(formattedData.participant_video);
-      if (formattedData.join_before_host !== undefined) formattedData.join_before_host = Boolean(formattedData.join_before_host);
-      if (formattedData.mute_upon_entry !== undefined) formattedData.mute_upon_entry = Boolean(formattedData.mute_upon_entry);
+      // Convert boolean values
+      ['host_video', 'participant_video', 'join_before_host', 'mute_upon_entry'].forEach(field => {
+        if (formattedData[field] !== undefined) {
+          formattedData[field] = Boolean(formattedData[field]);
+        }
+      });
       
       console.log('Sending formatted update data:', formattedData);
       
@@ -107,7 +108,7 @@ const zoomApi = {
     }
   },
 
-  // Видалення Zoom зустрічі
+  // Delete a Zoom meeting
   deleteZoomMeeting: async (meetingId) => {
     try {
       console.log(`Deleting Zoom meeting ID: ${meetingId}`);
@@ -122,59 +123,44 @@ const zoomApi = {
     }
   },
 
-  // Приєднання до Zoom зустрічі
-  
-joinZoomMeeting: async (meetingId) => {
-  try {
-    console.log(`Joining Zoom meeting ID: ${meetingId}`);
-    await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-    
-    const response = await axios.post(`${API_URL}/zoom/meetings/${meetingId}/join/`, {}, {
-      withCredentials: true
-    });
-    
-    console.log('Join response received:', response.data);
-    
-    // Validate response data
-    if (!response.data || !response.data.meeting || !response.data.sdk_data) {
-      console.error('Invalid response format:', response.data);
-      throw new Error('Некоректний формат відповіді від сервера');
-    }
-    
-    const { meeting, sdk_data } = response.data;
-    
-    // Ensure meeting ID is present
-    if (!meeting.meeting_id) {
-      console.error('Meeting ID missing in response');
-      throw new Error('ID зустрічі відсутній у відповіді сервера');
-    }
-    
-    // Ensure signature is present
-    if (!sdk_data.signature) {
-      console.error('Signature missing in SDK data');
-      throw new Error('Підпис для SDK відсутній у відповіді сервера');
-    }
-    
-    return response.data;
-  } catch (error) {
-    console.error('Error joining Zoom meeting:', error);
-    
-    // Handle specific error responses
-    if (error.response) {
-      if (error.response.status === 403) {
-        throw new Error('У вас немає прав для доступу до цієї зустрічі');
-      } else if (error.response.status === 404) {
-        throw new Error('Зустріч не знайдена');
-      } else if (error.response.data && error.response.data.error) {
-        throw new Error(error.response.data.error);
+  // Join a Zoom meeting
+  joinZoomMeeting: async (meetingId) => {
+    try {
+      console.log(`Joining Zoom meeting ID: ${meetingId}`);
+      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      const response = await axios.post(`${API_URL}/zoom/meetings/${meetingId}/join/`, {}, {
+        withCredentials: true
+      });
+      
+      console.log('Join response received:', response.data);
+      
+      // Validate response data
+      if (!response.data || !response.data.meeting || !response.data.sdk_data) {
+        console.error('Invalid response format:', response.data);
+        throw new Error('Некоректний формат відповіді від сервера');
       }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error joining Zoom meeting:', error);
+      
+      // Handle specific errors
+      if (error.response) {
+        if (error.response.status === 403) {
+          throw new Error('У вас немає прав для доступу до цієї зустрічі');
+        } else if (error.response.status === 404) {
+          throw new Error('Зустріч не знайдена');
+        } else if (error.response.data && error.response.data.error) {
+          throw new Error(error.response.data.error);
+        }
+      }
+      
+      throw error;
     }
-    
-    throw error;
-  }
-},
+  },
 
-  // Вихід із Zoom зустрічі
+  // Leave a Zoom meeting
   leaveZoomMeeting: async (meetingId) => {
     try {
       console.log(`Leaving Zoom meeting ID: ${meetingId}`);
@@ -189,14 +175,15 @@ joinZoomMeeting: async (meetingId) => {
     }
   },
 
-  // Отримання підпису для Zoom Meeting SDK
-  getZoomSignature: async (meetingNumber, role = 0) => {
+  // Get SDK signature for meeting
+  getZoomSignature: async (meetingNumber, role = 0, leaveUrl = '/dashboard') => {
     try {
       console.log(`Getting Zoom signature for meeting: ${meetingNumber}, role: ${role}`);
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       const response = await axios.post(`${API_URL}/zoom/sdk-auth/`, {
         meeting_id: meetingNumber,
-        role: role
+        role: role,
+        leave_url: leaveUrl
       }, {
         withCredentials: true
       });

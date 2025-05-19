@@ -230,7 +230,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-ZOOM_CLIENT_ID = config('ZOOM_CLIENT_ID', default='N7IghX4oRlmxBUalSDf9Lw')
-ZOOM_CLIENT_SECRET = config('ZOOM_CLIENT_SECRET', default='famk0fy3jeass7iwtGo7OrPBjk844VGs')
-ZOOM_SDK_KEY = config('ZOOM_SDK_KEY', default='N7IghX4oRlmxBUalSDf9Lw')
-ZOOM_SDK_SECRET = config('ZOOM_SDK_SECRET', default='famk0fy3jeass7iwtGo7OrPBjk844VGs')
+ACCOUNT_ID = config('ACCOUNT_ID', default='Ez184rvjSzOPHj0I0d9rrw')
+CLIENT_ID = config('CLIENT_ID', default='Hmq1QRw7SvKaU2xq_HcKrg')
+CLIENT_SECRET = config('CLIENT_SECRET', default='EJGHO2lMwigo435nSDE7jPphw0JX2vct')
+SDK_KEY = config('SDK_KEY', default=CLIENT_ID)
+SDK_SECRET = config('SDK_SECRET', default=CLIENT_SECRET)

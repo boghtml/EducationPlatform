@@ -1,7 +1,7 @@
 // src/components/zoom/ZoomModal.jsx
 import React, { useState, useEffect } from 'react';
 import './ZoomModal.css';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, VideoIcon } from 'lucide-react';
 import ZoomMeeting from './ZoomMeeting';
 import ZoomTroubleshooting from './ZoomTroubleshooting';
 import BrowserCheck from './BrowserCheck';
@@ -14,13 +14,19 @@ const ZoomModal = ({ meetingId, onClose }) => {
   const [showBrowserCheck, setShowBrowserCheck] = useState(false);
 
   useEffect(() => {
+    // Check for SharedArrayBuffer support
+    const hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
+    const hasSecureContext = window.isSecureContext;
     
-    if (typeof SharedArrayBuffer === 'undefined') {
+    if (!hasSharedArrayBuffer || !hasSecureContext) {
+      console.log('Browser environment check failed:',
+        { hasSharedArrayBuffer, hasSecureContext });
       setShowBrowserCheck(true);
       setIsLoading(false);
       return;
     }
 
+    // Short delay to show loading state
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 300);
@@ -29,12 +35,13 @@ const ZoomModal = ({ meetingId, onClose }) => {
   }, []);
   
   const handleClose = () => {
-    
+    // Add closing animation
     const container = document.querySelector('.zoom-modal-container');
     if (container) {
       container.classList.add('closing');
     }
     
+    // Delay actual closing to allow animation to complete
     setTimeout(() => {
       if (onClose) onClose();
     }, 300);
@@ -43,17 +50,21 @@ const ZoomModal = ({ meetingId, onClose }) => {
   const handleError = (errorMessage) => {
     setError(errorMessage);
     
-    if (errorMessage.includes('пароль')) {
+    // Determine error type for better handling
+    if (errorMessage.includes('password') || errorMessage.includes('Incorrect')) {
       setErrorType('password');
-    } else if (errorMessage.includes('SharedArrayBuffer')) {
+    } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('WebAssembly')) {
       setErrorType('browser');
       setShowBrowserCheck(true);
+    } else if (errorMessage.includes('has not started') || errorMessage.includes('not active')) {
+      setErrorType('meeting_status');
     } else {
       setErrorType('general');
     }
   };
 
   const handleRetry = () => {
+    // Reset all states
     setError(null);
     setErrorType(null);
     setShowTroubleshooting(false);
@@ -71,7 +82,7 @@ const ZoomModal = ({ meetingId, onClose }) => {
         {isLoading ? (
           <div className="zoom-modal-loading">
             <div className="loading-spinner"></div>
-            <p>Підготовка до зустрічі...</p>
+            <p>Preparing meeting...</p>
           </div>
         ) : showBrowserCheck ? (
           <BrowserCheck 
@@ -99,12 +110,24 @@ const ZoomModal = ({ meetingId, onClose }) => {
                   
                   {errorType === 'password' && (
                     <div className="error-help password-error">
-                      <h4>Проблема з паролем зустрічі</h4>
-                      <p>Для вирішення проблеми з паролем зустрічі:</p>
+                      <h4>Meeting Password Issue</h4>
+                      <p>Try the following to resolve password issues:</p>
                       <ul>
-                        <li>Зверніться до організатора зустрічі для отримання правильного пароля</li>
-                        <li>Переконайтеся, що пароль не містить спеціальних символів</li>
-                        <li>Спробуйте приєднатися до зустрічі через клієнт Zoom</li>
+                        <li>Contact the meeting host for the correct password</li>
+                        <li>Make sure the password doesn't contain special characters</li>
+                        <li>Try joining the meeting via the Zoom client</li>
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {errorType === 'meeting_status' && (
+                    <div className="error-help meeting-status-error">
+                      <h4>Meeting Status Issue</h4>
+                      <p>The meeting may not have started yet or has already ended. Try:</p>
+                      <ul>
+                        <li>Checking the meeting schedule</li>
+                        <li>Contacting the host to start the meeting</li>
+                        <li>Verifying the meeting ID is correct</li>
                       </ul>
                     </div>
                   )}
@@ -114,14 +137,14 @@ const ZoomModal = ({ meetingId, onClose }) => {
                       className="retry-button"
                       onClick={handleRetry}
                     >
-                      Спробувати знову
+                      Try Again
                     </button>
                     
                     <button 
                       className="troubleshooting-button"
                       onClick={() => setShowTroubleshooting(true)}
                     >
-                      Посібник з усунення несправностей
+                      Troubleshooting Guide
                     </button>
                   </div>
                 </div>
