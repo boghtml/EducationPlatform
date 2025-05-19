@@ -84,6 +84,19 @@ class ZoomMeeting(models.Model):
             models.Index(fields=['status']),
         ]
 
+    def save(self, *args, **kwargs):
+        """Перевизначаємо метод save для додаткового логування"""
+        is_new = self.pk is None
+        print(f"Saving ZoomMeeting: {'new instance' if is_new else f'existing instance {self.pk}'}")
+        print(f"ZoomMeeting data: course_id={self.course_id}, meeting_id={self.meeting_id}, created_by_id={self.created_by_id}")
+        
+        try:
+            result = super().save(*args, **kwargs)
+            print(f"Successfully saved ZoomMeeting with ID: {self.pk}")
+            return result
+        except Exception as e:
+            print(f"Error saving ZoomMeeting: {str(e)}", exc_info=True)
+            raise
 
 class ZoomMeetingParticipant(models.Model):
     # Зв'язок із зустріччю

@@ -123,69 +123,56 @@ const zoomApi = {
   },
 
   // Приєднання до Zoom зустрічі
-  joinZoomMeeting: async (meetingId) => {
-    try {
-      console.log(`Joining Zoom meeting ID: ${meetingId}`);
-      await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-      
-      // Спочатку отримуємо повну інформацію про зустріч для впевненості, що маємо правильний пароль
-      const meetingDetailsResponse = await axios.get(`${API_URL}/zoom/meetings/${meetingId}/`, {
-        withCredentials: true
-      });
-      
-      const meetingPassword = meetingDetailsResponse.data.meeting_password;
-      console.log(`Retrieved meeting password from details: ${meetingPassword ? 'Yes' : 'No'}`);
-      
-      const response = await axios.post(`${API_URL}/zoom/meetings/${meetingId}/join/`, {}, {
-        withCredentials: true
-      });
-      
-      console.log('Join response received with keys:', Object.keys(response.data));
-      
-      // Перевірка чи є в даних необхідні поля
-      if (!response.data || !response.data.meeting) {
-        console.error('Meeting data missing in response:', response.data);
-        throw new Error('Не вдалося отримати дані зустрічі для приєднання');
-      }
-      
-      const meetingData = response.data.meeting;
-      
-      // Переконуємось, що пароль встановлений
-      if (!meetingData.meeting_password || meetingData.meeting_password === '') {
-        console.warn('Meeting password missing in join response, using retrieved password');
-        meetingData.meeting_password = meetingPassword;
-      }
-      
-      console.log('Meeting data:', {
-        id: meetingData.id,
-        topic: meetingData.topic,
-        meeting_id: meetingData.meeting_id,
-        has_password: !!meetingData.meeting_password,
-        password_length: meetingData.meeting_password ? meetingData.meeting_password.length : 0
-      });
-      
-      // Перевірка SDK data
-      const sdkData = response.data.sdk_data || {};
-      console.log('SDK data keys:', Object.keys(sdkData));
-      
-      // Додаємо пароль в sdk_data з усіма можливими іменами параметрів
-      if (meetingData.meeting_password) {
-        const cleanPassword = String(meetingData.meeting_password).trim();
-        sdkData.password = cleanPassword;
-        sdkData.pwd = cleanPassword; 
-        sdkData.passWord = cleanPassword;
-        console.log('Added password to SDK data');
-      }
-      
-      // Для додаткової впевненості, додаємо пароль до основного об'єкта response
-      response.data.password = meetingData.meeting_password;
-      
-      return response.data;
-    } catch (error) {
-      console.error('Error joining Zoom meeting:', error);
-      throw error;
+  
+joinZoomMeeting: async (meetingId) => {
+  try {
+    console.log(`Joining Zoom meeting ID: ${meetingId}`);
+    await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+    
+    const response = await axios.post(`${API_URL}/zoom/meetings/${meetingId}/join/`, {}, {
+      withCredentials: true
+    });
+    
+    console.log('Join response received:', response.data);
+    
+    // Validate response data
+    if (!response.data || !response.data.meeting || !response.data.sdk_data) {
+      console.error('Invalid response format:', response.data);
+      throw new Error('Некоректний формат відповіді від сервера');
     }
-  },
+    
+    const { meeting, sdk_data } = response.data;
+    
+    // Ensure meeting ID is present
+    if (!meeting.meeting_id) {
+      console.error('Meeting ID missing in response');
+      throw new Error('ID зустрічі відсутній у відповіді сервера');
+    }
+    
+    // Ensure signature is present
+    if (!sdk_data.signature) {
+      console.error('Signature missing in SDK data');
+      throw new Error('Підпис для SDK відсутній у відповіді сервера');
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error joining Zoom meeting:', error);
+    
+    // Handle specific error responses
+    if (error.response) {
+      if (error.response.status === 403) {
+        throw new Error('У вас немає прав для доступу до цієї зустрічі');
+      } else if (error.response.status === 404) {
+        throw new Error('Зустріч не знайдена');
+      } else if (error.response.data && error.response.data.error) {
+        throw new Error(error.response.data.error);
+      }
+    }
+    
+    throw error;
+  }
+},
 
   // Вихід із Zoom зустрічі
   leaveZoomMeeting: async (meetingId) => {

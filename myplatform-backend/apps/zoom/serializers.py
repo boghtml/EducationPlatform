@@ -8,6 +8,7 @@ import hmac
 import hashlib
 import json
 from django.conf import settings
+from .utils import generate_sdk_signature
 
 class ZoomMeetingSerializer(serializers.ModelSerializer):
     """Серіалізатор для Zoom зустрічей"""
@@ -40,6 +41,16 @@ class ZoomMeetingCreateSerializer(serializers.ModelSerializer):
             'host_video', 'participant_video', 'join_before_host', 'mute_upon_entry',
             'auto_recording', 'settings_json'
         ]
+    
+    def create(self, validated_data):
+        print(f"ZoomMeetingCreateSerializer.create called with data: {validated_data}")
+        try:
+            instance = super().create(validated_data)
+            print(f"Meeting created successfully: {instance.id}")
+            return instance
+        except Exception as e:
+            print(f"Error in ZoomMeetingCreateSerializer.create: {str(e)}", exc_info=True)
+            raise
 
 class ZoomMeetingUpdateSerializer(serializers.ModelSerializer):
     """Серіалізатор для оновлення Zoom зустрічей"""
@@ -65,6 +76,7 @@ class ZoomMeetingParticipantSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['time_in_meeting']
 
+
 class ZoomSDKAuthSerializer(serializers.Serializer):
     """Серіалізатор для генерації Zoom SDK Auth та надання даних для приєднання до зустрічі"""
     
@@ -85,44 +97,6 @@ class ZoomSDKAuthSerializer(serializers.Serializer):
 
     def generate_signature(self, meeting_number, role):
         """
-        Генерація підпису для SDK Auth
-        
-        Args:
-            meeting_number (str): Номер зустрічі Zoom
-            role (int): Роль користувача (0 - учасник, 1 - ведучий)
-            
-        Returns:
-            dict: Підпис та дані для SDK
+        Generate signature for SDK Auth using our utility function
         """
-        
-        meeting_number = ''.join(filter(str.isdigit, str(meeting_number)))
-        
-        sdk_key = settings.ZOOM_SDK_KEY
-        sdk_secret = settings.ZOOM_SDK_SECRET
-        
-        timestamp = int(round(time.time() * 1000)) - 30000
-    
-        msg = f"{sdk_key}{meeting_number}{timestamp}{role}"
-        
-        try:
-            
-            hmac_obj = hmac.new(
-                sdk_secret.encode('utf-8'),
-                msg.encode('utf-8'),
-                hashlib.sha256
-            )
-            signature = base64.b64encode(hmac_obj.digest()).decode('utf-8')
-            
-            print(f"Generated signature with: meeting={meeting_number}, role={role}, timestamp={timestamp}")
-            print(f"Signature length: {len(signature)}")
-            
-            return {
-                'sdkKey': sdk_key,
-                'signature': signature,
-                'meetingNumber': meeting_number,
-                'role': role,
-                'timestamp': timestamp
-            }
-        except Exception as e:
-            print(f"Error generating signature: {str(e)}")
-            raise
+        return generate_sdk_signature(meeting_number, role)

@@ -78,6 +78,7 @@ MIDDLEWARE = [
     #'django.middleware.csrf.CsrfViewMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Додайте цей рядок
     'myplatform.middleware.ZoomSecurityMiddleware',
+    'myplatform.middleware.RequestLogMiddleware',
 ]
 
 
@@ -229,7 +230,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-ZOOM_CLIENT_ID = 'N7IghX4oRlmxBUalSDf9Lw'
-ZOOM_CLIENT_SECRET = 'famk0fy3jeass7iwtGo7OrPBjk844VGs'
-ZOOM_SDK_KEY = 'N7IghX4oRlmxBUalSDf9Lw'  
-ZOOM_SDK_SECRET = 'famk0fy3jeass7iwtGo7OrPBjk844VGs'  
+ZOOM_CLIENT_ID = config('ZOOM_CLIENT_ID', default='N7IghX4oRlmxBUalSDf9Lw')
+ZOOM_CLIENT_SECRET = config('ZOOM_CLIENT_SECRET', default='famk0fy3jeass7iwtGo7OrPBjk844VGs')
+ZOOM_SDK_KEY = config('ZOOM_SDK_KEY', default='N7IghX4oRlmxBUalSDf9Lw')
+ZOOM_SDK_SECRET = config('ZOOM_SDK_SECRET', default='famk0fy3jeass7iwtGo7OrPBjk844VGs')

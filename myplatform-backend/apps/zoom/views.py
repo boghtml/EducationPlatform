@@ -19,6 +19,8 @@ from apps.courses.models import Course
 from apps.enrollments.models import Enrollment
 from apps.assignments.mixins import CsrfExemptSessionAuthentication
 
+from .utils import create_zoom_meeting, generate_sdk_signature
+
 class ZoomMeetingViewSet(viewsets.ModelViewSet):
     """Viewset для Zoom зустрічей"""
     serializer_class = ZoomMeetingSerializer
@@ -27,24 +29,44 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
+        print(f"Fetching meetings for user: {user.id}, role: {user.role}")
+        
+        queryset = None
         
         if user.role == 'admin':
-            
-            return ZoomMeeting.objects.all()
+            queryset = ZoomMeeting.objects.all()
+            print(f"Admin user - returning all meetings")
         
         elif user.role == 'teacher':
-            
-            return ZoomMeeting.objects.filter(
+            queryset = ZoomMeeting.objects.filter(
                 Q(created_by=user) | Q(course__teacher=user)
             ).distinct()
+            print(f"Teacher user - returning teacher's meetings")
             
         else:
-            
             enrolled_courses = Enrollment.objects.filter(
                 student=user
             ).values_list('course_id', flat=True)
+            print(f"Student user - enrolled in courses: {list(enrolled_courses)}")
             
-            return ZoomMeeting.objects.filter(course_id__in=enrolled_courses)
+            queryset = ZoomMeeting.objects.filter(course_id__in=enrolled_courses)
+        
+        # Log the number of meetings found
+        if queryset is not None:
+            count = queryset.count()
+            print(f"Found {count} meetings for user {user.id}")
+            
+            # If empty, log the total meetings in the database for debugging
+            if count == 0:
+                total_meetings = ZoomMeeting.objects.all().count()
+                print(f"Total meetings in database: {total_meetings}")
+                
+                # If there are meetings in the database, log a few for debugging
+                if total_meetings > 0:
+                    sample_meetings = ZoomMeeting.objects.all()[:5]
+                    print(f"Sample meetings: {[(m.id, m.course_id, m.created_by_id) for m in sample_meetings]}")
+        
+        return queryset
     
     def get_serializer_class(self):
         if self.action == 'create':
@@ -54,12 +76,15 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         return ZoomMeetingSerializer
     
     def perform_create(self, serializer):
+        print("Starting Zoom meeting creation process")
         
         user = self.request.user
+        print(f"User attempting to create meeting: {user.id} ({user.username}), role: {user.role}")
         
         course_id = serializer.validated_data.get('course').id
         course = get_object_or_404(Course, id=course_id)
-        
+        print(f"Creating meeting for course: {course_id} ({course.title})")
+            
         if user.role == 'student':
             return Response(
                 {"error": "Студенти не можуть створювати зустрічі"}, 
@@ -71,19 +96,82 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 {"error": "Ви не є викладачем цього курсу"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
+        
+        try:
+            # Налаштування для Zoom API
+            topic = serializer.validated_data.get('topic')
+            description = serializer.validated_data.get('description', '')
+            start_time = serializer.validated_data.get('start_time').isoformat()
+            duration = serializer.validated_data.get('duration')
             
-        zoom_data = {
-            "meeting_id": f"zoom_{course_id}_{int(timezone.now().timestamp())}",
-            "meeting_password": "123456",
-            "join_url": f"https://zoom.us/j/8529817{course_id}"
-        }
-        
-        meeting = serializer.save(
-            created_by=user,
-            **zoom_data
-        )
-        
-        return meeting
+            # Додаткові налаштування
+            api_settings = {
+                "host_video": serializer.validated_data.get('host_video', True),
+                "participant_video": serializer.validated_data.get('participant_video', True),
+                "join_before_host": serializer.validated_data.get('join_before_host', False),
+                "mute_upon_entry": serializer.validated_data.get('mute_upon_entry', True),
+                "auto_recording": serializer.validated_data.get('auto_recording', 'none')
+            }
+            
+            try:
+                # Створюємо зустріч через Zoom API
+                print(f"Attempting to create real Zoom meeting via API for course {course.id}: {topic}")
+                
+                zoom_response = create_zoom_meeting(
+                    topic=topic,
+                    description=description,
+                    start_time=start_time,
+                    duration=duration,
+                    settings=api_settings
+                )
+                 
+                print(f"Zoom API response received for meeting '{topic}'")
+                
+                
+                zoom_data = {
+                    "meeting_id": str(zoom_response['id']),
+                    "meeting_password": zoom_response['password'],
+                    "join_url": zoom_response['join_url']
+                }
+                
+                print(f"Extracted meeting data: ID={zoom_data['meeting_id']}, Password={zoom_data['meeting_password']}")
+                
+                
+            except Exception as api_error:
+                print(f"Error calling Zoom API: {str(api_error)}")
+                
+                # Fallback до фейкових даних у випадку помилки
+                import random
+                fake_meeting_id = str(random.randint(100000000, 999999999))
+                fake_meeting_password = "".join([str(random.randint(0, 9)) for _ in range(6)])
+                
+                zoom_data = {
+                    "meeting_id": fake_meeting_id,
+                    "meeting_password": fake_meeting_password,
+                    "join_url": f"https://zoom.us/j/{fake_meeting_id}?pwd={fake_meeting_password}"
+                }
+                
+                print(f"Error occurred, using fallback meeting data: {zoom_data}")
+            
+            # Зберігаємо зустріч в базу даних
+            from django.db import transaction
+            
+            with transaction.atomic():
+                meeting = serializer.save(
+                    created_by=user,
+                    **zoom_data
+                )
+                print(f"Successfully saved meeting to database with ID: {meeting.id}")
+                
+                # Додаткова перевірка збереження
+                saved_meeting = ZoomMeeting.objects.get(id=meeting.id)
+                print(f"Verified saved meeting: ID={saved_meeting.id}, meeting_id={saved_meeting.meeting_id}")
+            
+            return meeting
+                
+        except Exception as e:
+            print(f"ERROR: Error in Zoom meeting creation: {str(e)}")
+            raise
     
     def perform_update(self, serializer):
         
@@ -142,49 +230,39 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Ensure we have a valid password
         if meeting.meeting_password is None or meeting.meeting_password == '':
-            meeting.meeting_password = "123456" 
-        else:
-            
-            meeting.meeting_password = str(meeting.meeting_password).strip()
+            return Response(
+                {"error": "Пароль зустрічі не знайдено"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
+        # Get the actual Zoom meeting ID (should be saved from API response)
         meeting_id = meeting.meeting_id
-        if meeting_id.startswith('zoom_'):
-            parts = meeting_id.split('_')
-            if len(parts) >= 3:
-                meeting_id = parts[2]  
-        
-        meeting_id = ''.join(filter(str.isdigit, meeting_id))
-        
-        print(f"Meeting ID for SDK: '{meeting_id}', Password: '{meeting.meeting_password}'")
+        if not meeting_id or not meeting_id.isdigit():
+            return Response(
+                {"error": "Недійсний ID зустрічі Zoom"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         is_host = user.role in ['teacher', 'admin'] and (user.id == meeting.created_by.id or user.id == meeting.course.teacher.id)
         role = 1 if is_host else 0
         
-        serializer = ZoomSDKAuthSerializer(data={
-            'meeting_id': meeting_id,  
-            'role': role,
-            'user_name': f"{user.first_name} {user.last_name}".strip() or user.username,
-            'user_email': user.email
-        })
-        
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        sdk_auth_data = serializer.generate_signature(
+        # Generate SDK auth data using the actual meeting ID
+        sdk_auth_data = generate_sdk_signature(
             meeting_number=meeting_id, 
             role=role
         )
         
+        # Add meeting details to response
         sdk_auth_data.update({
             'password': meeting.meeting_password,
-            'pwd': meeting.meeting_password,
-            'passWord': meeting.meeting_password,
             'userName': f"{user.first_name} {user.last_name}".strip() or user.username,
             'userEmail': user.email,
-            'meetingNumber': meeting_id  
+            'meetingNumber': meeting_id
         })
         
+        # Record participant
         participant, created = ZoomMeetingParticipant.objects.update_or_create(
             meeting=meeting,
             user=user,
@@ -194,10 +272,6 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 'ip_address': request.META.get('REMOTE_ADDR')
             }
         )
-        
-        if meeting.meeting_id != meeting_id:
-            meeting.meeting_id = meeting_id
-            meeting.save(update_fields=['meeting_id'])
         
         return Response({
             'meeting': ZoomMeetingSerializer(meeting).data,
@@ -242,7 +316,8 @@ class ZoomSDKAuthView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         meeting_id = serializer.validated_data['meeting_id']
-        role = serializer.validated_data['role']
+        # Safely get role with default value of 0
+        role = serializer.validated_data.get('role', 0)
         user_name = serializer.validated_data.get('user_name', '')
         user_email = serializer.validated_data.get('user_email', '')
         
@@ -258,7 +333,8 @@ class ZoomSDKAuthView(generics.GenericAPIView):
             except ZoomMeeting.DoesNotExist:
                 pass
         
-        sdk_auth_data = serializer.generate_signature(
+        # Generate the signature using our utility function
+        sdk_auth_data = generate_sdk_signature(
             meeting_number=meeting_id,
             role=role
         )
@@ -274,6 +350,7 @@ class ZoomSDKAuthView(generics.GenericAPIView):
             sdk_auth_data['userEmail'] = request.user.email
         
         return Response(sdk_auth_data)
+
 
 class CourseZoomMeetingsView(generics.ListAPIView):
     """View для отримання зустрічей для конкретного курсу"""
@@ -300,3 +377,22 @@ class CourseZoomMeetingsView(generics.ListAPIView):
                 return ZoomMeeting.objects.none()
         
         return ZoomMeeting.objects.filter(course_id=course_id)
+    
+from rest_framework.decorators import api_view
+from .utils import get_zoom_access_token
+
+@api_view(['GET'])
+def test_zoom_token(request):
+    """Тестовий ендпоінт для перевірки отримання Zoom токена"""
+    try:
+        token = get_zoom_access_token()
+        return Response({
+            'success': True,
+            'message': 'Successfully obtained Zoom access token',
+            'token_preview': token[:10] + '...' if token else 'None'
+        })
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=500)

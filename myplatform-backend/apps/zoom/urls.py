@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     ZoomMeetingViewSet,
     ZoomSDKAuthView,
-    CourseZoomMeetingsView
+    CourseZoomMeetingsView,
+    test_zoom_token
 )
 
 router = DefaultRouter()
@@ -18,4 +19,6 @@ urlpatterns = [
     
     # URL для отримання зустрічей для конкретного курсу
     path('course/<int:course_id>/meetings/', CourseZoomMeetingsView.as_view(), name='course-zoom-meetings'),
+
+    path('test-token/', test_zoom_token, name='test-zoom-token'),
 ]

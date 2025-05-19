@@ -102,10 +102,60 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
     }
   }, [isSDKLoaded]);
 
+  const joinMeeting = async (meetingData, sdkData) => {
+    try {
+      if (!zoomClient.current) {
+        throw new Error('Zoom SDK не ініціалізовано. Спробуйте перезавантажити сторінку.');
+      }
+      
+      // Extract and validate meeting number
+      const meetingNumber = sdkData.meetingNumber;
+      if (!meetingNumber || meetingNumber.length < 9) {
+        throw new Error('Недійсний ID зустрічі Zoom. Має бути числовим і містити мінімум 9 цифр.');
+      }
+      
+      // Ensure password is available
+      const password = meetingData.meeting_password || sdkData.password || '';
+      
+      // Join the meeting with validated data
+      await new Promise((resolve, reject) => {
+        zoomClient.current.join({
+          sdkKey: sdkData.sdkKey,
+          signature: sdkData.signature,
+          meetingNumber: meetingNumber,
+          password: password,
+          userName: sdkData.userName || sessionStorage.getItem('userName') || 'Користувач',
+          userEmail: sdkData.userEmail || sessionStorage.getItem('userEmail') || '',
+          success: () => {
+            console.log('Joined Zoom meeting successfully');
+            setIsJoined(true);
+            resolve();
+          },
+          error: (error) => {
+            console.error('Failed to join Zoom meeting:', error);
+            let errorMessage = 'Помилка приєднання до зустрічі';
+            
+            switch(error.errorCode) {
+              case 1: errorMessage = 'Неправильний номер зустрічі або зустріч не активна'; break;
+              case 2: errorMessage = 'Час зустрічі ще не настав'; break;
+              case 3: errorMessage = 'Неправильний пароль зустрічі'; break;
+              case 4: errorMessage = 'Зустріч вже закінчилася'; break;
+              default: errorMessage = error.errorMessage || 'Невідома помилка';
+            }
+            
+            reject(new Error(`Помилка приєднання до зустрічі: ${errorMessage}`));
+          }
+        });
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
   const initZoom = async () => {
     try {
       setLoading(true);
 
+      // Get meeting data and auth info from backend
       const joinData = await zoomApi.joinZoomMeeting(meetingId);
       console.log("Join data received:", joinData);
       
@@ -117,84 +167,13 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
       
       const { meeting, sdk_data } = joinData;
       
-      console.log('Raw SDK data:', {
-        meetingNumber: sdk_data.meetingNumber,
-        signatureExists: !!sdk_data.signature,
-        signatureLength: sdk_data?.signature?.length
-      });
-
-      const { signature, sdkKey } = sdk_data;
-      const meetingNumber = sdk_data.meetingNumber || meeting.meeting_id;
-      
-      const cleanMeetingNumber = extractMeetingNumber(meetingNumber);
-      console.log(`Original meeting number: "${meetingNumber}", cleaned: "${cleanMeetingNumber}"`);
-      
-      const rawPassword = meeting.meeting_password || sdk_data.password || sdk_data.passWord || '';
-      let password = String(rawPassword).trim();
-
-      if (password && password.length === 6 && /^\d+$/.test(password)) {
-
-        password = password; 
-        console.log("Using numeric password format:", password);
-      } else if (!password) {
-        
-        password = "123456";
-        console.log("Using default password:", password);
-      }
-
-      const encodedPassword = encodeURIComponent(password);
-      console.log("Password formats:", {
-        original: password,
-        encoded: encodedPassword
-      });
-      
-      const userName = sdk_data.userName || sessionStorage.getItem('userName') || 'Користувач';
-      const userEmail = sdk_data.userEmail || sessionStorage.getItem('userEmail') || '';
-      
-      console.table({
-        sdkKey,
-        signatureLength: signature?.length,
-        cleanMeetingNumber,
-        hasSignature: !!signature,
-        userName
-      });
-
-      const missingParams = [];
-      if (!sdkKey) missingParams.push('sdkKey');
-      if (!signature) missingParams.push('signature');
-      if (!cleanMeetingNumber) missingParams.push('meetingNumber');
-
-      if (missingParams.length > 0) {
-        console.error('Missing required parameters:', {
-          sdkKey,
-          signature: signature ? `${signature.slice(0, 10)}...` : undefined,
-          meetingNumber
-        });
-        throw new Error(`Відсутні необхідні параметри для ініціалізації Zoom SDK: ${missingParams.join(', ')}`);
-      }
-      
-      if (!cleanMeetingNumber || cleanMeetingNumber.length < 9) {
-        console.error('Invalid meeting number format:', {
-          original: meetingNumber,
-          cleaned: cleanMeetingNumber
-        });
-        throw new Error('Недійсний формат номеру зустрічі. Має бути числовим і мати мінімум 9 цифр.');
-      }
-      
-      console.log('Using meeting values:', {
-        meetingNumber,
-        cleanMeetingNumber,
-        passwordFromMeeting: meeting.meeting_password,
-        passwordFromSDK: sdk_data.password,
-        finalPassword: password,
-        passwordLength: password.length
-      });
-
+      // Initialize Zoom SDK
       const zoomContainer = document.getElementById('zmmtg-root');
       if (!zoomContainer) {
         throw new Error('Не знайдено контейнер для Zoom SDK. Перезавантажте сторінку і спробуйте знову.');
       }
       
+      // Clear existing content
       while (zoomContainer.firstChild) {
         zoomContainer.removeChild(zoomContainer.firstChild);
       }
@@ -205,8 +184,8 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
         throw new Error('Не вдалося ініціалізувати Zoom SDK. Перезавантажте сторінку і спробуйте знову.');
       }
       
+      // Load necessary libraries
       zoomClient.current.setZoomJSLib('https://source.zoom.us/3.13.2/lib', '/av');
-      
       zoomClient.current.i18n.load('en-US');
       zoomClient.current.i18n.reload('en-US');
       
@@ -219,150 +198,30 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
         throw new Error('Помилка завантаження WebAssembly модулів: ' + wasmError.message);
       }
 
-      try {
-        await new Promise((resolve, reject) => {
-          zoomClient.current.init({
-            leaveUrl: window.location.origin + '/teacher/zoom-meetings',
-            disableCORP: true, 
-            debug: true, 
-            videoDrag: true, 
-            screenShare: true, 
-            disablePreview: false, 
-            success: () => {
-              console.log('Zoom Meeting SDK initialized successfully');
-              resolve();
-            },
-            error: (error) => {
-              console.error('Failed to initialize Zoom SDK', error);
-              reject(new Error(`Помилка ініціалізації Zoom SDK: ${error.errorMessage || error.reason || JSON.stringify(error)}`));
-            }
-          });
+      // Initialize the SDK
+      await new Promise((resolve, reject) => {
+        zoomClient.current.init({
+          leaveUrl: window.location.origin + '/teacher/zoom-meetings',
+          disableCORP: true, 
+          debug: true, 
+          videoDrag: true, 
+          screenShare: true, 
+          disablePreview: false, 
+          success: () => {
+            console.log('Zoom Meeting SDK initialized successfully');
+            resolve();
+          },
+          error: (error) => {
+            console.error('Failed to initialize Zoom SDK', error);
+            reject(new Error(`Помилка ініціалізації Zoom SDK: ${error.errorMessage || error.reason || JSON.stringify(error)}`));
+          }
         });
-        
-        console.log("Zoom SDK initialized, trying to join meeting now");
-      } catch (initError) {
-        console.error("Error initializing Zoom SDK:", initError);
-        throw initError;
-      }
-
-      try {
-        await new Promise((resolve, reject) => {
-          
-          console.log("Joining meeting with params:", {
-            sdkKey,
-            meetingNumber: cleanMeetingNumber,
-            hasPassword: !!password,
-            passwordLength: password.length,
-            userName
-          });
-          
-          const joinParams = {
-            sdkKey,
-            signature,
-            meetingNumber: cleanMeetingNumber,
-            password: password,
-            userName,
-            userEmail,
-            success: () => {
-              console.log('Joined Zoom meeting successfully');
-              setIsJoined(true);
-              setLoading(false);
-              resolve();
-            },
-            error: (error) => {
-              
-              if (error.errorCode === 3) {
-                console.log('Password error detected, trying alternate format...');
-                
-                zoomApi.getZoomSignature(cleanMeetingNumber, 0)
-                  .then(sigData => {
-                    console.log('Got alternative signature:', sigData);
-                    
-                    const passwordVariants = [
-                      password, 
-                      "", 
-                      "123456", 
-                      encodedPassword,
-                      Buffer.from(password).toString('base64') 
-                    ];
-                    
-                    let attemptIndex = 0;
-                    
-                    const tryNextPassword = () => {
-                      if (attemptIndex >= passwordVariants.length) {
-                        
-                        reject(new Error('Помилка приєднання до зустрічі: Неправильний пароль зустрічі після кількох спроб'));
-                        return;
-                      }
-                      
-                      const currentPassword = passwordVariants[attemptIndex];
-                      console.log(`Trying password variant ${attemptIndex + 1}/${passwordVariants.length}:`, 
-                        currentPassword === '' ? '(empty string)' : currentPassword);
-                      
-                      const newJoinParams = {
-                        ...joinParams,
-                        password: currentPassword,
-                        signature: sigData.signature
-                      };
-                      
-                      attemptIndex++;
-                      
-                      try {
-                        zoomClient.current.join(newJoinParams);
-                        
-                        setTimeout(() => {
-                          if (!isJoined) {
-                            console.log(`Password variant ${attemptIndex} failed, trying next...`);
-                            tryNextPassword();
-                          }
-                        }, 2000);
-                      } catch (e) {
-                        console.error('Error during join attempt:', e);
-                        tryNextPassword();
-                      }
-                    };
-                    
-                    tryNextPassword();
-                  })
-                  .catch(sigErr => {
-                    console.error('Failed to get alternative signature:', sigErr);
-                    reject(new Error(`Помилка приєднання до зустрічі: Не вдалося отримати підпис: ${sigErr.message}`));
-                  });
-                return;
-              }
-              
-              console.error('Failed to join Zoom meeting:', error);
-              
-              let errorMessage = '';
-              switch(error.errorCode) {
-                case 1:
-                  errorMessage = 'Неправильний номер зустрічі або зустріч не активна';
-                  break;
-                case 2:
-                  errorMessage = 'Час зустрічі ще не настав';
-                  break;
-                case 3:
-                  errorMessage = 'Неправильний пароль зустрічі';
-                  break;
-                case 4:
-                  errorMessage = 'Зустріч вже закінчилася';
-                  break;
-                default:
-                  errorMessage = error.errorMessage || 'Невідома помилка';
-              }
-              
-              reject(new Error(`Помилка приєднання до зустрічі: ${errorMessage}`));
-            }
-          };
-          
-          console.log("Final join params:", joinParams);
-          zoomClient.current.join(joinParams);
-        });
-      } catch (joinError) {
-        console.error("Error joining meeting:", joinError);
-        throw joinError;
-      }
-
+      });
+      
+      // Join the meeting
+      await joinMeeting(meeting, sdk_data);
+      setLoading(false);
+      
     } catch (err) {
       console.error('Error initializing Zoom meeting:', err);
       setErrorWithCallback(err.message || 'Помилка з\'єднання з сервером. Будь ласка, спробуйте пізніше.');
