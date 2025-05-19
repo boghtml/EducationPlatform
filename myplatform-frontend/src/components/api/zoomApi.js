@@ -127,6 +127,15 @@ const zoomApi = {
     try {
       console.log(`Joining Zoom meeting ID: ${meetingId}`);
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+      
+      // Спочатку отримуємо повну інформацію про зустріч для впевненості, що маємо правильний пароль
+      const meetingDetailsResponse = await axios.get(`${API_URL}/zoom/meetings/${meetingId}/`, {
+        withCredentials: true
+      });
+      
+      const meetingPassword = meetingDetailsResponse.data.meeting_password;
+      console.log(`Retrieved meeting password from details: ${meetingPassword ? 'Yes' : 'No'}`);
+      
       const response = await axios.post(`${API_URL}/zoom/meetings/${meetingId}/join/`, {}, {
         withCredentials: true
       });
@@ -140,27 +149,36 @@ const zoomApi = {
       }
       
       const meetingData = response.data.meeting;
+      
+      // Переконуємось, що пароль встановлений
+      if (!meetingData.meeting_password || meetingData.meeting_password === '') {
+        console.warn('Meeting password missing in join response, using retrieved password');
+        meetingData.meeting_password = meetingPassword;
+      }
+      
       console.log('Meeting data:', {
         id: meetingData.id,
         topic: meetingData.topic,
         meeting_id: meetingData.meeting_id,
-        has_password: !!meetingData.meeting_password
+        has_password: !!meetingData.meeting_password,
+        password_length: meetingData.meeting_password ? meetingData.meeting_password.length : 0
       });
-      
-      // Перевірка наявності пароля
-      if (!meetingData.meeting_password && meetingData.meeting_password !== '') {
-        console.warn('Meeting password is missing or undefined!');
-      }
       
       // Перевірка SDK data
       const sdkData = response.data.sdk_data || {};
       console.log('SDK data keys:', Object.keys(sdkData));
       
-      // Додаємо пароль в sdk_data, якщо він відсутній
-      if (sdkData && !sdkData.passWord && meetingData.meeting_password) {
-        sdkData.passWord = meetingData.meeting_password;
+      // Додаємо пароль в sdk_data з усіма можливими іменами параметрів
+      if (meetingData.meeting_password) {
+        const cleanPassword = String(meetingData.meeting_password).trim();
+        sdkData.password = cleanPassword;
+        sdkData.pwd = cleanPassword; 
+        sdkData.passWord = cleanPassword;
         console.log('Added password to SDK data');
       }
+      
+      // Для додаткової впевненості, додаємо пароль до основного об'єкта response
+      response.data.password = meetingData.meeting_password;
       
       return response.data;
     } catch (error) {

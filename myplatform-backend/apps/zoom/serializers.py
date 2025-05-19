@@ -68,20 +68,21 @@ class ZoomMeetingParticipantSerializer(serializers.ModelSerializer):
 class ZoomSDKAuthSerializer(serializers.Serializer):
     """Серіалізатор для генерації Zoom SDK Auth та надання даних для приєднання до зустрічі"""
     
-    meeting_id = serializers.CharField()
-    role = serializers.IntegerField(default=0)
-    user_name = serializers.CharField(required=False, allow_blank=True)
-    user_email = serializers.CharField(required=False, allow_blank=True)
+    # Input fields
+    meeting_id = serializers.CharField(write_only=True)
+    role = serializers.IntegerField(write_only=True, default=0)
+    user_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    user_email = serializers.CharField(write_only=True, required=False, allow_blank=True)
     
-    # Поля результату
+    # Output fields
     sdkKey = serializers.CharField(read_only=True)
     signature = serializers.CharField(read_only=True)
     meetingNumber = serializers.CharField(read_only=True)
     passWord = serializers.CharField(read_only=True, allow_blank=True, allow_null=True)
     userName = serializers.CharField(read_only=True)
     userEmail = serializers.CharField(read_only=True, allow_blank=True)
-    role = serializers.IntegerField(read_only=True)
-    
+    outputRole = serializers.IntegerField(read_only=True, source='role')
+
     def generate_signature(self, meeting_number, role):
         """
         Генерація підпису для SDK Auth
@@ -93,29 +94,35 @@ class ZoomSDKAuthSerializer(serializers.Serializer):
         Returns:
             dict: Підпис та дані для SDK
         """
-        # Використовуємо ключі SDK з налаштувань
+        
+        meeting_number = ''.join(filter(str.isdigit, str(meeting_number)))
+        
         sdk_key = settings.ZOOM_SDK_KEY
         sdk_secret = settings.ZOOM_SDK_SECRET
         
-        # Генеруємо часову мітку
         timestamp = int(round(time.time() * 1000)) - 30000
-        
-        # Будуємо повідомлення для підпису
+    
         msg = f"{sdk_key}{meeting_number}{timestamp}{role}"
         
-        # Створюємо HMAC SHA256 хеш і підпис
-        hmac_obj = hmac.new(
-            sdk_secret.encode('utf-8'),
-            msg.encode('utf-8'),
-            hashlib.sha256
-        )
-        signature = base64.b64encode(hmac_obj.digest()).decode('utf-8')
-        
-        # Повертаємо дані для SDK Auth
-        return {
-            'sdkKey': sdk_key,
-            'signature': signature,
-            'meetingNumber': meeting_number,
-            'role': role,
-            'timestamp': timestamp
-        }
+        try:
+            
+            hmac_obj = hmac.new(
+                sdk_secret.encode('utf-8'),
+                msg.encode('utf-8'),
+                hashlib.sha256
+            )
+            signature = base64.b64encode(hmac_obj.digest()).decode('utf-8')
+            
+            print(f"Generated signature with: meeting={meeting_number}, role={role}, timestamp={timestamp}")
+            print(f"Signature length: {len(signature)}")
+            
+            return {
+                'sdkKey': sdk_key,
+                'signature': signature,
+                'meetingNumber': meeting_number,
+                'role': role,
+                'timestamp': timestamp
+            }
+        except Exception as e:
+            print(f"Error generating signature: {str(e)}")
+            raise

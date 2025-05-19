@@ -37,7 +37,6 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     fetchMeetings();
   }, [courseId]);
 
-  // Форматування дати і часу
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
     const formattedDate = date.toLocaleDateString('uk-UA', {
@@ -52,7 +51,6 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     return { date: formattedDate, time: formattedTime };
   };
 
-  // Отримання відфільтрованих зустрічей відповідно до вибраної вкладки
   const filteredMeetings = () => {
     const now = new Date();
     
@@ -74,14 +72,12 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     }
   };
 
-  // Обробник вибору зустрічі
   const handleMeetingClick = (meeting) => {
     if (onSelectMeeting) {
       onSelectMeeting(meeting);
     }
   };
 
-  // Обчислення статусу зустрічі для відображення
   const getMeetingStatus = (meeting) => {
     if (meeting.status === 'canceled') {
       return {
@@ -102,7 +98,7 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     const endTime = new Date(meeting.end_time);
 
     if (now < startTime) {
-      // Зустріч ще не почалася
+      
       const diffMs = startTime - now;
       const diffMins = Math.round(diffMs / 60000);
       const diffHours = Math.round(diffMs / 3600000);
@@ -125,13 +121,13 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
         };
       }
     } else if (now > endTime) {
-      // Зустріч вже закінчилася
+      
       return {
         label: 'Завершено',
         className: 'ended'
       };
     } else {
-      // Зустріч зараз активна
+      
       return {
         label: 'В процесі',
         className: 'active'
@@ -139,12 +135,10 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     }
   };
 
-  // Перевірка, чи можна приєднатися до зустрічі
   const canJoinMeeting = (meeting) => {
     return meeting.can_join && meeting.status !== 'canceled';
   };
 
-  // Якщо триває завантаження
   if (loading) {
     return (
       <div className="zoom-meetings-loading">
@@ -154,7 +148,6 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     );
   }
 
-  // Якщо сталася помилка
   if (error) {
     return (
       <div className="zoom-meetings-error">
@@ -170,7 +163,6 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     );
   }
 
-  // Якщо зустрічей немає
   if (meetings.length === 0) {
     return (
       <div className="zoom-meetings-empty">

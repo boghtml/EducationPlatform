@@ -77,6 +77,7 @@ MIDDLEWARE = [
 
     #'django.middleware.csrf.CsrfViewMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Додайте цей рядок
+    'myplatform.middleware.ZoomSecurityMiddleware',
 ]
 
 

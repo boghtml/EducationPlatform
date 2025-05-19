@@ -29,17 +29,17 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         user = self.request.user
         
         if user.role == 'admin':
-            # Адміни бачать всі зустрічі
+            
             return ZoomMeeting.objects.all()
         
         elif user.role == 'teacher':
-            # Викладачі бачать зустрічі своїх курсів
+            
             return ZoomMeeting.objects.filter(
                 Q(created_by=user) | Q(course__teacher=user)
             ).distinct()
             
         else:
-            # Студенти бачать тільки зустрічі курсів, на які вони записані
+            
             enrolled_courses = Enrollment.objects.filter(
                 student=user
             ).values_list('course_id', flat=True)
@@ -54,10 +54,9 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         return ZoomMeetingSerializer
     
     def perform_create(self, serializer):
-        # Встановлюємо поточного користувача як створювача зустрічі
+        
         user = self.request.user
         
-        # Перевіряємо, чи має користувач право створювати зустрічі для цього курсу
         course_id = serializer.validated_data.get('course').id
         course = get_object_or_404(Course, id=course_id)
         
@@ -73,7 +72,6 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
             
-        # Генеруємо фіктивні дані для Zoom (в реальному застосунку тут була б інтеграція з Zoom API)
         zoom_data = {
             "meeting_id": f"zoom_{course_id}_{int(timezone.now().timestamp())}",
             "meeting_password": "123456",
@@ -88,7 +86,7 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         return meeting
     
     def perform_update(self, serializer):
-        # Перевірка прав доступу перед оновленням
+        
         user = self.request.user
         meeting = self.get_object()
         
@@ -138,20 +136,33 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         meeting = self.get_object()
         user = request.user
         
-        # Перевірка, чи активна зустріч і чи можна до неї приєднатися
         if not meeting.can_join:
             return Response(
                 {"error": "Неможливо приєднатися до цієї зустрічі зараз"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        if meeting.meeting_password is None or meeting.meeting_password == '':
+            meeting.meeting_password = "123456" 
+        else:
             
-        # Для викладача або адміна - роль ведучого, для студента - учасника
+            meeting.meeting_password = str(meeting.meeting_password).strip()
+        
+        meeting_id = meeting.meeting_id
+        if meeting_id.startswith('zoom_'):
+            parts = meeting_id.split('_')
+            if len(parts) >= 3:
+                meeting_id = parts[2]  
+        
+        meeting_id = ''.join(filter(str.isdigit, meeting_id))
+        
+        print(f"Meeting ID for SDK: '{meeting_id}', Password: '{meeting.meeting_password}'")
+        
         is_host = user.role in ['teacher', 'admin'] and (user.id == meeting.created_by.id or user.id == meeting.course.teacher.id)
         role = 1 if is_host else 0
         
-        # Створення серіалізатора для SDK Auth
         serializer = ZoomSDKAuthSerializer(data={
-            'meeting_id': meeting.meeting_id,
+            'meeting_id': meeting_id,  
             'role': role,
             'user_name': f"{user.first_name} {user.last_name}".strip() or user.username,
             'user_email': user.email
@@ -160,20 +171,20 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        # Генерація даних для SDK Auth
         sdk_auth_data = serializer.generate_signature(
-            meeting_number=meeting.meeting_id,
+            meeting_number=meeting_id, 
             role=role
         )
         
-        # Додавання додаткових полів
         sdk_auth_data.update({
+            'password': meeting.meeting_password,
+            'pwd': meeting.meeting_password,
             'passWord': meeting.meeting_password,
             'userName': f"{user.first_name} {user.last_name}".strip() or user.username,
-            'userEmail': user.email
+            'userEmail': user.email,
+            'meetingNumber': meeting_id  
         })
         
-        # Створення або оновлення запису про участь
         participant, created = ZoomMeetingParticipant.objects.update_or_create(
             meeting=meeting,
             user=user,
@@ -184,12 +195,16 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
             }
         )
         
+        if meeting.meeting_id != meeting_id:
+            meeting.meeting_id = meeting_id
+            meeting.save(update_fields=['meeting_id'])
+        
         return Response({
             'meeting': ZoomMeetingSerializer(meeting).data,
             'sdk_data': sdk_auth_data,
             'is_host': is_host
         })
-    
+
     @action(detail=True, methods=['post'])
     def leave(self, request, pk=None):
         """Вихід з зустрічі"""
@@ -200,7 +215,7 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
             participant = ZoomMeetingParticipant.objects.get(meeting=meeting, user=user)
             
             if participant.joined_at:
-                # Оновлення часу виходу та тривалості участі
+                
                 left_at = timezone.now()
                 time_spent = (left_at - participant.joined_at).total_seconds()
                 
@@ -231,7 +246,6 @@ class ZoomSDKAuthView(generics.GenericAPIView):
         user_name = serializer.validated_data.get('user_name', '')
         user_email = serializer.validated_data.get('user_email', '')
         
-        # Перевірка прав доступу на роль ведучого
         if role == 1:
             user = request.user
             try:
@@ -244,13 +258,11 @@ class ZoomSDKAuthView(generics.GenericAPIView):
             except ZoomMeeting.DoesNotExist:
                 pass
         
-        # Генерація даних для SDK Auth
         sdk_auth_data = serializer.generate_signature(
             meeting_number=meeting_id,
             role=role
         )
         
-        # Додавання додаткових полів
         if user_name:
             sdk_auth_data['userName'] = user_name
         else:
@@ -273,7 +285,6 @@ class CourseZoomMeetingsView(generics.ListAPIView):
         course_id = self.kwargs.get('course_id')
         user = self.request.user
         
-        # Перевірка доступу користувача до курсу
         if user.role == 'student':
             has_access = Enrollment.objects.filter(
                 student=user,

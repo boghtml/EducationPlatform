@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './CreateZoomMeeting.css';
 import axios from 'axios';
-import API_URL from '../../api'; // Виправлений шлях імпорту
+import API_URL from '../../api'; 
 import { Calendar, Clock, Users, Video, Info } from 'lucide-react';
 
 const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
@@ -27,7 +27,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
   useEffect(() => {
     console.log("CreateZoomMeeting component mounted. courseId:", courseId);
     
-    // Завантаження списку курсів, якщо вони потрібні для вибору
     const fetchCourses = async () => {
       setCoursesLoading(true);
       try {
@@ -43,7 +42,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         console.log("Courses received:", response.data);
         setCourses(response.data || []);
         
-        // Якщо courseId не передано, а є курси - встановлюємо перший курс за замовчуванням
         if (!courseId && response.data && response.data.length > 0) {
           console.log("Setting default course:", response.data[0].id);
           setFormData(prev => ({
@@ -70,7 +68,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
     }
   }, [courseId]);
   
-  // Форматування дати і часу для input[type="datetime-local"]
   function formatDateTimeForInput(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -81,7 +78,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
-  // Обробник зміни полів форми
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     console.log(`Field changed: ${name}, value: ${type === 'checkbox' ? checked : value}`);
@@ -91,7 +87,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
     }));
   };
   
-  // Обробник відправки форми
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -99,7 +94,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
       setIsSubmitting(true);
       setError(null);
       
-      // Перевірка обов'язкових полів
       if (!formData.topic.trim()) {
         throw new Error('Тема зустрічі обов\'язкова');
       }
@@ -108,7 +102,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         throw new Error('Виберіть курс для зустрічі');
       }
       
-      // Перевірка дати
       const startTime = new Date(formData.start_time);
       if (isNaN(startTime.getTime())) {
         throw new Error('Вкажіть коректну дату та час початку');
@@ -118,20 +111,17 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         throw new Error('Дата та час початку не можуть бути в минулому');
       }
       
-      // Перевірка тривалості
       if (formData.duration < 15 || formData.duration > 300) {
         throw new Error('Тривалість має бути від 15 до 300 хвилин');
       }
       
-      // Отримуємо CSRF токен
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
-      // Підготовка даних для запиту - важливо передати дані в правильному форматі
       const requestData = {
         course: parseInt(formData.course),
         topic: formData.topic,
         description: formData.description,
-        start_time: (new Date(formData.start_time)).toISOString(), // ISO формат для бекенду
+        start_time: (new Date(formData.start_time)).toISOString(), 
         duration: parseInt(formData.duration),
         host_video: formData.host_video,
         participant_video: formData.participant_video,
@@ -142,7 +132,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
       
       console.log('Sending data to backend:', requestData);
       
-      // Відправка даних на сервер
       const response = await axios.post(`${API_URL}/zoom/meetings/`, requestData, {
         withCredentials: true,
         headers: {
@@ -153,7 +142,6 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
       console.log('Meeting created successfully:', response.data);
       setIsSubmitting(false);
       
-      // Виклик функції зворотного виклику після успішного створення
       if (onCreated) {
         onCreated(response.data);
       }

@@ -5,7 +5,6 @@ import hashlib
 import json
 from django.conf import settings
 
-# Ключі Zoom SDJ
 CLIENT_ID = 'N7IghX4oRlmxBUalSDf9Lw'
 CLIENT_SECRET = 'famk0fy3jeass7iwtGo7OrPBjk844VGs'
 
@@ -23,14 +22,12 @@ def generate_signature(meeting_number, role):
     timestamp = int(round(time.time() * 1000)) - 30000
     msg = f"{CLIENT_ID}{meeting_number}{timestamp}{role}"
     
-    # Створюємо HMAC SHA256 хеш
     hmac_obj = hmac.new(
         CLIENT_SECRET.encode('utf-8'),
         msg.encode('utf-8'),
         hashlib.sha256
     )
     
-    # Формуємо підпис
     signature = base64.b64encode(hmac_obj.digest()).decode('utf-8')
     
     return {
