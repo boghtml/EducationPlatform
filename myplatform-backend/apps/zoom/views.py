@@ -13,9 +13,8 @@ from .serializers import (
     ZoomMeetingCreateSerializer,
     ZoomMeetingUpdateSerializer,
     ZoomMeetingParticipantSerializer,
-    ZoomSignatureSerializer
+    ZoomSDKAuthSerializer
 )
-from .utils import get_meeting_sdk_data
 from apps.courses.models import Course
 from apps.enrollments.models import Enrollment
 from apps.assignments.mixins import CsrfExemptSessionAuthentication
@@ -135,7 +134,7 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def join(self, request, pk=None):
-        """Приєднання до зустрічі"""
+        """Приєднання до зустрічі з використанням SDK Auth"""
         meeting = self.get_object()
         user = request.user
         
@@ -148,9 +147,31 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
             
         # Для викладача або адміна - роль ведучого, для студента - учасника
         is_host = user.role in ['teacher', 'admin'] and (user.id == meeting.created_by.id or user.id == meeting.course.teacher.id)
+        role = 1 if is_host else 0
         
-        # Отримання даних для SDK
-        sdk_data = get_meeting_sdk_data(meeting.meeting_id, is_host)
+        # Створення серіалізатора для SDK Auth
+        serializer = ZoomSDKAuthSerializer(data={
+            'meeting_id': meeting.meeting_id,
+            'role': role,
+            'user_name': f"{user.first_name} {user.last_name}".strip() or user.username,
+            'user_email': user.email
+        })
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Генерація даних для SDK Auth
+        sdk_auth_data = serializer.generate_signature(
+            meeting_number=meeting.meeting_id,
+            role=role
+        )
+        
+        # Додавання додаткових полів
+        sdk_auth_data.update({
+            'passWord': meeting.meeting_password,
+            'userName': f"{user.first_name} {user.last_name}".strip() or user.username,
+            'userEmail': user.email
+        })
         
         # Створення або оновлення запису про участь
         participant, created = ZoomMeetingParticipant.objects.update_or_create(
@@ -165,7 +186,7 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
         
         return Response({
             'meeting': ZoomMeetingSerializer(meeting).data,
-            'sdk_data': sdk_data,
+            'sdk_data': sdk_auth_data,
             'is_host': is_host
         })
     
@@ -195,9 +216,9 @@ class ZoomMeetingViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class ZoomSignatureView(generics.GenericAPIView):
-    """View для отримання Zoom JWT підпису"""
-    serializer_class = ZoomSignatureSerializer
+class ZoomSDKAuthView(generics.GenericAPIView):
+    """View для отримання Zoom SDK Auth для веб-клієнта"""
+    serializer_class = ZoomSDKAuthSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [CsrfExemptSessionAuthentication]
     
@@ -207,6 +228,8 @@ class ZoomSignatureView(generics.GenericAPIView):
         
         meeting_id = serializer.validated_data['meeting_id']
         role = serializer.validated_data['role']
+        user_name = serializer.validated_data.get('user_name', '')
+        user_email = serializer.validated_data.get('user_email', '')
         
         # Перевірка прав доступу на роль ведучого
         if role == 1:
@@ -221,10 +244,24 @@ class ZoomSignatureView(generics.GenericAPIView):
             except ZoomMeeting.DoesNotExist:
                 pass
         
-        # Генерація підпису
-        signature_data = get_meeting_sdk_data(meeting_id, role==1)
+        # Генерація даних для SDK Auth
+        sdk_auth_data = serializer.generate_signature(
+            meeting_number=meeting_id,
+            role=role
+        )
         
-        return Response(signature_data)
+        # Додавання додаткових полів
+        if user_name:
+            sdk_auth_data['userName'] = user_name
+        else:
+            sdk_auth_data['userName'] = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
+            
+        if user_email:
+            sdk_auth_data['userEmail'] = user_email
+        else:
+            sdk_auth_data['userEmail'] = request.user.email
+        
+        return Response(sdk_auth_data)
 
 class CourseZoomMeetingsView(generics.ListAPIView):
     """View для отримання зустрічей для конкретного курсу"""

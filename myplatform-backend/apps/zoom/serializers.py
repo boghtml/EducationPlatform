@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import ZoomMeeting, ZoomMeetingParticipant
 from apps.courses.serializers import CourseSerializer
 from apps.users.serializers import CustomUserSerializer
+import time
+import base64
+import hmac
+import hashlib
+import json
+from django.conf import settings
 
 class ZoomMeetingSerializer(serializers.ModelSerializer):
     """Серіалізатор для Zoom зустрічей"""
@@ -59,14 +65,57 @@ class ZoomMeetingParticipantSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['time_in_meeting']
 
-class ZoomSignatureSerializer(serializers.Serializer):
-    """Серіалізатор для генерації Zoom JWT підпису"""
+class ZoomSDKAuthSerializer(serializers.Serializer):
+    """Серіалізатор для генерації Zoom SDK Auth та надання даних для приєднання до зустрічі"""
     
     meeting_id = serializers.CharField()
     role = serializers.IntegerField(default=0)
+    user_name = serializers.CharField(required=False, allow_blank=True)
+    user_email = serializers.CharField(required=False, allow_blank=True)
     
     # Поля результату
+    sdkKey = serializers.CharField(read_only=True)
     signature = serializers.CharField(read_only=True)
-    apiKey = serializers.CharField(read_only=True)
     meetingNumber = serializers.CharField(read_only=True)
-    timestamp = serializers.IntegerField(read_only=True)
+    passWord = serializers.CharField(read_only=True, allow_blank=True, allow_null=True)
+    userName = serializers.CharField(read_only=True)
+    userEmail = serializers.CharField(read_only=True, allow_blank=True)
+    role = serializers.IntegerField(read_only=True)
+    
+    def generate_signature(self, meeting_number, role):
+        """
+        Генерація підпису для SDK Auth
+        
+        Args:
+            meeting_number (str): Номер зустрічі Zoom
+            role (int): Роль користувача (0 - учасник, 1 - ведучий)
+            
+        Returns:
+            dict: Підпис та дані для SDK
+        """
+        # Використовуємо ключі SDK з налаштувань
+        sdk_key = settings.ZOOM_SDK_KEY
+        sdk_secret = settings.ZOOM_SDK_SECRET
+        
+        # Генеруємо часову мітку
+        timestamp = int(round(time.time() * 1000)) - 30000
+        
+        # Будуємо повідомлення для підпису
+        msg = f"{sdk_key}{meeting_number}{timestamp}{role}"
+        
+        # Створюємо HMAC SHA256 хеш і підпис
+        hmac_obj = hmac.new(
+            sdk_secret.encode('utf-8'),
+            msg.encode('utf-8'),
+            hashlib.sha256
+        )
+        signature = base64.b64encode(hmac_obj.digest()).decode('utf-8')
+        
+        # Повертаємо дані для SDK Auth
+        return {
+            'sdkKey': sdk_key,
+            'signature': signature,
+            'meetingNumber': meeting_number,
+            'role': role,
+            'timestamp': timestamp
+        }

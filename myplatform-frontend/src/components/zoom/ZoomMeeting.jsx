@@ -1,4 +1,4 @@
-// src/components/zoom/ZoomMeeting.jsx - Оновлений з новою автентифікацією
+// src/components/zoom/ZoomMeeting.jsx - Виправлений з підтримкою пароля
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ZoomMeeting.css';
@@ -81,18 +81,35 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
 
       // Отримання даних про зустріч з API
       const joinData = await zoomApi.joinZoomMeeting(meetingId);
+      console.log("Join data received:", {
+        meetingInfo: joinData.meeting ? {
+          id: joinData.meeting.id,
+          topic: joinData.meeting.topic,
+          meeting_id: joinData.meeting.meeting_id,
+          has_password: !!joinData.meeting.meeting_password
+        } : null,
+        sdk_data_keys: joinData.sdk_data ? Object.keys(joinData.sdk_data) : null
+      });
+      
       setMeetingData(joinData);
 
       const { meeting, sdk_data } = joinData;
-      const { signature, sdkKey, meetingNumber, passWord, userName, userEmail, role } = sdk_data;
-
-      console.log('Meeting data received:', {
-        meeting,
-        sdkData: {
-          ...sdk_data,
-          signature: signature.substring(0, 10) + '...' // Для безпеки показуємо частково
-        }
-      });
+      
+      // Перевірка, що дані містять необхідні поля
+      if (!sdk_data || !sdk_data.sdkKey || !sdk_data.signature || !sdk_data.meetingNumber) {
+        throw new Error('Не вдалося отримати необхідні дані для приєднання до Zoom зустрічі.');
+      }
+      
+      // Отримання значень для приєднання
+      const { signature, sdkKey, meetingNumber } = sdk_data;
+      
+      // Отримання пароля зустрічі - критично важливо!
+      const password = meeting.meeting_password || '';
+      console.log("Meeting password:", password ? "Available" : "Not available");
+      
+      // Отримання імені та email користувача
+      const userName = sdk_data.userName || sessionStorage.getItem('userName') || 'User';
+      const userEmail = sdk_data.userEmail || sessionStorage.getItem('userEmail') || '';
 
       // Ініціалізація клієнта Zoom SDK
       zoomClient.current = window.ZoomMtg;
@@ -102,27 +119,25 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
       zoomClient.current.preLoadWasm();
       zoomClient.current.prepareWebSDK();
 
-      // Налаштування мови інтерфейсу
+      // Налаштування мови інтерфейсу (використовуємо англійську для сумісності)
       zoomClient.current.i18n.load('en-US');
       zoomClient.current.i18n.reload('en-US');
 
-      // Ініціалізація клієнта з використанням SDK Auth
+      // Ініціалізація клієнта
       zoomClient.current.init({
         leaveUrl: window.location.origin + '/teacher/zoom-meetings', // URL для переадресації після виходу
         disableCORP: true,
         success: () => {
           console.log('Zoom Meeting SDK initialized');
 
-          // Приєднання до зустрічі з використанням SDK Auth
+          // Приєднання до зустрічі використовуючи SDK Auth
           zoomClient.current.join({
             sdkKey: sdkKey,
             signature: signature,
             meetingNumber: meetingNumber,
-            password: passWord || meeting.meeting_password || '', // Пароль зустрічі
-            userName: userName || sessionStorage.getItem('userName') || 'User', // Ім'я користувача
-            userEmail: userEmail || sessionStorage.getItem('userEmail') || '', // Email користувача
-            tk: '',
-            zak: '',
+            password: password, // Важливо: правильний пароль!
+            userName: userName,
+            userEmail: userEmail,
             success: () => {
               console.log('Joined Zoom meeting successfully');
               setIsJoined(true);
@@ -130,21 +145,21 @@ const ZoomMeeting = ({ meetingId, onClose }) => {
             },
             error: (error) => {
               console.error('Failed to join Zoom meeting', error);
-              setError('Помилка приєднання до зустрічі: ' + (error.errorMessage || error.reason || 'Невідома помилка'));
+              setError(`Помилка приєднання до зустрічі: ${error.errorMessage || error.reason || JSON.stringify(error)}`);
               setLoading(false);
             }
           });
         },
         error: (error) => {
           console.error('Failed to initialize Zoom SDK', error);
-          setError('Помилка ініціалізації Zoom SDK: ' + (error.errorMessage || error.reason || 'Будь ласка, спробуйте пізніше.'));
+          setError('Помилка ініціалізації Zoom SDK. Будь ласка, спробуйте пізніше.');
           setLoading(false);
         }
       });
 
     } catch (err) {
       console.error('Error initializing Zoom meeting:', err);
-      setError(err.response?.data?.error || 'Помилка з\'єднання з сервером. Будь ласка, спробуйте пізніше.');
+      setError(err.response?.data?.error || err.message || 'Помилка з\'єднання з сервером. Будь ласка, спробуйте пізніше.');
       setLoading(false);
     }
   };

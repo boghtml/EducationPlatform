@@ -1,4 +1,4 @@
-// src/components/api/zoomApi.js - Оновлена версія з виправленими шляхами
+// src/components/api/zoomApi.js - Оновлений для кращої обробки пароля
 import axios from 'axios';
 import API_URL from '../../api'; // Правильний шлях до API_URL
 
@@ -130,6 +130,38 @@ const zoomApi = {
       const response = await axios.post(`${API_URL}/zoom/meetings/${meetingId}/join/`, {}, {
         withCredentials: true
       });
+      
+      console.log('Join response received with keys:', Object.keys(response.data));
+      
+      // Перевірка чи є в даних необхідні поля
+      if (!response.data || !response.data.meeting) {
+        console.error('Meeting data missing in response:', response.data);
+        throw new Error('Не вдалося отримати дані зустрічі для приєднання');
+      }
+      
+      const meetingData = response.data.meeting;
+      console.log('Meeting data:', {
+        id: meetingData.id,
+        topic: meetingData.topic,
+        meeting_id: meetingData.meeting_id,
+        has_password: !!meetingData.meeting_password
+      });
+      
+      // Перевірка наявності пароля
+      if (!meetingData.meeting_password && meetingData.meeting_password !== '') {
+        console.warn('Meeting password is missing or undefined!');
+      }
+      
+      // Перевірка SDK data
+      const sdkData = response.data.sdk_data || {};
+      console.log('SDK data keys:', Object.keys(sdkData));
+      
+      // Додаємо пароль в sdk_data, якщо він відсутній
+      if (sdkData && !sdkData.passWord && meetingData.meeting_password) {
+        sdkData.passWord = meetingData.meeting_password;
+        console.log('Added password to SDK data');
+      }
+      
       return response.data;
     } catch (error) {
       console.error('Error joining Zoom meeting:', error);
@@ -157,7 +189,7 @@ const zoomApi = {
     try {
       console.log(`Getting Zoom signature for meeting: ${meetingNumber}, role: ${role}`);
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-      const response = await axios.post(`${API_URL}/zoom/signature/`, {
+      const response = await axios.post(`${API_URL}/zoom/sdk-auth/`, {
         meeting_id: meetingNumber,
         role: role
       }, {
