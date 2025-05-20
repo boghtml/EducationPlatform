@@ -13,39 +13,88 @@ const RangeSlider = ({
   label
 }) => {
   const sliderRef = useRef(null);
+  const isInitializedRef = useRef(false);
+  const onUpdateRef = useRef(null);
   const [values, setValues] = useState(initialValues);
-  
-  useEffect(() => {
-    if (sliderRef.current && !sliderRef.current.noUiSlider) {
-      noUiSlider.create(sliderRef.current, {
-        start: initialValues,
-        connect: true,
-        step: step,
-        range: {
-          'min': min,
-          'max': max
-        },
-        format: {
-          to: value => Math.round(value),
-          from: value => Number(value)
-        }
-      });
 
-      sliderRef.current.noUiSlider.on('update', (values) => {
-        const numericValues = values.map(v => parseInt(v));
-        setValues(numericValues);
-        if (onChange) {
-          onChange(numericValues);
-        }
-      });
+  // Store onChange in a ref to prevent it from causing re-renders
+  onUpdateRef.current = (values) => {
+    const numericValues = values.map(v => parseInt(v));
+    setValues(numericValues);
+    if (onChange) {
+      onChange(numericValues);
+    }
+  };
+
+  // Create the slider only once
+  useEffect(() => {
+    // Skip if already initialized or ref not available
+    if (isInitializedRef.current || !sliderRef.current) {
+      return;
     }
 
-    return () => {
-      if (sliderRef.current && sliderRef.current.noUiSlider) {
-        sliderRef.current.noUiSlider.destroy();
+    noUiSlider.create(sliderRef.current, {
+      start: initialValues,
+      connect: true,
+      step: step,
+      range: {
+        'min': min,
+        'max': max
+      },
+      format: {
+        to: value => Math.round(value),
+        from: value => Number(value)
+      }
+    });
+
+    // Use a stable callback reference
+    const handleUpdate = (values) => {
+      if (onUpdateRef.current) {
+        onUpdateRef.current(values);
       }
     };
-  }, [min, max, step, onChange]);
+
+    sliderRef.current.noUiSlider.on('update', handleUpdate);
+    isInitializedRef.current = true;
+
+    // Cleanup function
+    return () => {
+      if (sliderRef.current && sliderRef.current.noUiSlider) {
+        sliderRef.current.noUiSlider.off('update');
+        sliderRef.current.noUiSlider.destroy();
+        isInitializedRef.current = false;
+      }
+    };
+  }, []); // Empty dependency array, so this only runs once on mount
+
+  // Update slider if min, max, or step changes
+  useEffect(() => {
+    if (!isInitializedRef.current || !sliderRef.current || !sliderRef.current.noUiSlider) {
+      return;
+    }
+
+    // Update range if min or max changes
+    sliderRef.current.noUiSlider.updateOptions({
+      range: {
+        'min': min,
+        'max': max
+      },
+      step: step
+    });
+  }, [min, max, step]);
+
+  // Update slider if initialValues changes externally
+  useEffect(() => {
+    if (!isInitializedRef.current || !sliderRef.current || !sliderRef.current.noUiSlider) {
+      return;
+    }
+
+    // Only update if values are different
+    const currentValues = sliderRef.current.noUiSlider.get().map(v => parseInt(v));
+    if (initialValues[0] !== currentValues[0] || initialValues[1] !== currentValues[1]) {
+      sliderRef.current.noUiSlider.set(initialValues);
+    }
+  }, [initialValues]);
 
   const handleInputChange = (index, event) => {
     const newValue = parseInt(event.target.value);
@@ -61,14 +110,8 @@ const RangeSlider = ({
       newValues[index] = values[0];
     }
     
-    setValues(newValues);
-    
     if (sliderRef.current && sliderRef.current.noUiSlider) {
       sliderRef.current.noUiSlider.set(newValues);
-    }
-    
-    if (onChange) {
-      onChange(newValues);
     }
   };
 
