@@ -1,10 +1,11 @@
-/* src/components/ZoomMeetingPage.css */
+/* src/css/ZoomMeetingPage.css - Enhanced version */
 .zoom-meeting-page {
   min-height: 100vh;
   background-color: #f5f7fa;
+  padding-bottom: 50px;
 }
 
-/* Стани завантаження і помилки */
+/* Loading and error states */
 .zoom-meeting-page.loading,
 .zoom-meeting-page.error {
   display: flex;
@@ -45,7 +46,7 @@
   line-height: 1.5;
 }
 
-/* Контейнер інформації про зустріч */
+/* Meeting details container */
 .meeting-details-container {
   max-width: 900px;
   margin: 0 auto;
@@ -73,7 +74,7 @@
   color: #1f2937;
 }
 
-/* Деталі зустрічі */
+/* Meeting details */
 .meeting-details {
   background-color: white;
   border-radius: 12px;
@@ -165,12 +166,83 @@
 .meeting-status-badge {
   display: inline-block;
   padding: 6px 12px;
-  background-color: #2d8cff;
-  color: white;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 15px;
+}
+
+.meeting-status-badge.scheduled {
+  background-color: #d0ebff;
+  color: #1971c2;
+}
+
+.meeting-status-badge.live {
+  background-color: #d3f9d8;
+  color: #2b8a3e;
+}
+
+.meeting-status-badge.ended {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.meeting-status-badge.canceled {
+  background-color: #ffe3e3;
+  color: #c92a2a;
+}
+
+.join-options {
+  margin-top: 15px;
+}
+
+.join-text {
+  margin: 0 0 15px 0;
+  color: #4b5563;
+  font-size: 15px;
+}
+
+.join-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.join-browser-btn,
+.join-app-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.join-browser-btn {
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+}
+
+.join-browser-btn:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(45, 140, 255, 0.2);
+}
+
+.join-app-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.join-app-btn:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
 }
 
 .join-info {
@@ -191,9 +263,17 @@
   background-color: #f9fafb;
 }
 
+.credentials-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 15px 0;
+}
+
 .credentials-item {
   display: flex;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .credentials-item:last-child {
@@ -210,12 +290,51 @@
   color: #1f2937;
   font-family: 'Courier New', monospace;
   font-weight: 500;
+  flex: 1;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: white;
+  color: #4b5563;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.copy-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.credentials-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.credentials-tip svg {
+  color: #f59e0b;
+  flex-shrink: 0;
 }
 
 .meeting-join-external {
   text-align: center;
   padding-top: 20px;
   border-top: 1px solid #e5e7eb;
+  margin-bottom: 30px;
 }
 
 .meeting-join-external p {
@@ -228,6 +347,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 10px 20px;
   background-color: #2d8cff;
   color: white;
@@ -244,7 +364,31 @@
   box-shadow: 0 4px 8px rgba(45, 140, 255, 0.2);
 }
 
-/* Адаптивність для мобільних пристроїв */
+.meeting-course-info {
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.course-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.course-link {
+  color: #2d8cff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.course-link:hover {
+  color: #1a73e8;
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .meeting-details-container {
     padding: 20px 15px;
@@ -270,7 +414,27 @@
     flex-direction: column;
   }
   
+  .join-buttons {
+    flex-direction: column;
+  }
+  
+  .join-browser-btn,
+  .join-app-btn,
   .external-join-btn {
     width: 100%;
+    justify-content: center;
+  }
+  
+  .credentials-item {
+    flex-wrap: wrap;
+  }
+  
+  .credentials-label {
+    min-width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .copy-btn {
+    margin-left: auto;
   }
 }

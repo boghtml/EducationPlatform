@@ -1,6 +1,6 @@
-// src/components/zoom/ZoomMeetingsList.jsx
+// src/components/zoom/ZoomMeetingsList.jsx - Enhanced version
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './ZoomMeetingsList.css';
 import zoomApi from '../api/zoomApi';
 import { 
@@ -11,14 +11,21 @@ import {
   Check, 
   AlertTriangle,
   X,
-  ChevronRight
+  ChevronRight,
+  Search,
+  Filter,
+  List,
+  Grid
 } from 'lucide-react';
 
 const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMeetings = async () => {
@@ -39,42 +46,63 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
 
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
-    const formattedDate = date.toLocaleDateString('uk-UA', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
-    const formattedTime = date.toLocaleTimeString('uk-UA', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-    return { date: formattedDate, time: formattedTime };
+    return {
+      date: date.toLocaleDateString('uk-UA', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }),
+      time: date.toLocaleTimeString('uk-UA', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      rawDate: date
+    };
   };
 
-  const filteredMeetings = () => {
+  const getFilteredMeetings = () => {
+    // First filter by search query
+    let filtered = meetings;
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(meeting => 
+        meeting.topic.toLowerCase().includes(query) || 
+        (meeting.description && meeting.description.toLowerCase().includes(query))
+      );
+    }
+    
+    // Then filter by tab
     const now = new Date();
     
     switch (activeTab) {
       case 'upcoming':
-        return meetings.filter(meeting => 
+        return filtered.filter(meeting => 
           new Date(meeting.start_time) > now && 
           meeting.status !== 'canceled'
         );
+      case 'active':
+        return filtered.filter(meeting => 
+          meeting.is_active || 
+          (meeting.can_join && meeting.status !== 'canceled')
+        );
       case 'past':
-        return meetings.filter(meeting => 
-          new Date(meeting.start_time) < now ||
+        return filtered.filter(meeting => 
+          (new Date(meeting.end_time) < now && meeting.status !== 'canceled') || 
           meeting.status === 'ended'
         );
-      case 'active':
-        return meetings.filter(meeting => meeting.is_active);
+      case 'canceled':
+        return filtered.filter(meeting => meeting.status === 'canceled');
       default:
-        return meetings;
+        return filtered;
     }
   };
 
   const handleMeetingClick = (meeting) => {
     if (onSelectMeeting) {
       onSelectMeeting(meeting);
+    } else {
+      navigate(`/zoom/meetings/${meeting.id}`);
     }
   };
 
@@ -98,7 +126,6 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     const endTime = new Date(meeting.end_time);
 
     if (now < startTime) {
-      
       const diffMs = startTime - now;
       const diffMins = Math.round(diffMs / 60000);
       const diffHours = Math.round(diffMs / 3600000);
@@ -121,13 +148,11 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
         };
       }
     } else if (now > endTime) {
-      
       return {
         label: 'Завершено',
         className: 'ended'
       };
     } else {
-      
       return {
         label: 'В процесі',
         className: 'active'
@@ -137,6 +162,135 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
 
   const canJoinMeeting = (meeting) => {
     return meeting.can_join && meeting.status !== 'canceled';
+  };
+
+  const renderGridView = () => {
+    return (
+      <div className="zoom-meetings-grid">
+        {getFilteredMeetings().map(meeting => {
+          const { date, time } = formatDateTime(meeting.start_time);
+          const status = getMeetingStatus(meeting);
+          
+          return (
+            <div 
+              key={meeting.id} 
+              className={`zoom-meeting-card ${status.className} ${canJoinMeeting(meeting) ? 'joinable' : ''}`}
+              onClick={() => handleMeetingClick(meeting)}
+            >
+              <div className="meeting-card-header">
+                <div className={`meeting-status-icon ${status.className}`}>
+                  {status.className === 'active' && <Video size={16} />}
+                  {status.className === 'upcoming' && <Clock size={16} />}
+                  {status.className === 'soon' && <AlertTriangle size={16} />}
+                  {status.className === 'ended' && <Check size={16} />}
+                  {status.className === 'canceled' && <X size={16} />}
+                </div>
+                <span className={`meeting-status-text ${status.className}`}>
+                  {status.label}
+                </span>
+              </div>
+              
+              <h3 className="meeting-card-title">{meeting.topic}</h3>
+              
+              <div className="meeting-card-info">
+                <div className="info-row">
+                  <Calendar size={14} />
+                  <span>{date}</span>
+                </div>
+                <div className="info-row">
+                  <Clock size={14} />
+                  <span>{time}</span>
+                </div>
+                <div className="info-row">
+                  <User size={14} />
+                  <span>
+                    {meeting.created_by_data?.first_name} {meeting.created_by_data?.last_name}
+                  </span>
+                </div>
+              </div>
+              
+              {meeting.description && (
+                <div className="meeting-card-description">
+                  {meeting.description.length > 100 
+                    ? `${meeting.description.substring(0, 100)}...` 
+                    : meeting.description}
+                </div>
+              )}
+              
+              {canJoinMeeting(meeting) && (
+                <div className="meeting-card-action">
+                  <Video size={16} />
+                  <span>Приєднатися зараз</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderListView = () => {
+    return (
+      <div className="zoom-meetings-list-view">
+        {getFilteredMeetings().map(meeting => {
+          const { date, time } = formatDateTime(meeting.start_time);
+          const status = getMeetingStatus(meeting);
+          
+          return (
+            <div 
+              key={meeting.id}
+              className={`zoom-meeting-row ${status.className} ${canJoinMeeting(meeting) ? 'joinable' : ''}`}
+              onClick={() => handleMeetingClick(meeting)}
+            >
+              <div className={`meeting-row-status ${status.className}`}>
+                {status.className === 'active' && <Video size={18} />}
+                {status.className === 'upcoming' && <Clock size={18} />}
+                {status.className === 'soon' && <AlertTriangle size={18} />}
+                {status.className === 'ended' && <Check size={18} />}
+                {status.className === 'canceled' && <X size={18} />}
+              </div>
+              
+              <div className="meeting-row-content">
+                <h3 className="meeting-row-title">{meeting.topic}</h3>
+                
+                <div className="meeting-row-info">
+                  <div className="row-info-item">
+                    <Calendar size={14} />
+                    <span>{date}</span>
+                  </div>
+                  <div className="row-info-item">
+                    <Clock size={14} />
+                    <span>{time}</span>
+                  </div>
+                  <div className="row-info-item">
+                    <User size={14} />
+                    <span>
+                      {meeting.created_by_data?.first_name} {meeting.created_by_data?.last_name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="meeting-row-action">
+                <span className={`status-badge ${status.className}`}>
+                  {status.label}
+                </span>
+                
+                {canJoinMeeting(meeting) && (
+                  <button className="join-now-btn">
+                    <Video size={14} />
+                    <span>Приєднатися</span>
+                  </button>
+                )}
+                
+                <ChevronRight size={18} className="row-arrow" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   if (loading) {
@@ -167,102 +321,94 @@ const ZoomMeetingsList = ({ courseId, onSelectMeeting }) => {
     return (
       <div className="zoom-meetings-empty">
         <Video size={48} className="empty-icon" />
-        <h3>Немає заплановах Zoom зустрічей</h3>
+        <h3>Немає запланованих Zoom зустрічей</h3>
         <p>Для цього курсу ще не заплановано жодної відеоконференції</p>
       </div>
     );
   }
 
   return (
-    <div className="zoom-meetings-list-container">
-      {/* Вкладки для фільтрації зустрічей */}
-      <div className="zoom-meetings-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
-          onClick={() => setActiveTab('upcoming')}
-        >
-          Заплановані
-        </button>
+    <div className="zoom-meetings-container">
+      <div className="meetings-toolbar">
+        {/* Status tabs */}
+        <div className="meetings-tabs">
+          <button 
+            className={`meeting-tab ${activeTab === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveTab('all')}
+          >
+            Усі
+          </button>
+          <button 
+            className={`meeting-tab ${activeTab === 'active' ? 'active' : ''}`}
+            onClick={() => setActiveTab('active')}
+          >
+            Активні
+          </button>
+          <button 
+            className={`meeting-tab ${activeTab === 'upcoming' ? 'active' : ''}`}
+            onClick={() => setActiveTab('upcoming')}
+          >
+            Заплановані
+          </button>
+          <button 
+            className={`meeting-tab ${activeTab === 'past' ? 'active' : ''}`}
+            onClick={() => setActiveTab('past')}
+          >
+            Минулі
+          </button>
+          <button 
+            className={`meeting-tab ${activeTab === 'canceled' ? 'active' : ''}`}
+            onClick={() => setActiveTab('canceled')}
+          >
+            Скасовані
+          </button>
+        </div>
         
-        <button 
-          className={`tab-button ${activeTab === 'active' ? 'active' : ''}`}
-          onClick={() => setActiveTab('active')}
-        >
-          Активні
-        </button>
-        
-        <button 
-          className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
-          onClick={() => setActiveTab('past')}
-        >
-          Минулі
-        </button>
+        <div className="meetings-actions">
+          {/* Search */}
+          <div className="meetings-search">
+            <Search size={16} />
+            <input 
+              type="text" 
+              placeholder="Пошук зустрічей..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          {/* View toggles */}
+          <div className="view-toggles">
+            <button 
+              className={`view-toggle ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Плиткою"
+            >
+              <Grid size={18} />
+            </button>
+            <button 
+              className={`view-toggle ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="Списком"
+            >
+              <List size={18} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Список зустрічей */}
-      <div className="zoom-meetings-list">
-        {filteredMeetings().length === 0 ? (
-          <div className="no-meetings-message">
-            <p>Немає {activeTab === 'upcoming' ? 'запланованих' : activeTab === 'active' ? 'активних' : 'минулих'} Zoom зустрічей</p>
+      <div className="meetings-content">
+        {getFilteredMeetings().length === 0 ? (
+          <div className="no-meetings-found">
+            <p>Немає {
+              activeTab === 'all' ? '' :
+              activeTab === 'upcoming' ? 'запланованих' : 
+              activeTab === 'active' ? 'активних' : 
+              activeTab === 'past' ? 'минулих' : 
+              'скасованих'
+            } Zoom зустрічей{searchQuery ? ` за запитом "${searchQuery}"` : ''}</p>
           </div>
         ) : (
-          filteredMeetings().map(meeting => {
-            const { date, time } = formatDateTime(meeting.start_time);
-            const status = getMeetingStatus(meeting);
-            return (
-              <div 
-                key={meeting.id} 
-                className={`zoom-meeting-item ${status.className} ${canJoinMeeting(meeting) ? 'joinable' : ''}`}
-                onClick={() => canJoinMeeting(meeting) && handleMeetingClick(meeting)}
-              >
-                <div className="meeting-status-indicator">
-                  {status.className === 'active' && <Video className="status-icon active" />}
-                  {status.className === 'upcoming' && <Clock className="status-icon upcoming" />}
-                  {status.className === 'soon' && <AlertTriangle className="status-icon soon" />}
-                  {status.className === 'ended' && <Check className="status-icon ended" />}
-                  {status.className === 'canceled' && <X className="status-icon canceled" />}
-                </div>
-                
-                <div className="meeting-content">
-                  <h3 className="meeting-title">{meeting.topic}</h3>
-                  
-                  <div className="meeting-info">
-                    <div className="meeting-date-time">
-                      <Calendar size={14} />
-                      <span>{date}</span>
-                    </div>
-                    <div className="meeting-date-time">
-                      <Clock size={14} />
-                      <span>{time}</span>
-                    </div>
-                    <div className="meeting-host">
-                      <User size={14} />
-                      <span>
-                        {meeting.created_by_data?.first_name} {meeting.created_by_data?.last_name}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {meeting.description && (
-                    <p className="meeting-description">{meeting.description}</p>
-                  )}
-                </div>
-                
-                <div className="meeting-status">
-                  <span className={`status-badge ${status.className}`}>
-                    {status.label}
-                  </span>
-                  
-                  {canJoinMeeting(meeting) && (
-                    <div className="join-indicator">
-                      <span>Приєднатися</span>
-                      <ChevronRight size={16} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })
+          viewMode === 'grid' ? renderGridView() : renderListView()
         )}
       </div>
     </div>

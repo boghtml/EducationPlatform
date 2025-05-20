@@ -1,4 +1,4 @@
-/* src/components/zoom/ZoomModal.css */
+/* src/components/zoom/ZoomModal.css - Enhanced version */
 .zoom-modal-overlay {
   position: fixed;
   top: 0;
@@ -32,8 +32,8 @@
 
 .zoom-modal-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
   width: 36px;
   height: 36px;
   background-color: rgba(255, 255, 255, 0.9);
@@ -45,6 +45,7 @@
   z-index: 1100;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  border: none;
 }
 
 .zoom-modal-close:hover {
@@ -70,12 +71,12 @@
   padding: 30px;
 }
 
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -103,21 +104,277 @@
   }
 }
 
-/* Адаптивність для мобільних пристроїв */
-@media (max-width: 768px) {
-  .zoom-modal-container {
-    width: 95%;
-    height: 95%;
-  }
-  
-  .zoom-modal-loading {
-    padding: 20px;
-  }
-  
+/* Meeting details view */
+.zoom-modal-meeting-details {
+  height: 100%;
+  padding: 30px;
+  overflow-y: auto;
 }
 
+.modal-meeting-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 25px 0;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
+}
 
-/* Додайте ці стилі до src/components/zoom/ZoomModal.css */
+.modal-meeting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.modal-info-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-info-label {
+  font-weight: 500;
+  color: #4b5563;
+  min-width: 120px;
+}
+
+.modal-info-value {
+  color: #1f2937;
+}
+
+.modal-status-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal-status-badge.scheduled {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.modal-status-badge.live {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.modal-status-badge.ended {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.modal-status-badge.canceled {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.modal-meeting-description {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.modal-meeting-description h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.modal-meeting-description p {
+  font-size: 15px;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.modal-join-options {
+  margin-bottom: 25px;
+}
+
+.join-text {
+  font-size: 15px;
+  color: #4b5563;
+  margin: 0 0 15px 0;
+}
+
+.modal-join-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.modal-join-browser-btn,
+.modal-join-app-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.modal-join-browser-btn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+}
+
+.modal-join-browser-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+.modal-join-app-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.modal-join-app-btn:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.modal-join-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: #fffbeb;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+
+.modal-join-info svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.modal-join-info p {
+  font-size: 14px;
+  color: #92400e;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-meeting-credentials {
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9fafb;
+  margin-bottom: 25px;
+}
+
+.modal-credentials-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 15px 0;
+}
+
+.modal-credentials-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-credentials-item:last-child {
+  margin-bottom: 0;
+}
+
+.modal-credentials-label {
+  font-weight: 500;
+  color: #4b5563;
+  min-width: 100px;
+}
+
+.modal-credentials-value {
+  color: #1f2937;
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  flex: 1;
+}
+
+.modal-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: white;
+  color: #4b5563;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-copy-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+/* Error states */
+.zoom-modal-error-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+}
+
+.error-icon {
+  color: #ef4444;
+  margin-bottom: 20px;
+}
+
+.zoom-modal-error-content h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.zoom-modal-error-content p {
+  font-size: 16px;
+  color: #4b5563;
+  margin: 0 0 25px 0;
+  max-width: 500px;
+}
+
+.modal-back-btn {
+  padding: 10px 20px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-back-btn:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
 
 .zoom-modal-error {
   position: fixed;
@@ -172,12 +429,12 @@
 }
 
 .retry-button {
-  background-color: #2d8cff;
+  background-color: #2563eb;
   color: white;
 }
 
 .retry-button:hover {
-  background-color: #1a73e8;
+  background-color: #1d4ed8;
 }
 
 .troubleshooting-button {
@@ -199,34 +456,77 @@
   margin-top: 10px;
 }
 
-.password-error h4 {
+.password-error h4,
+.meeting-status-error h4 {
   margin: 0 0 10px;
   color: #ef4444;
   font-size: 16px;
 }
 
-.password-error p {
+.password-error p,
+.meeting-status-error p {
   margin: 0 0 10px;
   font-size: 14px;
   color: #4b5563;
 }
 
-.password-error ul {
+.password-error ul,
+.meeting-status-error ul {
   margin: 0;
   padding-left: 20px;
 }
 
-.password-error li {
+.password-error li,
+.meeting-status-error li {
   margin-bottom: 5px;
   font-size: 14px;
   color: #4b5563;
 }
 
-/* Додаткові стилі для модального вікна на мобільних пристроях */
+/* Responsive styles */
 @media (max-width: 768px) {
+  .zoom-modal-container {
+    width: 95%;
+    height: 95%;
+  }
+  
+  .zoom-modal-meeting-details {
+    padding: 20px 15px;
+  }
+  
+  .modal-meeting-title {
+    font-size: 20px;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-info-label {
+    min-width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .modal-join-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .modal-join-browser-btn,
+  .modal-join-app-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .modal-credentials-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .modal-copy-btn {
+    align-self: flex-end;
+  }
+  
   .zoom-modal-error {
     width: 95%;
-    padding: 15px;
   }
   
   .error-actions {
