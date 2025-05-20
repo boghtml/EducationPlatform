@@ -6,7 +6,7 @@ from datetime import timedelta
 import uuid
 
 class ZoomMeeting(models.Model):
-    # Статуси зустрічі
+    
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
         ('live', 'Live'),
@@ -14,36 +14,27 @@ class ZoomMeeting(models.Model):
         ('canceled', 'Canceled'),
     ]
     
-    # Унікальний ідентифікатор зустрічі
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     
-    # Зв'язок з курсом
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='zoom_meetings')
     
-    # Творець зустрічі (викладач)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_meetings')
     
-    # Основна інформація про зустріч
     topic = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     
-    # Zoom-специфічна інформація
     meeting_id = models.CharField(max_length=255, blank=True, null=True)
     meeting_password = models.CharField(max_length=50, blank=True, null=True)
     join_url = models.URLField(max_length=500, blank=True, null=True)
     
-    # Часові параметри
     start_time = models.DateTimeField()
-    duration = models.IntegerField(default=60)  # тривалість у хвилинах
+    duration = models.IntegerField(default=60) 
     
-    # Статус зустрічі
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
     
-    # Системні поля
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # Налаштування зустрічі
     host_video = models.BooleanField(default=True)
     participant_video = models.BooleanField(default=True)
     join_before_host = models.BooleanField(default=False)
@@ -54,7 +45,6 @@ class ZoomMeeting(models.Model):
         ('cloud', 'Cloud')
     ])
     
-    # Додаткові налаштування
     settings_json = models.JSONField(blank=True, null=True)
     
     def __str__(self):
@@ -72,7 +62,7 @@ class ZoomMeeting(models.Model):
     @property
     def can_join(self):
         now = timezone.now()
-        # Можливість приєднатися за 15 хв до початку і протягом всієї тривалості
+
         return (self.start_time - timedelta(minutes=15)) <= now <= self.end_time and self.status in ['scheduled', 'live']
     
     class Meta:
@@ -99,22 +89,18 @@ class ZoomMeeting(models.Model):
             raise
 
 class ZoomMeetingParticipant(models.Model):
-    # Зв'язок із зустріччю
+   
     meeting = models.ForeignKey(ZoomMeeting, on_delete=models.CASCADE, related_name='participants')
     
-    # Зв'язок з користувачем
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='zoom_participations')
     
-    # Статус участі
     joined_at = models.DateTimeField(null=True, blank=True)
     left_at = models.DateTimeField(null=True, blank=True)
     
-    # Додаткова інформація
     device_type = models.CharField(max_length=50, blank=True, null=True)
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     
-    # Статистика
-    time_in_meeting = models.IntegerField(default=0)  # тривалість у секундах
+    time_in_meeting = models.IntegerField(default=0)  
     
     class Meta:
         unique_together = ['meeting', 'user']

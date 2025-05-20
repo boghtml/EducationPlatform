@@ -30,7 +30,7 @@ function ZoomMeetingPage() {
   const [copiedPassword, setCopiedPassword] = useState(false);
 
   useEffect(() => {
-    // Function to load meeting information
+    
     const fetchMeeting = async () => {
       try {
         setLoading(true);
@@ -47,7 +47,6 @@ function ZoomMeetingPage() {
     fetchMeeting();
   }, [meetingId]);
 
-  // Date and time formatting
   const formatDateTime = (dateString) => {
     if (!dateString) return { date: 'Невідомо', time: 'Невідомо' };
     
@@ -64,17 +63,14 @@ function ZoomMeetingPage() {
     return { date: formattedDate, time: formattedTime };
   };
 
-  // Handler for going back
   const handleBack = () => {
     navigate(-1);
   };
 
-  // Handler for joining a meeting
   const handleJoinMeeting = () => {
     setShowJoinView(true);
   };
 
-  // Handler for copying meeting credentials
   const copyToClipboard = (text, type) => {
     navigator.clipboard.writeText(text).then(() => {
       if (type === 'id') {
@@ -87,7 +83,6 @@ function ZoomMeetingPage() {
     });
   };
 
-  // If loading
   if (loading) {
     return (
       <>
@@ -101,7 +96,6 @@ function ZoomMeetingPage() {
     );
   }
 
-  // If error
   if (error) {
     return (
       <>
@@ -122,7 +116,6 @@ function ZoomMeetingPage() {
     );
   }
 
-  // If meeting not found
   if (!meeting) {
     return (
       <>
@@ -143,11 +136,9 @@ function ZoomMeetingPage() {
     );
   }
 
-  // Format dates
   const { date: startDate, time: startTime } = formatDateTime(meeting.start_time);
   const { date: endDate, time: endTime } = formatDateTime(meeting.end_time);
 
-  // Render meeting details or join view
   return (
     <>
       <Header />

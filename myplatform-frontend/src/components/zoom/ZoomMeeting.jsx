@@ -14,7 +14,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
   const navigate = useNavigate();
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   
-  // Використовуємо стабільну версію SDK 2.11.0
   const SDK_VERSION = '2.11.0';
 
   const setErrorWithCallback = (errorMessage) => {
@@ -25,7 +24,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
     }
   };
 
-  // Set up Zoom container and cleanup
   useEffect(() => {
     let zoomContainer = document.getElementById('zmmtg-root');
     
@@ -50,13 +48,11 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
     };
   }, [meetingId, isJoined]);
 
-  // Load Zoom SDK scripts
   useEffect(() => {
     const loadZoomScripts = async () => {
       try {
         console.log(`Loading Zoom SDK version ${SDK_VERSION} scripts...`);
         
-        // Load CDN scripts
         await loadScript(`https://source.zoom.us/${SDK_VERSION}/lib/vendor/react.min.js`);
         await loadScript(`https://source.zoom.us/${SDK_VERSION}/lib/vendor/react-dom.min.js`);
         await loadScript(`https://source.zoom.us/${SDK_VERSION}/lib/vendor/redux.min.js`);
@@ -75,7 +71,7 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
 
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
-        // Check if script already exists
+        
         const existingScript = document.querySelector(`script[src="${src}"]`);
         if (existingScript) {
           console.log(`Script already loaded: ${src}`);
@@ -101,7 +97,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
     loadZoomScripts();
   }, [SDK_VERSION]);
 
-  // Initialize Zoom when SDK is loaded
   useEffect(() => {
     if (isSDKLoaded) {
       initZoom();
@@ -114,7 +109,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
         throw new Error('Zoom SDK not initialized. Please refresh the page.');
       }
       
-      // Extract and validate meeting number and password
       const meetingNumber = sdkData.meetingNumber;
       if (!meetingNumber) {
         throw new Error('Invalid Zoom meeting ID.');
@@ -122,7 +116,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
       
       const password = sdkData.passWord || '';
       
-      // Log complete join data for debugging
       console.log('Join meeting data:', {
         meetingNumber,
         password: password ? '[REDACTED]' : '[empty]',
@@ -133,7 +126,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
         role: sdkData.role
       });
       
-      // Join config для 2.11.0 версії
       const joinConfig = {
         apiKey: sdkData.sdkKey,
         signature: sdkData.signature,
@@ -149,7 +141,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
           console.error('Failed to join Zoom meeting:', error);
           let errorMessage = 'Error joining the meeting';
           
-          // Provide more detailed error messages
           if (error.errorCode) {
             switch(error.errorCode) {
               case 1: errorMessage = 'Invalid meeting number or meeting is not active'; break;
@@ -175,7 +166,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
     try {
       setLoading(true);
 
-      // Get meeting data from backend
       console.log(`Fetching join data for meeting ID: ${meetingId}`);
       const joinData = await zoomApi.joinZoomMeeting(meetingId);
       console.log("Join data received:", joinData);
@@ -188,13 +178,11 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
       
       const { meeting, sdk_data } = joinData;
       
-      // Initialize Zoom SDK
       const zoomContainer = document.getElementById('zmmtg-root');
       if (!zoomContainer) {
         throw new Error('Zoom container not found. Please refresh the page.');
       }
       
-      // Clear any existing content
       while (zoomContainer.firstChild) {
         zoomContainer.removeChild(zoomContainer.firstChild);
       }
@@ -205,16 +193,13 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
         throw new Error('Zoom Meeting SDK not found. Please refresh the page.');
       }
       
-      // Set up the SDK libraries for версії 2.11.0
       zoomClient.current.setZoomJSLib(`https://source.zoom.us/${SDK_VERSION}/lib`, '/av');
       zoomClient.current.preLoadWasm();
       zoomClient.current.prepareWebSDK();
       
-      // i18n init для версії 2.11.0
       zoomClient.current.i18n.load('en-US');
       zoomClient.current.i18n.reload('en-US');
       
-      // Initialize the SDK with required parameters
       zoomClient.current.init({
         leaveUrl: sdk_data.leaveUrl || '/dashboard',
         disableCORP: true, 
@@ -231,7 +216,6 @@ const ZoomMeeting = ({ meetingId, onClose, onError }) => {
         isSupportBreakout: true,
         success: () => {
           console.log('Zoom Meeting SDK initialized successfully');
-          // Join the meeting
           joinMeeting(meeting, sdk_data);
           setLoading(false);
         },

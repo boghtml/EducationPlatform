@@ -1,7 +1,7 @@
 // src/components/zoom/ZoomModal.jsx - Оптимізований для роботи з реальними зустрічами
 import React, { useState, useEffect } from 'react';
 import './ZoomModal.css';
-import { X, AlertTriangle, VideoIcon } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 import ZoomMeeting from './ZoomMeeting';
 import ZoomTroubleshooting from './ZoomTroubleshooting';
 import BrowserCheck from './BrowserCheck';
@@ -14,7 +14,7 @@ const ZoomModal = ({ meetingId, onClose }) => {
   const [showBrowserCheck, setShowBrowserCheck] = useState(false);
 
   useEffect(() => {
-    // Перевірка важливих вимог для Zoom SDK
+    
     const hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
     const hasSecureContext = window.isSecureContext;
     
@@ -25,7 +25,6 @@ const ZoomModal = ({ meetingId, onClose }) => {
       crossOriginIsolated: window.crossOriginIsolated
     });
     
-    // Потрібен SharedArrayBuffer для Zoom SDK
     if (!hasSharedArrayBuffer || !hasSecureContext) {
       console.log('Browser environment check failed:',
         { hasSharedArrayBuffer, hasSecureContext });
@@ -34,7 +33,6 @@ const ZoomModal = ({ meetingId, onClose }) => {
       return;
     }
 
-    // Короткa затримка для відображення завантаження
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 300);
@@ -43,13 +41,12 @@ const ZoomModal = ({ meetingId, onClose }) => {
   }, []);
   
   const handleClose = () => {
-    // Додаємо анімацію закриття
+    
     const container = document.querySelector('.zoom-modal-container');
     if (container) {
       container.classList.add('closing');
     }
     
-    // Затримка для анімації
     setTimeout(() => {
       if (onClose) onClose();
     }, 300);
@@ -59,7 +56,6 @@ const ZoomModal = ({ meetingId, onClose }) => {
     console.error('Zoom meeting error:', errorMessage);
     setError(errorMessage);
     
-    // Визначаємо тип помилки для кращого відображення
     if (errorMessage.includes('password') || errorMessage.includes('Incorrect')) {
       setErrorType('password');
     } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('WebAssembly')) {
@@ -73,7 +69,7 @@ const ZoomModal = ({ meetingId, onClose }) => {
   };
 
   const handleRetry = () => {
-    // Скидаємо всі стани і пробуємо знову
+    
     setError(null);
     setErrorType(null);
     setShowTroubleshooting(false);

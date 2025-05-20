@@ -16,7 +16,7 @@ import axios from 'axios';
 import API_URL from '../../api';
 
 function TeacherZoomMeetings() {
-  // Стан компонента
+  
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,12 +25,11 @@ function TeacherZoomMeetings() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState('all'); // 'all', 'upcoming', 'past', 'active'
+  const [filter, setFilter] = useState('all'); 
   const [loadingCourses, setLoadingCourses] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const navigate = useNavigate();
 
-  // Отримання списку курсів викладача
   const fetchTeacherCourses = async () => {
     try {
       setLoadingCourses(true);
@@ -67,7 +66,6 @@ function TeacherZoomMeetings() {
     }
   };
 
-  // Отримання всіх Zoom зустрічей
   const fetchAllMeetings = async () => {
     try {
       setLoading(true);
@@ -86,7 +84,6 @@ function TeacherZoomMeetings() {
     }
   };
 
-  // Початкове завантаження даних
   useEffect(() => {
     console.log("Компонент TeacherZoomMeetings змонтовано");
     
@@ -98,7 +95,6 @@ function TeacherZoomMeetings() {
     initData();
   }, []);
 
-  // Оновлення списку зустрічей при зміні фільтра курсу
   useEffect(() => {
     if (!selectedCourseId) return;
     
@@ -133,11 +129,9 @@ function TeacherZoomMeetings() {
     fetchMeetings();
   }, [selectedCourseId]);
 
-  // Фільтрування зустрічей за пошуком та типом
   const getFilteredMeetings = () => {
     let filtered = [...meetings];
     
-    // Фільтр по пошуку
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(meeting => 
@@ -146,7 +140,6 @@ function TeacherZoomMeetings() {
       );
     }
     
-    // Фільтр по статусу
     const now = new Date();
     switch (filter) {
       case 'upcoming':
@@ -174,17 +167,14 @@ function TeacherZoomMeetings() {
     return filtered;
   };
 
-  // Обробник вибору зустрічі
   const handleSelectMeeting = (meeting) => {
     setSelectedMeeting(meeting);
   };
 
-  // Обробник закриття модального вікна
   const handleCloseModal = () => {
     setSelectedMeeting(null);
   };
 
-  // Обробник створення нової зустрічі
   const handleCreateMeeting = () => {
     if (courses.length === 0) {
       if (window.confirm('У вас немає жодного курсу. Спочатку створіть курс, щоб мати можливість створювати зустрічі. Перейти до створення курсу?')) {
@@ -194,7 +184,7 @@ function TeacherZoomMeetings() {
     }
     
     setShowCreateForm(true);
-    // Прокручуємо до форми створення
+    
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -203,18 +193,15 @@ function TeacherZoomMeetings() {
     }, 100);
   };
 
-  // Обробник успішного створення зустрічі
   const handleMeetingCreated = (newMeeting) => {
     console.log("Зустріч успішно створено:", newMeeting);
     setShowCreateForm(false);
     
-    // Оновлюємо список зустрічей
     setMeetings(prev => {
       const updated = [newMeeting, ...prev];
       return updated;
     });
     
-    // Додаємо повідомлення про успішне створення
     const successMessage = document.createElement('div');
     successMessage.className = 'success-message';
     successMessage.innerHTML = `
@@ -225,35 +212,29 @@ function TeacherZoomMeetings() {
     `;
     document.body.appendChild(successMessage);
     
-    // Видаляємо повідомлення через 3 секунди
     setTimeout(() => {
       document.body.removeChild(successMessage);
     }, 3000);
   };
 
-  // Обробник скасування створення зустрічі
   const handleCancelCreate = () => {
     setShowCreateForm(false);
   };
 
-  // Обробник видалення зустрічі
   const handleDeleteMeeting = async (meetingId) => {
-    // Показуємо підтвердження видалення
+    
     setDeleteConfirmation(meetingId);
   };
   
-  // Підтвердження видалення
   const confirmDelete = async (meetingId) => {
     try {
       console.log("Видалення зустрічі з ID:", meetingId);
       await zoomApi.deleteZoomMeeting(meetingId);
       console.log("Зустріч успішно видалено");
       
-      // Оновлюємо список, видаляючи зустріч
       setMeetings(prev => prev.filter(meeting => meeting.id !== meetingId));
       setDeleteConfirmation(null);
       
-      // Показуємо повідомлення про успішне видалення
       const successMessage = document.createElement('div');
       successMessage.className = 'success-message';
       successMessage.innerHTML = `
@@ -264,7 +245,6 @@ function TeacherZoomMeetings() {
       `;
       document.body.appendChild(successMessage);
       
-      // Видаляємо повідомлення через 3 секунди
       setTimeout(() => {
         document.body.removeChild(successMessage);
       }, 3000);
@@ -275,12 +255,10 @@ function TeacherZoomMeetings() {
     }
   };
   
-  // Скасування видалення
   const cancelDelete = () => {
     setDeleteConfirmation(null);
   };
   
-  // Форматування дати
   const formatDate = (dateString) => {
     if (!dateString) return 'Невідомо';
     return new Date(dateString).toLocaleDateString('uk-UA', {
@@ -290,7 +268,6 @@ function TeacherZoomMeetings() {
     });
   };
   
-  // Форматування часу
   const formatTime = (dateString) => {
     if (!dateString) return 'Невідомо';
     return new Date(dateString).toLocaleTimeString('uk-UA', {
@@ -299,7 +276,6 @@ function TeacherZoomMeetings() {
     });
   };
   
-  // Отримання статусу зустрічі
   const getMeetingStatus = (meeting) => {
     const now = new Date();
     const startTime = new Date(meeting.start_time);
@@ -314,7 +290,7 @@ function TeacherZoomMeetings() {
     }
     
     if (now < startTime) {
-      // Перевіряємо близькість до початку
+      
       const diffMs = startTime - now;
       const diffMins = Math.round(diffMs / 60000);
       
@@ -333,7 +309,6 @@ function TeacherZoomMeetings() {
     return { text: 'Завершено', className: 'ended' };
   };
 
-  // Отримання іконки статусу зустрічі
   const getStatusIcon = (statusClassName) => {
     switch (statusClassName) {
       case 'live':
@@ -349,7 +324,6 @@ function TeacherZoomMeetings() {
     }
   };
 
-  // Сортування зустрічей за часом початку (спочатку найближчі)
   const sortMeetings = (meetings) => {
     const now = new Date();
     
@@ -357,23 +331,18 @@ function TeacherZoomMeetings() {
       const aTime = new Date(a.start_time);
       const bTime = new Date(b.start_time);
       
-      // Активні зустрічі мають пріоритет
       if (a.is_active && !b.is_active) return -1;
       if (!a.is_active && b.is_active) return 1;
       
-      // Потім майбутні зустрічі, найближчі перші
       if (aTime > now && bTime > now) return aTime - bTime;
       
-      // Потім майбутні зустрічі перед минулими
       if (aTime > now && bTime <= now) return -1;
       if (aTime <= now && bTime > now) return 1;
       
-      // Нарешті минулі зустрічі, недавні перші
       return bTime - aTime;
     });
   };
 
-  // Визначення статусного класу для карточки зустрічі
   const getMeetingCardClass = (meeting) => {
     if (meeting.status === 'canceled') return 'canceled';
     if (meeting.is_active) return 'live';
@@ -388,7 +357,6 @@ function TeacherZoomMeetings() {
     return 'live';
   };
 
-  // Отримання тексту для фільтрів і заголовків
   const getFilterText = () => {
     switch (filter) {
       case 'upcoming':
