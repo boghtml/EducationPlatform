@@ -139,7 +139,7 @@ def create_zoom_meeting(topic, description, start_time, duration, settings=None)
 
 def generate_sdk_signature(meeting_number, role):
     """
-    Generate Meeting SDK JWT signature
+    Generate Meeting SDK JWT signature for version 2.11.0
     
     Args:
         meeting_number (str): Zoom meeting number (id)
@@ -148,10 +148,14 @@ def generate_sdk_signature(meeting_number, role):
     Returns:
         dict: SDK data including signature, apiKey, meetingNumber, etc.
     """
-    # Zoom SDK needs current timestamp in milliseconds
+    # Make sure meeting_number is a string
+    meeting_number = str(meeting_number)
+    
+    # Zoom SDK v2.11.0 uses different format compared to newer versions
     timestamp = int(round(time.time() * 1000)) - 30000
-    # Format the message for JWT signature
     msg = f"{SDK_KEY}{meeting_number}{timestamp}{role}"
+    
+    print(f"Generating signature with: SDK_KEY={SDK_KEY[:5]}..., meeting={meeting_number}, timestamp={timestamp}, role={role}")
     
     # Create HMAC-SHA256 signature
     hmac_obj = hmac.new(
@@ -162,14 +166,15 @@ def generate_sdk_signature(meeting_number, role):
     
     signature = base64.b64encode(hmac_obj.digest()).decode('utf-8')
     
+    print(f"Generated signature: {signature[:10]}...")
+    
     # Return all necessary data for the Zoom Meeting SDK
     return {
         'signature': signature,
-        'sdkKey': SDK_KEY,
+        'sdkKey': SDK_KEY,  # In version 2.11.0 it's called apiKey in frontend
         'meetingNumber': meeting_number,
         'role': role,
-        'timestamp': timestamp,
-        'leaveUrl': '/dashboard', # Default leave URL
+        'leaveUrl': '/dashboard',  # Default leave URL
         'userName': '',  # Will be filled by the calling function
         'userEmail': '', # Will be filled by the calling function
         'passWord': '',  # Will be filled by the calling function
