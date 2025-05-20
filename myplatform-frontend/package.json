@@ -17,6 +17,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^2.30.0",
     "framer-motion": "^12.10.0",
+    "http-proxy-middleware": "^3.0.5",
     "lucide-react": "^0.436.0",
     "nouislider": "^15.8.1",
     "react": "^18.3.1",

@@ -1,9 +1,9 @@
-// src/components/zoom/CreateZoomMeeting.jsx - Виправлений
+// Updated EnhancedCreateZoomMeeting.jsx with fixes for meeting creation
 import React, { useState, useEffect } from 'react';
-import './CreateZoomMeeting.css';
 import axios from 'axios';
-import API_URL from '../../api'; 
-import { Calendar, Clock, Users, Video, Info } from 'lucide-react';
+import API_URL from '../../api';
+import { Calendar, Clock, Video, Users, Settings, AlertTriangle, Info, Check } from 'lucide-react';
+import './CreateZoomMeeting.css';
 
 const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
   const [courses, setCourses] = useState([]);
@@ -11,63 +11,24 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
     course: courseId || '',
     topic: '',
     description: '',
-    start_time: formatDateTimeForInput(new Date(Date.now() + 30 * 60000)), // зустріч через 30 хв за замовчуванням
+    start_time: formatDateTimeForInput(new Date(Date.now() + 30 * 60000)), // meeting in 30 min by default
     duration: 60,
     host_video: true,
     participant_video: true,
     join_before_host: false,
     mute_upon_entry: true,
-    auto_recording: 'none'
+    auto_recording: 'none',
+    waiting_room: true
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [coursesLoading, setCoursesLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [debugMessages, setDebugMessages] = useState([]);
+  const [showDebug, setShowDebug] = useState(false);
   
-  useEffect(() => {
-    console.log("CreateZoomMeeting component mounted. courseId:", courseId);
-    
-    const fetchCourses = async () => {
-      setCoursesLoading(true);
-      try {
-        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
-        const userId = sessionStorage.getItem('userId');
-        console.log("Fetching courses for teacher ID:", userId);
-        
-        const response = await axios.get(`${API_URL}/courses/`, {
-          withCredentials: true,
-          params: { teacher_id: userId }
-        });
-        
-        console.log("Courses received:", response.data);
-        setCourses(response.data || []);
-        
-        if (!courseId && response.data && response.data.length > 0) {
-          console.log("Setting default course:", response.data[0].id);
-          setFormData(prev => ({
-            ...prev,
-            course: response.data[0].id
-          }));
-        }
-        setCoursesLoading(false);
-      } catch (err) {
-        console.error('Error fetching courses:', err);
-        setError('Не вдалося завантажити список курсів. Будь ласка, спробуйте пізніше.');
-        setCoursesLoading(false);
-      }
-    };
-    
-    if (!courseId) {
-      fetchCourses();
-    } else {
-      console.log("Using provided courseId:", courseId);
-      setFormData(prev => ({
-        ...prev,
-        course: courseId
-      }));
-    }
-  }, [courseId]);
-  
+  // Helper function to format date for input
   function formatDateTimeForInput(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -77,23 +38,79 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
     
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
-
+  
+  // Debug logger function
+  const debugLog = (message, type = 'info') => {
+    console.log(`[DEBUG] ${message}`);
+    setDebugMessages(prev => [...prev, { message, type, timestamp: new Date().toISOString() }]);
+  };
+  
+  // Load teacher's courses
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setCoursesLoading(true);
+      try {
+        debugLog('Fetching CSRF token...');
+        await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
+        
+        const userId = sessionStorage.getItem('userId');
+        debugLog(`Fetching courses for teacher ID: ${userId}`);
+        
+        const response = await axios.get(`${API_URL}/courses/`, {
+          withCredentials: true,
+          params: { teacher_id: userId }
+        });
+        
+        debugLog(`Received ${response.data?.length || 0} courses`);
+        setCourses(response.data || []);
+        
+        if (!courseId && response.data && response.data.length > 0) {
+          debugLog(`Setting default course to: ${response.data[0].id} (${response.data[0].title})`);
+          setFormData(prev => ({
+            ...prev,
+            course: response.data[0].id
+          }));
+        }
+        setCoursesLoading(false);
+      } catch (err) {
+        const errorMsg = err.response?.data?.error || err.message;
+        debugLog(`Error fetching courses: ${errorMsg}`, 'error');
+        setError('Не вдалося завантажити список курсів. Будь ласка, спробуйте пізніше.');
+        setCoursesLoading(false);
+      }
+    };
+    
+    if (!courseId) {
+      fetchCourses();
+    } else {
+      debugLog(`Using provided courseId: ${courseId}`);
+      setFormData(prev => ({
+        ...prev,
+        course: courseId
+      }));
+    }
+  }, [courseId]);
+  
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    console.log(`Field changed: ${name}, value: ${type === 'checkbox' ? checked : value}`);
+    debugLog(`Field changed: ${name}, value: ${type === 'checkbox' ? checked : value}`);
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
   };
   
+  // Form submission with direct API call (without using zoomApi)
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
       setIsSubmitting(true);
       setError(null);
+      setSuccess(false);
       
+      // Input validation
       if (!formData.topic.trim()) {
         throw new Error('Тема зустрічі обов\'язкова');
       }
@@ -115,8 +132,10 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         throw new Error('Тривалість має бути від 15 до 300 хвилин');
       }
       
+      debugLog('Fetching CSRF token...');
       await axios.get(`${API_URL}/get-csrf-token/`, { withCredentials: true });
       
+      // Prepare data for API
       const requestData = {
         course: parseInt(formData.course),
         topic: formData.topic,
@@ -130,30 +149,55 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
         auto_recording: formData.auto_recording
       };
       
-      console.log('Sending data to backend:', requestData);
+      debugLog('Request data prepared:', requestData);
+      debugLog(JSON.stringify(requestData));
       
-      const response = await axios.post(`${API_URL}/zoom/meetings/`, requestData, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
+      // Direct API call with proper headers
+      debugLog('Sending API request to create Zoom meeting...');
+      const response = await axios.post(
+        `${API_URL}/zoom/meetings/`, 
+        requestData, 
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.cookie.split('csrftoken=')[1]?.split(';')[0] || ''
+          }
         }
-      });
+      );
       
-      console.log('Meeting created successfully:', response.data);
+      debugLog('API response received:');
+      debugLog(JSON.stringify(response.data));
+      
+      // Handle success
       setIsSubmitting(false);
+      setSuccess(true);
       
-      if (onCreated) {
-        onCreated(response.data);
-      }
+      // Show success for a moment before closing
+      setTimeout(() => {
+        if (onCreated) {
+          onCreated(response.data);
+        }
+      }, 1500);
       
     } catch (err) {
       setIsSubmitting(false);
-      if (err.response && err.response.data) {
-        console.error('Server error details:', err.response.data);
+      
+      // Detailed error logging
+      debugLog(`Error: ${err.message}`, 'error');
+      
+      if (err.response) {
+        debugLog(`Response status: ${err.response.status}`, 'error');
+        debugLog(`Response data: ${JSON.stringify(err.response.data)}`, 'error');
       }
+      
       setError(err.response?.data?.error || err.message || 'Не вдалося створити Zoom зустріч');
-      console.error('Error creating Zoom meeting:', err);
     }
+  };
+  
+  // Toggle debug console
+  const toggleDebug = () => {
+    setShowDebug(prev => !prev);
   };
 
   return (
@@ -165,16 +209,26 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
       
       {error && (
         <div className="form-error">
-          <Info size={18} />
+          <AlertTriangle size={18} />
           <p>{error}</p>
         </div>
       )}
       
+      {success && (
+        <div className="form-success">
+          <Check size={18} />
+          <p>Zoom зустріч успішно створена!</p>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="zoom-form">
-        {/* Відображаємо вибір курсу, якщо courseId не передано */}
+        {/* Course selection */}
         {!courseId && (
           <div className="form-group">
-            <label htmlFor="course">Виберіть курс*</label>
+            <label htmlFor="course">
+              <Video size={16} />
+              Виберіть курс*
+            </label>
             {coursesLoading ? (
               <div className="course-loading">Завантаження курсів...</div>
             ) : courses.length > 0 ? (
@@ -192,14 +246,19 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
               </select>
             ) : (
               <div className="no-courses-warning">
-                Курси не знайдені. Перш ніж створювати зустріч, створіть хоча б один курс.
+                <AlertTriangle size={16} />
+                <span>Курси не знайдені. Спочатку створіть хоча б один курс.</span>
               </div>
             )}
           </div>
         )}
         
+        {/* Meeting topic */}
         <div className="form-group">
-          <label htmlFor="topic">Тема зустрічі*</label>
+          <label htmlFor="topic">
+            <Info size={16} />
+            Тема зустрічі*
+          </label>
           <input
             type="text"
             id="topic"
@@ -211,6 +270,7 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
           />
         </div>
         
+        {/* Meeting description */}
         <div className="form-group">
           <label htmlFor="description">Опис зустрічі</label>
           <textarea
@@ -223,6 +283,7 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
           ></textarea>
         </div>
         
+        {/* Date and time selection */}
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="start_time">
@@ -257,7 +318,9 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
           </div>
         </div>
         
+        {/* Meeting settings */}
         <div className="form-divider">
+          <Settings size={16} />
           <span>Налаштування зустрічі</span>
         </div>
         
@@ -321,6 +384,7 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
           </select>
         </div>
         
+        {/* Form actions */}
         <div className="form-actions">
           <button 
             type="button" 
@@ -350,6 +414,26 @@ const CreateZoomMeeting = ({ courseId, onCreated, onCancel }) => {
           </button>
         </div>
       </form>
+      
+      {/* Debug information toggle button */}
+      <div className="troubleshooting-section">
+        <button className="troubleshooting-btn" onClick={toggleDebug}>
+          {showDebug ? 'Сховати' : 'Показати'} інформацію для розробників
+        </button>
+        
+        {showDebug && (
+          <div className="form-logs">
+            {debugMessages.map((message, index) => (
+              <div key={index} className={`log-message log-${message.type}`}>
+                [{message.timestamp.slice(11, 19)}] {message.message}
+              </div>
+            ))}
+            {debugMessages.length === 0 && (
+              <div className="log-empty">Немає повідомлень</div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

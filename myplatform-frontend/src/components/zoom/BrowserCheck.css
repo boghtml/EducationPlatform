@@ -1,86 +1,215 @@
-/* src/components/zoom/BrowserCheck.css */
+/* BrowserCheck.css - Enhanced */
 .browser-check {
-  max-width: 600px;
-  margin: 0 auto;
   padding: 30px;
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .browser-check-header {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .warning-icon {
-  color: #ff9800;
+  color: #f59e0b;
   margin-bottom: 15px;
 }
 
 .browser-check-header h2 {
   font-size: 22px;
-  color: #333;
-  margin: 0 0 10px;
+  color: #1f2937;
+  margin: 0 0 12px;
 }
 
 .browser-check-header p {
-  color: #666;
-  margin: 0;
+  font-size: 16px;
+  color: #4b5563;
+  max-width: 700px;
+  margin: 0 auto;
   line-height: 1.5;
 }
 
-.browser-recommendations {
-  background-color: #f9f9f9;
+/* Browser compatibility status */
+.browser-compatibility-status {
+  margin-bottom: 30px;
+  background-color: #f9fafb;
   border-radius: 8px;
   padding: 20px;
 }
 
-.browser-recommendations h3 {
-  margin-top: 0;
+.browser-compatibility-status h3 {
   font-size: 18px;
-  color: #333;
-  margin-bottom: 15px;
+  color: #1f2937;
+  margin: 0 0 15px;
 }
 
-.browser-recommendation-item {
+.compatibility-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.compatibility-check-item {
   display: flex;
   align-items: flex-start;
   gap: 15px;
+  padding: 15px;
+  border-radius: 6px;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.compatibility-check-item.pass {
+  border-left: 4px solid #10b981;
+}
+
+.compatibility-check-item.fail {
+  border-left: 4px solid #ef4444;
+}
+
+.check-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.compatibility-check-item.pass .check-icon {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.compatibility-check-item.fail .check-icon {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.check-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.check-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.check-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.compatibility-check-item.pass .check-value {
+  color: #047857;
+}
+
+.compatibility-check-item.fail .check-value {
+  color: #b91c1c;
+}
+
+.check-note {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+/* Recommendations section */
+.browser-recommendations {
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 20px;
   margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
 }
 
-.browser-recommendation-item:last-child {
-  border-bottom: none;
+.browser-recommendations h3 {
+  font-size: 18px;
+  color: #1f2937;
+  margin: 0 0 20px;
 }
 
-.browser-recommendation-item p {
-  color: #555;
+.dev-recommendation, 
+.user-recommendation {
+  background-color: white;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.dev-recommendation h4,
+.user-recommendation h4,
+.alternative-options h4 {
+  font-size: 16px;
+  color: #1f2937;
+  margin: 0 0 10px;
+}
+
+.dev-recommendation ol,
+.user-recommendation ol,
+.alternative-options ul {
   margin: 0;
-  line-height: 1.5;
-}
-
-.browser-recommendation-item ol, 
-.browser-recommendation-item ul {
-  margin-top: 10px;
-  margin-bottom: 0;
   padding-left: 20px;
 }
 
-.browser-recommendation-item li {
-  margin-bottom: 5px;
+.dev-recommendation li,
+.user-recommendation li,
+.alternative-options li {
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.dev-recommendation pre {
+  background-color: #1f2937;
+  color: #e5e7eb;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.dev-recommendation code {
+  font-family: 'Courier New', monospace;
+  background-color: #f3f4f6;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #1f2937;
+}
+
+.external-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.external-link:hover {
+  text-decoration: underline;
 }
 
 .browser-action-buttons {
   display: flex;
+  justify-content: center;
   gap: 15px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin: 25px 0;
 }
 
-.retry-button, 
+.retry-button,
 .close-button {
   padding: 10px 20px;
   border-radius: 6px;
@@ -88,12 +217,12 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
 }
 
 .retry-button {
   background-color: #2d8cff;
   color: white;
+  border: none;
 }
 
 .retry-button:hover {
@@ -103,7 +232,7 @@
 .close-button {
   background-color: #f3f4f6;
   color: #4b5563;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
 }
 
 .close-button:hover {
@@ -111,15 +240,134 @@
 }
 
 .alternative-options {
-  margin-top: 20px;
+  margin-top: 15px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .browser-check {
+    padding: 20px 15px;
+  }
+  
+  .browser-check-header h2 {
+    font-size: 20px;
+  }
+  
+  .browser-check-header p {
+    font-size: 14px;
+  }
+  
+  .browser-compatibility-status {
+    padding: 15px;
+  }
+  
+  .compatibility-check-item {
+    padding: 12px;
+  }
+  
+  .browser-recommendations {
+    padding: 15px;
+  }
+  
+  .browser-action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .retry-button,
+  .close-button {
+    width: 100%;
+  }
+}
+
+.browser-recommendation-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.browser-recommendation-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.browser-recommendation-item svg {
+  color: #2d8cff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.browser-recommendation-item p {
+  font-size: 15px;
+  color: #4b5563;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.browser-recommendation-item ol,
+.browser-recommendation-item ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.browser-recommendation-item li {
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.browser-action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.retry-button,
+.close-button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button {
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+}
+
+.retry-button:hover {
+  background-color: #1a73e8;
+}
+
+.close-button {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.close-button:hover {
+  background-color: #e5e7eb;
+}
+
+.alternative-options {
+  margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e5e7eb;
 }
 
 .alternative-options h4 {
   font-size: 16px;
-  color: #333;
-  margin: 0 0 10px;
+  color: #1f2937;
+  margin: 0 0 12px;
 }
 
 .alternative-options ul {
@@ -128,6 +376,41 @@
 }
 
 .alternative-options li {
+  font-size: 14px;
+  color: #4b5563;
   margin-bottom: 8px;
-  color: #555;
+  line-height: 1.4;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .browser-check {
+    padding: 20px 15px;
+  }
+  
+  .browser-check-header h2 {
+    font-size: 20px;
+  }
+  
+  .browser-check-header p {
+    font-size: 14px;
+  }
+  
+  .browser-recommendations {
+    padding: 15px;
+  }
+  
+  .browser-recommendations h3 {
+    font-size: 16px;
+  }
+  
+  .browser-action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .retry-button,
+  .close-button {
+    width: 100%;
+  }
 }

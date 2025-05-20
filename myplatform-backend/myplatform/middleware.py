@@ -1,4 +1,4 @@
-# middleware.py (додайте цей файл до myplatform-backend)
+# myplatform-backend/myplatform/middleware.py - Оновлений
 class ZoomSecurityMiddleware:
     """Middleware для додавання необхідних HTTP заголовків для Zoom SDK."""
     
@@ -8,10 +8,20 @@ class ZoomSecurityMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
         
-        # Додаємо необхідні заголовки для роботи SharedArrayBuffer
+        # Додаємо заголовки, необхідні для SharedArrayBuffer
         response["Cross-Origin-Opener-Policy"] = "same-origin"
         response["Cross-Origin-Embedder-Policy"] = "require-corp"
         response["Cross-Origin-Resource-Policy"] = "cross-origin"
+        
+        # Додаткові заголовки для CORS
+        response["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response["Access-Control-Allow-Credentials"] = "true"
+        response["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
+        response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        
+        # Додаємо заголовки для ZOOM SDK
+        if '/zoom/' in request.path:
+            response["Content-Security-Policy"] = "upgrade-insecure-requests"
         
         return response
 
@@ -28,11 +38,11 @@ class RequestLogMiddleware(MiddlewareMixin):
         if 'zoom' in request.path:
             logger.info(f"Request: {request.method} {request.path}")
             
-            # Логування заголовків
+            # Log headers
             headers = {k: v for k, v in request.META.items() if k.startswith('HTTP_')}
             logger.debug(f"Headers: {headers}")
             
-            # Логування тіла запиту для POST/PUT/PATCH
+            # Log request body for POST/PUT/PATCH
             if request.method in ['POST', 'PUT', 'PATCH']:
                 try:
                     if request.content_type and 'application/json' in request.content_type:
@@ -47,7 +57,7 @@ class RequestLogMiddleware(MiddlewareMixin):
         if 'zoom' in request.path:
             logger.info(f"Response: {request.method} {request.path} - {response.status_code}")
             
-            # Логування тіла відповіді
+            # Log response data
             if hasattr(response, 'data'):
                 logger.debug(f"Response data: {response.data}")
             

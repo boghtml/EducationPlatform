@@ -1,8 +1,8 @@
-// src/components/zoom/ZoomModal.jsx - Оптимізований для роботи з реальними зустрічами
+// src/components/zoom/ZoomModal.jsx - Оновлений
 import React, { useState, useEffect } from 'react';
 import './ZoomModal.css';
 import { X, AlertTriangle, VideoIcon } from 'lucide-react';
-import ZoomMeeting from './ZoomMeeting';
+import ImprovedZoomMeeting from './ImprovedZoomMeeting';
 import ZoomTroubleshooting from './ZoomTroubleshooting';
 import BrowserCheck from './BrowserCheck';
 
@@ -12,20 +12,13 @@ const ZoomModal = ({ meetingId, onClose }) => {
   const [errorType, setErrorType] = useState(null);
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
   const [showBrowserCheck, setShowBrowserCheck] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Перевірка важливих вимог для Zoom SDK
+    // Check for SharedArrayBuffer support
     const hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
     const hasSecureContext = window.isSecureContext;
     
-    console.log('Browser compatibility check:', {
-      hasSharedArrayBuffer,
-      hasSecureContext,
-      isHttps: window.location.protocol === 'https:',
-      crossOriginIsolated: window.crossOriginIsolated
-    });
-    
-    // Потрібен SharedArrayBuffer для Zoom SDK
     if (!hasSharedArrayBuffer || !hasSecureContext) {
       console.log('Browser environment check failed:',
         { hasSharedArrayBuffer, hasSecureContext });
@@ -34,32 +27,29 @@ const ZoomModal = ({ meetingId, onClose }) => {
       return;
     }
 
-    // Короткa затримка для відображення завантаження
+    // Short delay to show loading state
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 300);
+    }, 500);
     
     return () => clearTimeout(timer);
   }, []);
   
   const handleClose = () => {
-    // Додаємо анімацію закриття
-    const container = document.querySelector('.zoom-modal-container');
-    if (container) {
-      container.classList.add('closing');
-    }
+    // Add closing animation
+    setIsClosing(true);
     
-    // Затримка для анімації
+    // Delay actual closing to allow animation to complete
     setTimeout(() => {
       if (onClose) onClose();
     }, 300);
   };
 
   const handleError = (errorMessage) => {
-    console.error('Zoom meeting error:', errorMessage);
+    console.log('Zoom meeting error:', errorMessage);
     setError(errorMessage);
     
-    // Визначаємо тип помилки для кращого відображення
+    // Determine error type for better handling
     if (errorMessage.includes('password') || errorMessage.includes('Incorrect')) {
       setErrorType('password');
     } else if (errorMessage.includes('SharedArrayBuffer') || errorMessage.includes('WebAssembly')) {
@@ -73,7 +63,7 @@ const ZoomModal = ({ meetingId, onClose }) => {
   };
 
   const handleRetry = () => {
-    // Скидаємо всі стани і пробуємо знову
+    // Reset all states
     setError(null);
     setErrorType(null);
     setShowTroubleshooting(false);
@@ -87,11 +77,11 @@ const ZoomModal = ({ meetingId, onClose }) => {
 
   return (
     <div className="zoom-modal-overlay">
-      <div className="zoom-modal-container">
+      <div className={`zoom-modal-container ${isClosing ? 'closing' : ''}`}>
         {isLoading ? (
           <div className="zoom-modal-loading">
             <div className="loading-spinner"></div>
-            <p>Preparing meeting...</p>
+            <p>Підготовка зустрічі...</p>
           </div>
         ) : showBrowserCheck ? (
           <BrowserCheck 
@@ -106,7 +96,7 @@ const ZoomModal = ({ meetingId, onClose }) => {
               <X size={20} />
             </div>
             <div className="zoom-modal-content">
-              <ZoomMeeting 
+              <ImprovedZoomMeeting 
                 meetingId={meetingId} 
                 onClose={handleClose} 
                 onError={handleError}
@@ -119,24 +109,24 @@ const ZoomModal = ({ meetingId, onClose }) => {
                   
                   {errorType === 'password' && (
                     <div className="error-help password-error">
-                      <h4>Meeting Password Issue</h4>
-                      <p>Try the following to resolve password issues:</p>
+                      <h4>Проблема з паролем зустрічі</h4>
+                      <p>Спробуйте наступне для вирішення проблеми:</p>
                       <ul>
-                        <li>Contact the meeting host for the correct password</li>
-                        <li>Make sure the password doesn't contain special characters</li>
-                        <li>Try joining the meeting via the Zoom client</li>
+                        <li>Зв'яжіться з організатором для отримання правильного пароля</li>
+                        <li>Переконайтеся, що пароль не містить спеціальних символів</li>
+                        <li>Спробуйте приєднатися через настільний клієнт Zoom</li>
                       </ul>
                     </div>
                   )}
                   
                   {errorType === 'meeting_status' && (
                     <div className="error-help meeting-status-error">
-                      <h4>Meeting Status Issue</h4>
-                      <p>The meeting may not have started yet or has already ended. Try:</p>
+                      <h4>Проблема зі статусом зустрічі</h4>
+                      <p>Зустріч може ще не розпочатися або вже завершитися. Спробуйте:</p>
                       <ul>
-                        <li>Checking the meeting schedule</li>
-                        <li>Contacting the host to start the meeting</li>
-                        <li>Verifying the meeting ID is correct</li>
+                        <li>Перевірити розклад зустрічі</li>
+                        <li>Зв'язатися з організатором для початку зустрічі</li>
+                        <li>Перевірити, чи ID зустрічі правильний</li>
                       </ul>
                     </div>
                   )}
@@ -146,14 +136,14 @@ const ZoomModal = ({ meetingId, onClose }) => {
                       className="retry-button"
                       onClick={handleRetry}
                     >
-                      Try Again
+                      Спробувати знову
                     </button>
                     
                     <button 
                       className="troubleshooting-button"
                       onClick={() => setShowTroubleshooting(true)}
                     >
-                      Troubleshooting Guide
+                      Вирішення проблем
                     </button>
                   </div>
                 </div>

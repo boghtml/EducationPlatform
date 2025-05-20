@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../css/ZoomMeetingPage.css';
 import zoomApi from './api/zoomApi';
-import ZoomMeeting from './zoom/ZoomMeeting';
+import ImprovedZoomMeeting from './zoom/ImprovedZoomMeeting';
+import MeetingDetailView from './zoom/MeetingDetailView';
+
 import { 
   ArrowLeft, 
   Calendar, 
@@ -126,7 +128,7 @@ function ZoomMeetingPage() {
     <div className="zoom-meeting-page">
       {/* Вбудована Zoom зустріч, якщо зустріч активна та можна приєднатися */}
       {meeting.can_join ? (
-        <ZoomMeeting meetingId={meetingId} onClose={handleBack} />
+        <ImprovedZoomMeeting meetingId={meetingId} onClose={handleBack} />
       ) : (
         <div className="meeting-details-container">
           <button className="back-btn" onClick={handleBack}>

@@ -10,10 +10,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.4/nouislider.min.css">
   
     
-    <!-- Zoom Meeting SDK Styles -->
-    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/2.11.0/css/bootstrap.css" />
-    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/2.11.0/css/react-select.css" />
+    <!-- Zoom SDK scripts -->
+    <script src="https://source.zoom.us/3.13.5/lib/av/1102_video_simd_wasm.js" crossorigin="anonymous"></script>
+    <script src="https://source.zoom.us/3.13.5/lib/zoom-meeting-3.13.5.min.js" crossorigin="anonymous"></script>
 
+    <script>
+      ZoomMtg.setZoomJSLib('https://source.zoom.us/3.13.5/lib', '/av');
+      ZoomMtg.preLoadWasm();
+      ZoomMtg.prepareJssdk();
+    </script>
+    
     <!-- Important meta tags for SharedArrayBuffer support -->
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
     <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
