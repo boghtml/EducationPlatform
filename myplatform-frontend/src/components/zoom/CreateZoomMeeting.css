@@ -1,0 +1,362 @@
+/* src/components/zoom/CreateZoomMeeting.css */
+.create-zoom-meeting {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.form-title {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-icon {
+  color: #2d8cff;
+  margin-right: 10px;
+}
+
+.form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 15px;
+  background-color: #fee2e2;
+  border-radius: 6px;
+  color: #b91c1c;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.form-error p {
+  margin: 0;
+}
+
+.zoom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #2d8cff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.2);
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 10px 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-divider::before,
+.form-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.form-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.form-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-checkbox-item label {
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-cancel,
+.btn-create {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cancel {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.btn-create {
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+}
+
+.btn-cancel:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-create:hover {
+  background-color: #1a73e8;
+}
+
+.btn-cancel:disabled,
+.btn-create:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .create-zoom-meeting {
+    padding: 20px 15px;
+  }
+  
+  .form-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-checkboxes {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+  
+  .btn-cancel,
+  .btn-create {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Додаткові стилі для CreateZoomMeeting.css */
+.course-loading {
+  padding: 10px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  color: #4b5563;
+  text-align: center;
+  font-style: italic;
+}
+
+.no-courses-warning {
+  padding: 12px 15px;
+  background-color: #fff8e6;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  color: #856404;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Покращення доступності форми */
+select:required:invalid {
+  color: #6b7280;
+}
+
+option {
+  color: #1f2937;
+}
+
+option:first-child {
+  color: #6b7280;
+}
+
+/* Стилі для відображення помилок в консолі в UI */
+.debug-console {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: monospace;
+  padding: 10px;
+  font-size: 12px;
+  z-index: 9999;
+  border-top: 2px solid #ff6600;
+}
+
+.debug-console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.debug-console-title {
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.debug-console-toggle {
+  cursor: pointer;
+  padding: 2px 5px;
+  background-color: #ff6600;
+  border-radius: 3px;
+  color: #000;
+}
+
+.debug-console-message {
+  margin: 3px 0;
+  word-break: break-word;
+}
+
+.debug-console-message:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.debug-console-message.error {
+  color: #ff6666;
+}
+
+.debug-console-message.warning {
+  color: #ffcc00;
+}
+
+.debug-console-message.info {
+  color: #66ccff;
+}
+
+/* Покращення чекбоксів */
+.form-checkbox-item input[type="checkbox"] {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  position: relative;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-checkbox-item input[type="checkbox"]:checked {
+  border-color: #2d8cff;
+  background-color: #2d8cff;
+}
+
+.form-checkbox-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.form-checkbox-item input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.2);
+}
+
+.form-checkbox-item label {
+  user-select: none;
+}

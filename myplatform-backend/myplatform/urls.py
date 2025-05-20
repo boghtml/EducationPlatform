@@ -85,8 +85,9 @@ urlpatterns = [
 
     path('api/analytics/', include('apps.analytics.urls')),
     path('api/events/', include('apps.events.urls')),
-    
+
     path('api/chats/', include('apps.chats.urls')),
+    path('api/zoom/', include('apps.zoom.urls')),
     # Документація
     path('swagger.json', get_schema_json, name='schema-json'),
     path('swagger.yaml', get_schema_yaml, name='schema-yaml'),

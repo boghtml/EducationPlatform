@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'apps.events',
     'apps.categories',
     'apps.chats', 
-    
+    'apps.zoom',
+
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -76,6 +77,8 @@ MIDDLEWARE = [
 
     #'django.middleware.csrf.CsrfViewMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Додайте цей рядок
+    'myplatform.middleware.ZoomSecurityMiddleware',
+    'myplatform.middleware.RequestLogMiddleware',
 ]
 
 
@@ -226,3 +229,9 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
 }
+
+ACCOUNT_ID = config('ACCOUNT_ID', default='Ez184rvjSzOPHj0I0d9rrw')
+CLIENT_ID = config('CLIENT_ID', default='Hmq1QRw7SvKaU2xq_HcKrg')
+CLIENT_SECRET = config('CLIENT_SECRET', default='EJGHO2lMwigo435nSDE7jPphw0JX2vct')
+SDK_KEY = config('SDK_KEY', default=CLIENT_ID)
+SDK_SECRET = config('SDK_SECRET', default=CLIENT_SECRET)

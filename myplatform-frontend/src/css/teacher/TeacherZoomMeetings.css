@@ -1,0 +1,569 @@
+/* src/css/teacher/TeacherZoomMeetings.css - Покращена версія */
+.teacher-zoom-page {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.teacher-zoom-container {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.teacher-zoom-content {
+  flex: 1;
+  padding: 30px;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+.teacher-sidebar.collapsed + .teacher-zoom-content {
+  margin-left: 70px;
+}
+
+/* Заголовок та кнопка створення */
+.teacher-zoom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.teacher-zoom-title {
+  max-width: 75%;
+}
+
+.teacher-zoom-title h1 {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.title-icon {
+  color: #2d8cff;
+  margin-right: 12px;
+}
+
+.teacher-zoom-title p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.create-meeting-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(45, 140, 255, 0.2);
+}
+
+.create-meeting-button:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(45, 140, 255, 0.3);
+}
+
+/* Фільтри та пошук */
+.teacher-zoom-filters {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.course-filter,
+.status-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-filter label,
+.status-filter label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.course-filter select,
+.status-filter select {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: white;
+  min-width: 200px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.search-filter {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-filter svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-filter input {
+  width: 100%;
+  padding: 10px 14px 10px 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.search-filter input:focus,
+.course-filter select:focus,
+.status-filter select:focus {
+  outline: none;
+  border-color: #2d8cff;
+  box-shadow: 0 0 0 3px rgba(45, 140, 255, 0.2);
+}
+
+/* Картки зустрічей */
+.meetings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.meeting-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.meeting-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Красива індикація статусу зустрічі */
+.meeting-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e5e7eb;
+}
+
+.meeting-card.scheduled::before {
+  background-color: #10b981;
+}
+
+.meeting-card.live::before {
+  background-color: #2d8cff;
+}
+
+.meeting-card.ended::before {
+  background-color: #6b7280;
+}
+
+.meeting-card.canceled::before {
+  background-color: #ef4444;
+}
+
+.meeting-status {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.meeting-status.scheduled {
+  background-color: #10b981;
+}
+
+.meeting-status.live {
+  background-color: #2d8cff;
+}
+
+.meeting-status.ended {
+  background-color: #6b7280;
+}
+
+.meeting-status.canceled {
+  background-color: #ef4444;
+}
+
+.meeting-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+}
+
+.meeting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.info-item svg {
+  color: #6b7280;
+}
+
+.meeting-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 20px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+}
+
+.meeting-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.meeting-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-view {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.btn-edit {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+}
+
+.btn-delete {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+  grid-column: span 2;
+}
+
+.btn-join {
+  background-color: #ecfdf5;
+  color: #16a34a;
+  border: 1px solid #d1fae5;
+  grid-column: span 2;
+}
+
+.btn-view:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-edit:hover {
+  background-color: #dbeafe;
+}
+
+.btn-delete:hover {
+  background-color: #fee2e2;
+}
+
+.btn-join:hover {
+  background-color: #d1fae5;
+}
+
+/* Порожні стани та повідомлення */
+.no-meetings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.no-meetings svg {
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+.no-meetings h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.no-meetings p {
+  color: #6b7280;
+  margin: 0 0 25px 0;
+  max-width: 450px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.create-first-meeting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #2d8cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(45, 140, 255, 0.2);
+}
+
+.create-first-meeting:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(45, 140, 255, 0.3);
+}
+
+.teacher-zoom-create-form {
+  margin-top: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Стани завантаження та помилок */
+.zoom-loading,
+.zoom-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.zoom-loading p {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.zoom-error svg {
+  color: #ef4444;
+  margin-bottom: 20px;
+}
+
+.zoom-error h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.zoom-error p {
+  color: #6b7280;
+  margin: 0 0 25px 0;
+  max-width: 450px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.retry-button {
+  padding: 10px 20px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+/* Анімації для покращення UX */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(45, 140, 255, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(45, 140, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(45, 140, 255, 0); }
+}
+
+.btn-join {
+  animation: pulse 2s infinite;
+}
+
+.btn-join:hover {
+  animation: none;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 992px) {
+  .teacher-zoom-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+  
+  .teacher-sidebar.collapsed + .teacher-zoom-content {
+    margin-left: 70px;
+  }
+  
+  .teacher-zoom-header {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .teacher-zoom-title {
+    max-width: 100%;
+  }
+  
+  .teacher-zoom-title h1 {
+    font-size: 24px;
+  }
+  
+  .create-meeting-button {
+    width: 100%;
+  }
+  
+  .filters-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .course-filter,
+  .status-filter,
+  .search-filter {
+    width: 100%;
+  }
+  
+  .course-filter select,
+  .status-filter select {
+    width: 100%;
+  }
+  
+  .meetings-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .meeting-card {
+    padding: 20px;
+  }
+  
+  .meeting-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn-join, .btn-delete {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .teacher-zoom-content {
+    padding: 15px;
+  }
+  
+  .teacher-zoom-filters {
+    padding: 15px;
+  }
+  
+  .meeting-title {
+    font-size: 16px;
+  }
+  
+  .info-item {
+    font-size: 13px;
+  }
+  
+  .meeting-description {
+    font-size: 13px;
+    -webkit-line-clamp: 3;
+  }
+}

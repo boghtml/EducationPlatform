@@ -33,7 +33,7 @@ import Subscription from './components/Subscription';
 import Settings from './components/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import EventDetail from './components/EventDetail';
-
+import ZoomMeetingPage from './components/ZoomMeetingPage';
 // Teacher components import
 import TeacherDashboard from './components/teacher/TeacherDashboard';
 import TeacherCourses from './components/teacher/TeacherCourses';
@@ -66,7 +66,8 @@ import TeacherLessonLinks from './components/teacher/TeacherLessonLinks';
 import StudentAssignmentDetail from './components/teacher/StudentAssignmentDetail';
 import TeacherHelp from './components/teacher/TeacherHelp';
 import TeacherAnalytics from './components/teacher/TeacherAnalytics';
-
+import TeacherDiscussionsTab from './components/teacher/TeacherDiscussionsTab';
+import TeacherZoomMeetings from './components/teacher/TeacherZoomMeetings';
 /*
 import TeacherQA from './components/teacher/TeacherQA';
 import TeacherLessons from './components/teacher/TeacherLessons';
@@ -156,6 +157,14 @@ function App() {
           <Route path="participants" element={<ParticipantsTab />} />
           <Route path="grades" element={<GradesTab />} />
         </Route>
+        
+        <Route path="/zoom/meetings/:meetingId" element={
+          <ProtectedRoute 
+            element={<ZoomMeetingPage />}
+            allowedRoles={['student', 'teacher', 'admin']} 
+          />
+        } />
+
         <Route path="/courses/:courseId/modules/:moduleId/lessons/:lessonId" element={
           <ProtectedRoute 
             element={<LessonDetail />}
@@ -364,6 +373,28 @@ function App() {
             allowedRoles={['teacher']} 
           />
         } />
+
+        <Route path="/teacher/zoom-meetings" element={
+          <ProtectedRoute 
+            element={<TeacherZoomMeetings />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+        
+        <Route path="/teacher/zoom/edit/:meetingId" element={
+          <ProtectedRoute 
+            element={<TeacherZoomMeetings />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+
+         <Route path="/teacher/discussions" element={
+          <ProtectedRoute 
+            element={<TeacherDiscussionsTab />}
+            allowedRoles={['teacher']} 
+          />
+        } />
+
         {
           /*
                 

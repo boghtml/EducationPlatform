@@ -15,7 +15,8 @@ import {
   FaQuestion,
   FaBullhorn,
   FaBell,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaVideo
 } from 'react-icons/fa';
 
 function TeacherSidebar() {
@@ -95,6 +96,15 @@ function TeacherSidebar() {
           >
             <FaUsers className="sidebar-icon" />
             {!isCollapsed && <span className="sidebar-label">Студенти</span>}
+          </Link>
+          
+          {/* Додаємо новий пункт меню для Zoom зустрічей */}
+          <Link 
+            to="/teacher/zoom-meetings" 
+            className={`sidebar-item ${isActive('/teacher/zoom-meetings') ? 'active' : ''}`}
+          >
+            <FaVideo className="sidebar-icon" />
+            {!isCollapsed && <span className="sidebar-label">Zoom зустрічі</span>}
           </Link>
 
           <Link 

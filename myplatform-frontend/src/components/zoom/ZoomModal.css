@@ -1,0 +1,884 @@
+/* src/components/zoom/ZoomModal.css - Покращена версія */
+.zoom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.zoom-modal-container {
+  width: 90%;
+  height: 90%;
+  max-width: 1200px;
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.zoom-modal-container.closing {
+  animation: scaleOut 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+}
+
+.zoom-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1100;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.zoom-modal-close:hover {
+  background-color: #f3f4f6;
+  transform: scale(1.1) rotate(90deg);
+}
+
+.zoom-modal-close:active {
+  transform: scale(0.95);
+}
+
+.zoom-modal-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.zoom-modal-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background-color: #f9fafb;
+}
+
+.zoom-modal-loading p {
+  font-size: 16px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Анімації */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes scaleOut {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.9); opacity: 0; }
+}
+
+/* Деталі зустрічі */
+.zoom-modal-meeting-details {
+  height: 100%;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.modal-meeting-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 25px 0;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  line-height: 1.3;
+}
+
+.modal-meeting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+  background-color: #f9fafb;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.modal-info-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-info-label {
+  font-weight: 600;
+  color: #4b5563;
+  min-width: 140px;
+  font-size: 15px;
+}
+
+.modal-info-value {
+  color: #1f2937;
+  font-size: 15px;
+}
+
+.modal-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.modal-status-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.modal-status-badge.scheduled {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.modal-status-badge.live {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.modal-status-badge.ended {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.modal-status-badge.canceled {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.modal-meeting-description {
+  background-color: #f9fafb;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border-left: 4px solid #2d8cff;
+}
+
+.modal-meeting-description h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 15px 0;
+}
+
+.modal-meeting-description p {
+  font-size: 15px;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.modal-join-options {
+  margin-bottom: 30px;
+  background-color: #eff6ff;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #dbeafe;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(45, 140, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(45, 140, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 140, 255, 0);
+  }
+}
+
+.join-text {
+  font-size: 16px;
+  color: #1f2937;
+  margin: 0 0 20px 0;
+  font-weight: 500;
+}
+
+.modal-join-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.modal-join-browser-btn,
+.modal-join-app-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.modal-join-browser-btn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.modal-join-browser-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25);
+}
+
+.modal-join-browser-btn:active {
+  transform: translateY(-1px);
+}
+
+.modal-join-app-btn {
+  background-color: white;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.modal-join-app-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-join-app-btn:active {
+  transform: translateY(-1px);
+}
+
+.modal-join-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: #fffbeb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border: 1px solid #fef3c7;
+}
+
+.modal-join-info svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.modal-join-info p {
+  font-size: 15px;
+  color: #92400e;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.modal-join-info.ended-info {
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.modal-join-info.ended-info svg {
+  color: #6b7280;
+}
+
+.modal-join-info.ended-info p {
+  color: #4b5563;
+}
+
+.modal-join-info.canceled-info {
+  background-color: #fee2e2;
+  border-color: #fecaca;
+}
+
+.modal-join-info.canceled-info svg {
+  color: #ef4444;
+}
+
+.modal-join-info.canceled-info p {
+  color: #b91c1c;
+}
+
+.modal-meeting-credentials {
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 25px;
+  background-color: #f9fafb;
+  margin-bottom: 30px;
+}
+
+.modal-credentials-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 20px 0;
+}
+
+.modal-credentials-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: white;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.modal-credentials-item:last-child {
+  margin-bottom: 15px;
+}
+
+.modal-credentials-label {
+  font-weight: 600;
+  color: #4b5563;
+  min-width: 110px;
+}
+
+.modal-credentials-value {
+  color: #1f2937;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  flex: 1;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.modal-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: white;
+  color: #4b5563;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.modal-copy-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  transform: translateY(-1px);
+}
+
+.modal-copy-btn:active {
+  transform: translateY(0);
+}
+
+.credentials-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #6b7280;
+  font-style: italic;
+  background-color: rgba(253, 230, 138, 0.2);
+  padding: 10px 15px;
+  border-radius: 6px;
+}
+
+.credentials-tip svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.meeting-join-external {
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+  margin-bottom: 30px;
+  background-color: #f9fafb;
+  border-radius: 12px;
+}
+
+.meeting-join-external p {
+  font-size: 15px;
+  color: #4b5563;
+  margin-bottom: 15px;
+}
+
+.external-join-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #2d8cff;
+  color: white;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(45, 140, 255, 0.2);
+}
+
+.external-join-btn:hover {
+  background-color: #1a73e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(45, 140, 255, 0.3);
+}
+
+.meeting-course-info {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  border-radius: 12px;
+}
+
+.course-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px 0;
+}
+
+.course-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.course-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.course-link:active {
+  color: #1e40af;
+}
+
+/* Повідомлення про успішне приєднання */
+.join-success-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #dcfce7;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideDown 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1500;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Стилі для помилок */
+.zoom-modal-error-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  background-color: #f9fafb;
+}
+
+.error-icon {
+  color: #ef4444;
+  margin-bottom: 20px;
+}
+
+.zoom-modal-error-content h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 15px 0;
+}
+
+.zoom-modal-error-content p {
+  font-size: 16px;
+  color: #4b5563;
+  margin: 0 0 25px 0;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.modal-back-btn {
+  padding: 12px 24px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.modal-back-btn:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-back-btn:active {
+  transform: translateY(-1px);
+}
+
+.zoom-modal-error {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 1500;
+  animation: slideUp 0.3s ease;
+  border: 1px solid #fee2e2;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 30px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.zoom-modal-error svg {
+  color: #ef4444;
+  margin-bottom: 10px;
+}
+
+.zoom-modal-error p {
+  margin: 0 0 15px;
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.error-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.retry-button,
+.troubleshooting-button {
+  padding: 10px 16px;
+  border-radius: a6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.retry-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+}
+
+.retry-button:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.troubleshooting-button {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.troubleshooting-button:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.error-help {
+  width: 100%;
+  text-align: left;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  border: 1px solid #f3f4f6;
+}
+
+.password-error h4,
+.meeting-status-error h4 {
+  margin: 0 0 10px;
+  color: #ef4444;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.password-error p,
+.meeting-status-error p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.password-error ul,
+.meeting-status-error ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.password-error li,
+.meeting-status-error li {
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .zoom-modal-container {
+    width: 95%;
+    height: 95%;
+  }
+  
+  .zoom-modal-meeting-details {
+    padding: 20px 15px;
+  }
+  
+  .modal-meeting-title {
+    font-size: 22px;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-meeting-info,
+  .modal-meeting-description,
+  .modal-join-options,
+  .modal-join-info,
+  .modal-meeting-credentials {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-info-label {
+    min-width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .modal-join-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .modal-join-browser-btn,
+  .modal-join-app-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+  
+  .modal-credentials-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+  
+  .modal-credentials-value {
+    width: 100%;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  
+  .modal-copy-btn {
+    align-self: flex-end;
+    margin-top: 5px;
+  }
+  
+  .zoom-modal-error {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .retry-button,
+  .troubleshooting-button {
+    width: 100%;
+  }
+}
+
+/* Доступність */
+.zoom-modal-close:focus,
+.modal-join-browser-btn:focus,
+.modal-join-app-btn:focus,
+.modal-copy-btn:focus,
+.external-join-btn:focus,
+.retry-button:focus,
+.troubleshooting-button:focus,
+.modal-back-btn:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Підтримка темної теми */
+@media (prefers-color-scheme: dark) {
+  .zoom-modal-overlay {
+    background-color: rgba(0, 0, 0, 0.85);
+  }
+  
+  .zoom-modal-container {
+    background-color: #1f2937;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  }
+  
+  .zoom-modal-close {
+    background-color: rgba(31, 41, 55, 0.95);
+    color: #e5e7eb;
+  }
+  
+  .zoom-modal-close:hover {
+    background-color: #374151;
+  }
+  
+  .zoom-modal-meeting-details {
+    background-color: #1f2937;
+  }
+  
+  .modal-meeting-title {
+    color: #f3f4f6;
+    border-bottom-color: #374151;
+  }
+  
+  .modal-meeting-info {
+    background-color: #111827;
+  }
+  
+  .modal-info-label {
+    color: #9ca3af;
+  }
+  
+  .modal-info-value {
+    color: #e5e7eb;
+  }
+  
+  .modal-meeting-description {
+    background-color: #111827;
+    border-left-color: #2d8cff;
+  }
+  
+  .modal-meeting-description h3 {
+    color: #f3f4f6;
+  }
+  
+  .modal-meeting-description p {
+    color: #d1d5db;
+  }
+  
+  .modal-credentials-item {
+    background-color: #111827;
+    border-color: #374151;
+  }
+  
+  .modal-credentials-value {
+    color: #e5e7eb;
+  }
+  
+  .modal-copy-btn {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+  
+  .modal-copy-btn:hover {
+    background-color: #4b5563;
+    color: #e5e7eb;
+  }
+}

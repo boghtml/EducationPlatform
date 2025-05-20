@@ -1,0 +1,133 @@
+/* src/components/zoom/BrowserCheck.css */
+.browser-check {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.browser-check-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.warning-icon {
+  color: #ff9800;
+  margin-bottom: 15px;
+}
+
+.browser-check-header h2 {
+  font-size: 22px;
+  color: #333;
+  margin: 0 0 10px;
+}
+
+.browser-check-header p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.browser-recommendations {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.browser-recommendations h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.browser-recommendation-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.browser-recommendation-item:last-child {
+  border-bottom: none;
+}
+
+.browser-recommendation-item p {
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.browser-recommendation-item ol, 
+.browser-recommendation-item ul {
+  margin-top: 10px;
+  margin-bottom: 0;
+  padding-left: 20px;
+}
+
+.browser-recommendation-item li {
+  margin-bottom: 5px;
+}
+
+.browser-action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.retry-button, 
+.close-button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.retry-button {
+  background-color: #2d8cff;
+  color: white;
+}
+
+.retry-button:hover {
+  background-color: #1a73e8;
+}
+
+.close-button {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.close-button:hover {
+  background-color: #e5e7eb;
+}
+
+.alternative-options {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.alternative-options h4 {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 10px;
+}
+
+.alternative-options ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.alternative-options li {
+  margin-bottom: 8px;
+  color: #555;
+}
